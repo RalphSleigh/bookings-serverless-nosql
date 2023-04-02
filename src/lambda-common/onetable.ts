@@ -31,7 +31,7 @@ export type UserType = Entity<typeof schema.models.User>
 
 export const table = new Table({
     client: client,
-    name: 'MyTable',
+    name: 'Bookings',
     schema: schema,
 })
 
