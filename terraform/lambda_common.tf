@@ -36,6 +36,25 @@ data "aws_iam_policy_document" "lambda_exec_role_policy" {
      ]
      resources = ["arn:aws:lambda:eu-west-2:${data.aws_caller_identity.current.account_id}:*:*"]
   }
+
+  statement {
+    actions = [
+      "dynamodb:DeleteItem",
+      "dynamodb:DescribeTable",
+      "dynamodb:GetItem",
+      "dynamodb:GetRecords",
+      "dynamodb:ListTables",
+      "dynamodb:PutItem",
+      "dynamodb:Query",
+      "dynamodb:Scan",
+      "dynamodb:UpdateItem",
+      "dynamodb:UpdateTable",
+    ]
+
+    resources = [aws_dynamodb_table.bookings_table.arn]
+
+    effect = "Allow"
+  }
 }
 
 resource "aws_iam_policy" "lambda_execution_policy" {
