@@ -17,18 +17,21 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
     try {
 
         let User = table.getModel('User')
-
+        /*
         let account = await User.create({
             userName: 'Ralph',               //  OK
             password: bcrypt.hashSync('Hello', bcrypt.genSaltSync()),
             email: 'ralph.sleigh@woodcraft.org.uk',
         })
+        */
 
+        const account = await User.get({userName: "Ralph"})
+        
         response = {
             statusCode: 200,
             body: JSON.stringify(account)
         };
-        
+
     } catch (err: unknown) {
         console.log(err);
         response = {
