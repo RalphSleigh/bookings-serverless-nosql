@@ -8,12 +8,12 @@ const schema = {
     format: 'onetable:1.1.0',
     version: '0.0.1',
     indexes: {
-        primary: {hash: 'PK', sort: 'SK'}
+        primary: {hash: 'pk', sort: 'sk'}
     },
     models: {
         User: {
-            PK: {type: String, value: 'user:${remoteId}'},
-            SK: {type: String, value: 'user:${source}'},
+            pk: {type: String, value: 'user:${userName}'},
+            sk: {type: String, value: 'user'},
             remoteId: {type: String},
             userName: {type: String, required: true},
             password: {type: String},

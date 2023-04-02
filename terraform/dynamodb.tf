@@ -3,16 +3,16 @@ resource "aws_dynamodb_table" "basic-dynamodb-table" {
   billing_mode   = "PROVISIONED"
   read_capacity  = 20
   write_capacity = 20
-  hash_key       = "PK"
-  range_key      = "SK"
+  hash_key       = "pk"
+  range_key      = "sk"
 
   attribute {
-    name = "PK"
+    name = "pk"
     type = "S"
   }
 
   attribute {
-    name = "SK"
+    name = "sk"
     type = "S"
   }
 }
