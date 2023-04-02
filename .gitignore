@@ -1,0 +1,63 @@
+# Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# Crash log files
+crash.log
+
+# Ignore any .tfvars files that are generated automatically for each Terraform run. Most
+# .tfvars files are managed as part of configuration and so should be included in
+# version control.
+#
+# example.tfvars
+
+# Ignore override files as they are usually used to override resources locally and so
+# are not checked in
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Include override files you do wish to add to version control using negated pattern
+#
+# !example_override.tf
+
+# Include tfplan files to ignore the plan output of command: terraform plan -out=tfplan
+# example: *tfplan*
+
+dist-local/
+dist-lambda/
+node_modules
+terraform/files
+config.js
+
+/node_modules
+database.sqlite
+database.sqlite-journal
+bookings.sqlite
+config.ts
+server/googlejwt.json
+npm-debug.log
+.eslintrc.json
+sqlite3.exe
+npm-debug*
+sessions.db
+sessions
+public/bundle.app.js
+public/bundle.app.js.map
+public/bundle.vendor.js
+public/bundle.vendor.js.map
+public/bundle.app.js.LICENSE.txt
+public/bundle.vendor.js.LICENSE.txt
+public/*.gif
+.idea*
+meta.json
+
+public/bundle.app.js
+public/bundle.app.js.map
+public/bundle.vendor.js
+public/bundle.vendor.js.LICENSE.txt
+public/bundle.vendor.js.map
