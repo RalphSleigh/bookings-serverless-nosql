@@ -1,5 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { orm } from '../../lambda-common/orm'
+import { table } from '../../lambda-common/onetable'
+import bcrypt from 'bcryptjs'
+
 /**
  *
  * Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
@@ -14,17 +16,19 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
     let response: APIGatewayProxyResult;
     try {
 
-        const db = await orm()
+        let User = table.getModel('User')
 
-        const [results, metadata] = await db.sequelize.query("select * from users");
-
-        for(const result of results) console.log(JSON.stringify(result))
-        
+        let account = await User.create({
+            userName: 'Ralph',               //  OK
+            password: bcrypt.hashSync('Hello', bcrypt.genSaltSync()),
+            email: 'ralph.sleigh@woodcraft.org.uk',
+        })
 
         response = {
             statusCode: 200,
-            body: JSON.stringify(event)
+            body: JSON.stringify(account)
         };
+        
     } catch (err: unknown) {
         console.log(err);
         response = {
