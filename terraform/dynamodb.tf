@@ -15,4 +15,10 @@ resource "aws_dynamodb_table" "bookings_table" {
     name = "sk"
     type = "S"
   }
+
+  local_secondary_index {
+    name               = "ls1"
+    projection_type    = "ALL"
+    range_key          = "user"
+  }
 }
