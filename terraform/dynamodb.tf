@@ -17,7 +17,7 @@ resource "aws_dynamodb_table" "bookings_table" {
   }
 
     attribute {
-    name = "userId"
+    name = "userIdVersion"
     type = "S"
   }
 
