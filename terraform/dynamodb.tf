@@ -24,6 +24,6 @@ resource "aws_dynamodb_table" "bookings_table" {
   local_secondary_index {
     name               = "ls1"
     projection_type    = "ALL"
-    range_key          = "userId"
+    range_key          = "userIdVersion"
   }
 }
