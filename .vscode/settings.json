@@ -1,0 +1,12 @@
+{
+    "typescript.tsdk": "node_modules\\typescript\\lib",
+    "serverlessConsole.services": [
+        {
+            "type": "dynamodb",
+            "title": "Bookings",
+            "tableName": "Bookings",
+            "awsProfile": "vcamp",
+            "region": "eu-west-2"
+        }
+    ]
+}

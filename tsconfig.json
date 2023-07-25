@@ -1,14 +1,14 @@
 {
     "compilerOptions": {
       "lib": ["es2022", "dom"],
-      "module": "commonjs",
+      "module": "es2022",
       "target": "es2022",
       "strict": true,
       "esModuleInterop": true,
-      "skipLibCheck": true,
+      "skipLibCheck": false,
       "forceConsistentCasingInFileNames": true,
       "useDefineForClassFields": true,
-      "moduleResolution": "node",
+      "moduleResolution": "node16",
       "allowJs": true,
       "allowSyntheticDefaultImports": true,
       "sourceMap": true,

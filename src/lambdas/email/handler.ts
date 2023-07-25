@@ -1,4 +1,4 @@
-import { get_config } from "../../lambda-common"
+/* import { get_config } from "../../lambda-common"
 import { get_email_client } from "../../lambda-common/email"
 
 //@ts-ignore
@@ -25,3 +25,4 @@ export const lambdaHandler = async (event: any): Promise<any> => {
             await email.toManagers(template, event.email.values)
         }
 }
+ */

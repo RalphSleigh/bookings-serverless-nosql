@@ -6,6 +6,8 @@ on:
       - main
       - vcamp
       - ealing
+      
+  workflow_dispatch:    
 
 permissions:
   id-token: write
@@ -44,11 +46,11 @@ jobs:
 
       - name: build lambdas
         run: |
-          node esbuild-lambda.js 
+          node esbuild-lambda.cjs 
 
       - name: build front
         run: |
-          npx webpack      
+          node esbuild-front.mjs 
 
       - name: terraform init
         working-directory: terraform

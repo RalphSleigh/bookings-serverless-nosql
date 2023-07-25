@@ -1,17 +1,13 @@
-import * as React from 'react'
-import { Item } from "react-html-email";
-//this represents a free event whereby no fees are expected/managed by the system.
+import { InputAdornment, TextField, Typography } from "@mui/material";
+import { FeeStructure } from "./feeStructure.js";
+import React from "react";
 
-export const name = "free";
-export const selection = "Free Event (don't manage fees)";
+export class Free implements FeeStructure {
+    public static feeName = "Free"
 
-export const Config = () => <p>Nothing to decide3</p>;
-
-export const BookingForm = (props) => <p>This is free event, no money involved</p>;
-
-export const ThanksRow = (props) => null
-
-export function emailHTML(event, booking) {
-    return (<Item>
-    </Item>)
+    public static ConfigurationElement({}) {
+        return <>
+            <Typography sx={{ mt: 2 }} variant="h5">No Options</Typography>
+        </>
+    }
 }

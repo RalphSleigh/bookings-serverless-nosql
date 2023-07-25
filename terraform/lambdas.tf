@@ -1,8 +1,8 @@
 data "archive_file" "lambda_zip" {
-  for_each    = local.filtered_lambdas
-  type        = "zip"
-  source_dir  = "${path.module}/../dist-lambda/lambdas/${each.value.code_dir}"
-  output_path = "${path.module}/files/${each.value.name}-lambda.zip"
+  for_each           = local.filtered_lambdas
+  type               = "zip"
+  source_source_file = "${path.module}/../dist-lambda/lambdas/${each.value.code}.js"
+  output_path        = "${path.module}/files/${each.value.name}-lambda.zip"
 }
 
 resource "aws_s3_object" "lambda_code" {
@@ -28,8 +28,8 @@ resource "aws_lambda_function" "lambda" {
   s3_key    = resource.aws_s3_object.lambda_code[each.key].key
 
   architectures = ["arm64"]
-  memory_size = 256
-  timeout = 60
+  memory_size   = 256
+  timeout       = 60
 
   #layers = [resource.aws_lambda_layer_version.common_layer.arn, resource.aws_lambda_layer_version.node_modules_layer.arn, "arn:aws:lambda:eu-west-2:282860088358:layer:AWS-AppConfig-Extension-Arm64:11"]
   layers = [resource.aws_lambda_layer_version.node_modules_layer.arn, "arn:aws:lambda:eu-west-2:282860088358:layer:AWS-AppConfig-Extension-Arm64:11"]
@@ -37,7 +37,7 @@ resource "aws_lambda_function" "lambda" {
   environment {
     variables = {
       workspace = terraform.workspace
-      log_arm = resource.aws_cloudwatch_log_stream.booking_system_logs.arn
+      log_arm   = resource.aws_cloudwatch_log_stream.booking_system_logs.arn
     }
   }
 

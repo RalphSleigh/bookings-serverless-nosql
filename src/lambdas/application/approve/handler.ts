@@ -7,7 +7,7 @@ import { get_email_client } from '../../../lambda-common/email';
 import * as applicationApproved from '../../../lambda-common/emails/applicationApproved'
 import { getEventDetails } from '../../../lambda-common/util';
 import { ApplicationModel } from '../../../lambda-common/models/application';
-import { postToDiscord } from '../../../lambda-common/discord';
+import { postToDiscord } from '../../../lambda-common/discord.js';
 
 /**
  *

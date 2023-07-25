@@ -1,29 +1,31 @@
-import { AWSError, CloudWatchLogs } from 'aws-sdk'
-import { PromiseResult } from 'aws-sdk/lib/request'
+import { CloudWatchLogsClient, PutLogEventsCommand, PutLogEventsCommandOutput } from "@aws-sdk/client-cloudwatch-logs"
 import { serializeError } from 'serialize-error'
-import am_in_lambda from './am_in_lambda'
+import am_in_lambda from './am_in_lambda.js'
+
+import { CloudWatchClient } from "@aws-sdk/client-cloudwatch";
 
 
-let tasks: Promise<PromiseResult<CloudWatchLogs.PutLogEventsResponse, AWSError>>[] = []
+
+let tasks: Promise<PutLogEventsCommandOutput>[] = []
 
 const log_group = `bookings_system_logs_${process.env.workspace}`
 const log_stream = `bookings_system_logs_${process.env.workspace}`
 
-const cloudwatch = new CloudWatchLogs()
+const client = new CloudWatchLogsClient({ region: "eu-west-2" });
 
 export function log(message) {
     try {
-
+        console.log(message)
         if (!am_in_lambda()) return
 
-        tasks.push(cloudwatch.putLogEvents({
+        tasks.push(client.send(new PutLogEventsCommand({
             logEvents: [{
                 message: message,
                 timestamp: Date.now()
             }],
             logGroupName: log_group,
             logStreamName: log_stream
-        }).promise())
+        })))
     } catch (e) {
         console.log("Error logging to cloudwatch")
         console.log(serializeError(e))

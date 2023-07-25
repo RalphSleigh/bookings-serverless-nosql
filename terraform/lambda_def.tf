@@ -3,13 +3,7 @@ variable "lambda_definitions" {
   type        = map(any)
 
   default = {
-    test = {
-      name     = "test"
-      code_dir = "test"
-      path     = "test"
-      method = "get"
-    },
-    migrate = {
+    /*migrate = {
       name                 = "migrate"
       code_dir             = "migrate"
       path                 = "migrate"
@@ -26,7 +20,7 @@ variable "lambda_definitions" {
       code_dir             = "seed"
       path                 = "seed"
       dont_create_endpoint = true
-    },
+    },*/
     email = {
       name                 = "email"
       code_dir             = "email"
@@ -34,47 +28,47 @@ variable "lambda_definitions" {
       dont_create_endpoint = true
     },
     env = {
-      name     = "env"
-      code_dir = "env"
-      path     = "env"
-      method   = "get"
+      name   = "env"
+      code   = "env/getEnv"
+      path   = "env"
+      method = "get"
     }
     user = {
-      name     = "user"
-      code_dir = "user/get"
-      path     = "user"
-      method   = "get"
+      name   = "user"
+      code   = "user/getUser"
+      path   = "user"
+      method = "get"
     },
     user_logout = {
-      name     = "user_logout"
-      code_dir = "user/logout"
-      path     = "user/logout"
-      method   = "post"
+      name   = "user_logout"
+      code   = "user/logout"
+      path   = "user/logout"
+      method = "post"
     },
-    user_list = {
+    /*user_list = {
       name     = "user_list"
       code_dir = "user/list"
       path     = "users/{id}"
       method   = "get"
-    },
+    },*/
     events = {
-      name     = "events"
-      code_dir = "events/get"
-      path     = "events"
-      method   = "get"
+      name   = "events"
+      code   = "events/getEvents"
+      path   = "events"
+      method = "get"
     },
     events_create = {
-      name     = "events_create"
-      code_dir = "events/create"
-      path     = "event/create"
-      method   = "post"
+      name   = "events_create"
+      code   = "events/createEvent"
+      path   = "event/create"
+      method = "post"
     },
     events_edit = {
-      name     = "events_edit"
-      code_dir = "events/edit"
-      path     = "event/edit"
-      method   = "post"
-    },
+      name   = "events_edit"
+      code   = "events/editEvent"
+      path   = "event/edit"
+      method = "post"
+    }, /*
     events_delete = {
       name     = "events_delete"
       code_dir = "events/delete"
@@ -92,31 +86,31 @@ variable "lambda_definitions" {
       code_dir = "events/apply"
       path     = "event/{id}/apply"
       method   = "post"
-    },
+    },*/
     bookings_user = {
-      name     = "bookings_user"
-      code_dir = "bookings/user"
-      path     = "booking/user"
-      method   = "get"
+      name   = "bookings_user"
+      code   = "bookings/getUsersBookings"
+      path   = "booking/user"
+      method = "get"
     },
     bookings_create = {
-      name     = "bookings_create"
-      code_dir = "bookings/create"
-      path     = "booking/{id}/create"
-      method   = "post"
-    },
+      name   = "bookings_create"
+      code   = "bookings/createBooking"
+      path   = "booking/create"
+      method = "post"
+    }, /*
     bookings_get = {
       name     = "bookings_get"
       code_dir = "bookings/get"
       path     = "booking/{id}"
       method   = "get"
-    },
+    },*/
     bookings_edit = {
-      name     = "bookings_edit"
-      code_dir = "bookings/edit"
-      path     = "booking/edit"
-      method   = "post"
-    },
+      name   = "bookings_edit"
+      code   = "bookings/editBooking"
+      path   = "booking/edit"
+      method = "post"
+    }, /*
     bookings_delete = {
       name     = "bookings_delete"
       code_dir = "bookings/delete"
@@ -218,19 +212,19 @@ variable "lambda_definitions" {
       code_dir = "dbs/unapprove"
       path     = "dbs/unapprove"
       method   = "post"
-    },
+    },*/
     auth_google_redirect = {
-      name     = "auth_google_redirect"
-      code_dir = "auth/google/redirect"
-      path     = "auth/google/redirect"
-      method   = "get"
+      name   = "auth_google_redirect"
+      code   = "auth/google/redirect"
+      path   = "auth/google/redirect"
+      method = "get"
     },
     auth_google_callback = {
-      name     = "auth_google_callback"
-      code_dir = "auth/google/callback"
-      path     = "auth/google/callback"
-      method   = "get"
-    },
+      name   = "auth_google_callback"
+      code   = "auth/google/callback"
+      path   = "auth/google/callback"
+      method = "get"
+    }, /*
     auth_facebook_redirect = {
       name     = "auth_facebook_redirect"
       code_dir = "auth/facebook/redirect"
@@ -266,12 +260,12 @@ variable "lambda_definitions" {
       code_dir = "auth/microsoft/callback"
       path     = "auth/microsoft/callback"
       method   = "get"
-    },
-      client_error = {
-      name     = "client_error"
-      code_dir = "error"
-      path     = "error"
-      method   = "post"
+    },*/
+    client_error = {
+      name   = "client_error"
+      code   = "error/reportError"
+      path   = "error"
+      method = "post"
     }
   }
 }

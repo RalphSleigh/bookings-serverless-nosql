@@ -8,7 +8,7 @@ import { auth, admin } from '@googleapis/admin'
 import { get_config } from './config'
 import e from 'express'
 
-export type PermissionFuntion = (lambda_event: PermissionEvent, user: UserModel, db: db) => void
+export type PermissionFunction = (lambda_event: PermissionEvent, user: UserModel, db: db) => void
 
 export type PermissionEvent = Pick<APIGatewayProxyEvent, Exclude<keyof APIGatewayProxyEvent, 'body'>> & { 
     body: any

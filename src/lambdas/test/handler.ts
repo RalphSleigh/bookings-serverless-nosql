@@ -16,7 +16,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
     let response: APIGatewayProxyResult;
     try {
 
-        let User = table.getModel('User')
+        //let User = table.getModel('User')
         /*
         let account = await User.create({
             userName: 'Ralph',               //  OK
@@ -25,11 +25,12 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
         })
         */
 
-        const account = await User.get({userName: "Ralph"})
+        //const account = await User.get({userName: "Ralph"})
         
         response = {
             statusCode: 200,
-            body: JSON.stringify(account)
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify({ user: null })
         };
 
     } catch (err: unknown) {

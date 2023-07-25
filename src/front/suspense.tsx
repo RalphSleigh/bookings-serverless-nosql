@@ -1,0 +1,12 @@
+import { CircularProgress } from "@mui/material";
+import React from "react";
+
+export function SuspenseWrapper(props) {
+    return <React.Suspense fallback={<Loader />}>
+        {props.children}
+    </React.Suspense>
+}
+
+function Loader() {
+    return <CircularProgress />
+}
