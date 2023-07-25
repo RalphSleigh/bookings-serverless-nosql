@@ -3,7 +3,7 @@ import * as esbuild from 'esbuild'
 await esbuild.build({
   entryPoints: ['src/front/index.tsx'],
   bundle: true,
-  minify: false,
+  minify: true,
   sourcemap: true,
   splitting: true,
   format: 'esm',
@@ -19,5 +19,5 @@ await esbuild.build({
     '.svg': 'dataurl',
     '.gif': 'dataurl',
   },
-  watch: true
+  watch: false
 })
