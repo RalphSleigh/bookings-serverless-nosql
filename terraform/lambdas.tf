@@ -22,7 +22,7 @@ resource "aws_lambda_function" "lambda" {
   for_each      = local.filtered_lambdas
   function_name = "function_${each.value.name}"
   role          = aws_iam_role.iam_for_lambda.arn
-  handler       = "handler.lambdaHandler"
+  handler       = "${reverse(split("/", each.value.code))[0]}handler.lambdaHandler"
 
   s3_bucket = aws_s3_bucket.lambda_code.id
   s3_key    = resource.aws_s3_object.lambda_code[each.key].key
