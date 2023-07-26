@@ -32,7 +32,7 @@ resource "aws_lambda_function" "lambda" {
   timeout       = 60
 
   #layers = [resource.aws_lambda_layer_version.common_layer.arn, resource.aws_lambda_layer_version.node_modules_layer.arn, "arn:aws:lambda:eu-west-2:282860088358:layer:AWS-AppConfig-Extension-Arm64:11"]
-  layers = [resource.aws_lambda_layer_version.node_modules_layer.arn, "arn:aws:lambda:eu-west-2:282860088358:layer:AWS-AppConfig-Extension-Arm64:11"]
+  layers = [resource.aws_lambda_layer_version.node_modules_layer.arn]
 
   environment {
     variables = {

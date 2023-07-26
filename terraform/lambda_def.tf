@@ -23,7 +23,7 @@ variable "lambda_definitions" {
     },*/
     email = {
       name                 = "email"
-      code                 = "email"
+      code                 = "email/email"
       path                 = "email"
       dont_create_endpoint = true
     },

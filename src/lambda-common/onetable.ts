@@ -3,6 +3,20 @@ import { Table, Entity } from 'dynamodb-onetable'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { STSClient, AssumeRoleCommand } from "@aws-sdk/client-sts";
 import { Schema } from '@mui/icons-material';
+import am_in_lambda from './am_in_lambda.js';
+
+
+let client
+
+if(am_in_lambda()) {
+
+    client = new Dynamo({
+        client: new DynamoDBClient({
+            region: 'eu-west-2',
+        })
+    })
+
+} else {
 
 const stsClient = new STSClient({ region: "eu-west-2" });
 
@@ -13,7 +27,7 @@ const command = new AssumeRoleCommand({
 
 const data = await stsClient.send(command);
 
-const client = new Dynamo({
+client = new Dynamo({
     client: new DynamoDBClient({
         region: 'eu-west-2',
         credentials: {
@@ -23,6 +37,8 @@ const client = new Dynamo({
         }
     })
 })
+
+}
 
 const schema = {
     format: 'onetable:1.1.0',
