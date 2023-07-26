@@ -1,7 +1,7 @@
 data "archive_file" "lambda_zip" {
   for_each           = local.filtered_lambdas
   type               = "zip"
-  source_source_file = "${path.module}/../dist-lambda/lambdas/${each.value.code}.js"
+  source_file = "${path.module}/../dist-lambda/lambdas/${each.value.code}.js"
   output_path        = "${path.module}/files/${each.value.name}-lambda.zip"
 }
 
