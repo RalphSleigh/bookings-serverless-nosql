@@ -34,7 +34,7 @@ resource "aws_dynamodb_table" "config_table" {
   read_capacity  = 20
   write_capacity = 20
   hash_key       = "pk"
-  range_key      = "sk"
+  range_key      = "key"
 
   attribute {
     name = "pk"
