@@ -1,44 +1,12 @@
 import { Dynamo } from 'dynamodb-onetable/Dynamo'
 import { Table, Entity } from 'dynamodb-onetable'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { STSClient, AssumeRoleCommand } from "@aws-sdk/client-sts";
-import { Schema } from '@mui/icons-material';
-import am_in_lambda from './am_in_lambda.js';
 
-
-let client
-
-if(am_in_lambda()) {
-
-    client = new Dynamo({
-        client: new DynamoDBClient({
-            region: 'eu-west-2',
-        })
-    })
-
-} else {
-
-const stsClient = new STSClient({ region: "eu-west-2" });
-
-const command = new AssumeRoleCommand({
-    RoleArn: 'arn:aws:iam::004208341186:role/OrganizationAccountAccessRole',
-    RoleSessionName: 'dynamodb',
-});
-
-const data = await stsClient.send(command);
-
-client = new Dynamo({
+const client = new Dynamo({
     client: new DynamoDBClient({
         region: 'eu-west-2',
-        credentials: {
-            accessKeyId: data.Credentials?.AccessKeyId!,
-            secretAccessKey: data.Credentials?.SecretAccessKey!,
-            sessionToken: data.Credentials?.SessionToken!
-        }
     })
 })
-
-}
 
 const schema = {
     format: 'onetable:1.1.0',
@@ -107,7 +75,7 @@ const schema = {
                         },
                     }
 
-                }, 
+                },
                 required: true
             },
             created: { type: Date, required: true },
@@ -122,8 +90,8 @@ const schema = {
                 items: {
                     type: Object,
                     schema: {
-                        userId: {type: String, required: true},
-                        time: {type: Date, required: true}
+                        userId: { type: String, required: true },
+                        time: { type: Date, required: true }
                     }
                 },
             },

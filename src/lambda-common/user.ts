@@ -28,7 +28,7 @@ export async function get_user_from_event(event: APIGatewayProxyEvent, config): 
     }
 }
 
-export async function get_user_from_login(id: string | undefined | null, displayName: string, source: string) {
+export async function get_user_from_login(id: string | undefined | null, displayName: string, source: string, config) {
     if (typeof id !== 'string') throw new Error("No ID from provider");
     const combinedId = source + id;
     const UserModel = table.getModel<UserType>('User')
@@ -44,7 +44,7 @@ export async function get_user_from_login(id: string | undefined | null, display
        return user;
     }
 
-    const newUser = await UserModel.create({ remoteId: combinedId, userName: displayName, source:source})
+    const newUser = await UserModel.create({ remoteId: combinedId, userName: displayName, source:source, admin: config.ENV === "dev"})
 
     log(`Creating new user ${newUser.userName}`)
 
