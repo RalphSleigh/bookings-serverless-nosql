@@ -68,7 +68,26 @@ variable "lambda_definitions" {
       code   = "events/editEvent"
       path   = "event/edit"
       method = "post"
-    }, /*
+    }, 
+    event_bookings = {
+      name   = "events_bookings"
+      code   = "events/getEventBookings"
+      path   = "event/{id}/manage/bookings"
+      method = "get"
+    },
+    event_bookings_historical = {
+      name   = "events_bookings_historical"
+      code   = "events/getEventHistoricalBookings"
+      path   = "event/{id}/manage/bookings/{timestamp}"
+      method = "get"
+    },
+    event_timeline = {
+      name   = "events_timeline"
+      code   = "events/getEventTimeline"
+      path   = "event/{id}/manage/timeline"
+      method = "get"
+    },
+/*handlerSetup('/api/event/:id/manage/timeline', 'events/manage/getTimeline')
     events_delete = {
       name     = "events_delete"
       code_dir = "events/delete"
