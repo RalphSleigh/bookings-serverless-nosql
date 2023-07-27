@@ -39,7 +39,7 @@ esbuild
         format: 'esm',
         platform: 'node',
         //sourcemap: 'inline',
-        target: ['node16'],
+        target: ['node18'],
         external: ['sequelize', 'aws-sdk','lodash', 'aws-lambda','@aws-sdk/*','dynamodb-onetable'],
         metafile: true,
     }).then(build => {
