@@ -74,7 +74,7 @@ handlerSetup('/api/event/edit', 'events/editEvent', 'POST')
 //handlerSetup('/api/event/:id/apply', 'events/apply/handler', 'POST')
 handlerSetup('/api/event/:id/manage/bookings', 'events/manage/getEventBookings')
 handlerSetup('/api/event/:id/manage/bookings/:timestamp', 'events/manage/getEventHistoricalBookings')
-handlerSetup('/api/event/:id/manage/timeline', 'events/manage/getTimeline')
+handlerSetup('/api/event/:id/manage/timeline', 'events/manage/getEventTimeline')
 
 handlerSetup('/api/booking/user', 'bookings/getUsersBookings')
 handlerSetup('/api/booking/create', 'bookings/createBooking', "POST")
