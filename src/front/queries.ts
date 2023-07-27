@@ -20,7 +20,7 @@ export function useEnv() {
 
 export const userQuery = {
     queryKey: ['user'],
-    queryFn: async () => (await axios.get("/api/env")).data
+    queryFn: async () => (await axios.get("/api/user")).data
 }
 
 export function useUser() {
