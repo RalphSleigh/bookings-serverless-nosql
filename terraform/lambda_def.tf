@@ -43,7 +43,7 @@ variable "lambda_definitions" {
       name   = "user_logout"
       code   = "user/logout"
       path   = "user/logout"
-      method = "post"
+      method = "get"
     },
     /*user_list = {
       name     = "user_list"
