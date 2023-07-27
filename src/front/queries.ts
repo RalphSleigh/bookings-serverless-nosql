@@ -1,7 +1,8 @@
-import { QueryObserverSuccessResult, UseQueryOptions, useMutation, useQueries, useQuery } from '@tanstack/react-query'
+import { QueryObserverSuccessResult, UseQueryOptions, useMutation, useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 import { Jsonify } from 'type-fest'
 import { BookingType, EventBookingTimelineType, EventType } from '../lambda-common/onetable.js'
+import { UserContextType } from './user/userContext.js'
 
 export async function get_api<Res>(url: string) {
     const { data } = await axios.get<Res>(`/api/${url}`)
@@ -10,6 +11,20 @@ export async function get_api<Res>(url: string) {
 
 export async function post_api<Res>(url: string, data: any): Promise<Res> {
     return axios.post(`/api/${url}`, data)
+}
+
+export function useEnv() {
+    return useQuery(['env'],
+        async () => (await axios.get("/api/env")).data) as QueryObserverSuccessResult<{ "env": string }>
+}
+
+export const userQuery = {
+    queryKey: ['user'],
+    queryFn: async () => (await axios.get("/api/env")).data
+}
+
+export function useUser() {
+    return useQuery(userQuery.queryKey, userQuery.queryFn) as QueryObserverSuccessResult<{ "user": UserContextType }>
 }
 
 export function useEvents() {
@@ -62,7 +77,7 @@ export const eventTimelineQuery = eventId => {
     }
 }
 
-export type eventTimelineQueryType = UseQueryOptions<{ "timeline": Jsonify<EventBookingTimelineType>}, any>
+export type eventTimelineQueryType = UseQueryOptions<{ "timeline": Jsonify<EventBookingTimelineType> }, any>
 /* export function useEventTimeline(eventId) {
     return useQuery([eventId, 'bookings'],
         async () => (await axios.get(`/api/event/${eventId}/manage/timeline`)).data) as QueryObserverSuccessResult<{ "timeline": Jsonify<EventBookingTimelineType> }>

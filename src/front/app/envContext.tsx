@@ -1,18 +1,16 @@
-import { useQuery } from '@tanstack/react-query';
 import React, { createContext } from 'react';
-import { get_api } from '../queries.js';
-import { SuspenseWrapper } from '../suspense.js';
+import { useEnv, userQuery } from '../queries.js';
+import { useQueryClient } from "@tanstack/react-query";
 
 export const EnvContext = createContext("dev");
 
 export function EnvContextProvider(props) {
-    const data = useQuery(['env'], getEnv).data!
+    const queryClient = useQueryClient()
+    queryClient.prefetchQuery(userQuery)
+    const { env } = useEnv().data
 
-    return <EnvContext.Provider value={data.env}>
+    return <EnvContext.Provider value={env}>
         {props.children}
     </EnvContext.Provider>
 }
 
-async function getEnv() {
-    return await get_api<{ env: string }>('env')
-}
