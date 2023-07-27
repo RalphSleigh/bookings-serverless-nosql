@@ -43,7 +43,7 @@ data "aws_iam_policy_document" "lambda_exec_role_policy" {
       "dynamodb:UpdateTable",
     ]
 
-    resources = [aws_dynamodb_table.bookings_table.arn, aws_dynamodb_table.config_table.arn]
+    resources = [aws_dynamodb_table.bookings_table.arn, "${aws_dynamodb_table.bookings_table.arn}/index/*", aws_dynamodb_table.config_table.arn]
 
     effect = "Allow"
   }
