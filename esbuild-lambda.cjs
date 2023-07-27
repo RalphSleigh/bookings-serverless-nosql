@@ -35,11 +35,12 @@ esbuild
         //splitting: true,
         outdir: path.join(__dirname, outDir),
         outbase: functionsDir,
+        outExtension: { '.js': '.mjs' },
         format: 'esm',
         platform: 'node',
         //sourcemap: 'inline',
         target: ['node16'],
-        external: ['sequelize', 'aws-sdk','lodash', 'aws-lambda'],
+        external: ['sequelize', 'aws-sdk','lodash', 'aws-lambda','@aws-sdk/*','dynamodb-onetable'],
         metafile: true,
     }).then(build => {
 
@@ -53,6 +54,7 @@ esbuild
             //splitting: true,
             outdir: path.join(__dirname, outDir),
             outbase: functionsDir,
+            outExtension: { '.js': '.mjs' },
             //format: 'cjs',
             platform: 'node',
             //sourcemap: 'inline',
