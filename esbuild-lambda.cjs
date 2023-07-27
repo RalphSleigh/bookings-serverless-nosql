@@ -42,6 +42,16 @@ esbuild
         target: ['node18'],
         external: ['sequelize', 'aws-sdk','lodash', 'aws-lambda','@aws-sdk/*','dynamodb-onetable'],
         metafile: true,
+        banner: {
+            js: `
+            import path from 'path';
+            import { fileURLToPath } from 'url';
+            import { createRequire as topLevelCreateRequire } from 'module';
+            const require = topLevelCreateRequire(import.meta.url);
+            const __filename = fileURLToPath(import.meta.url);
+            const __dirname = path.dirname(__filename);
+            `,
+          },
     }).then(build => {
 
         return esbuild
