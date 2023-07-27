@@ -71,19 +71,19 @@ variable "lambda_definitions" {
     }, 
     event_bookings = {
       name   = "events_bookings"
-      code   = "events/getEventBookings"
+      code   = "events/manage/getEventBookings"
       path   = "event/{id}/manage/bookings"
       method = "get"
     },
     event_bookings_historical = {
       name   = "events_bookings_historical"
-      code   = "events/getEventHistoricalBookings"
+      code   = "events/manage/getEventHistoricalBookings"
       path   = "event/{id}/manage/bookings/{timestamp}"
       method = "get"
     },
     event_timeline = {
       name   = "events_timeline"
-      code   = "events/getEventTimeline"
+      code   = "events/manage/getEventTimeline"
       path   = "event/{id}/manage/timeline"
       method = "get"
     },
