@@ -1,17 +1,13 @@
 import React from "react";
 import { EventForm } from "./eventForm.js";
-import { useMutation } from "@tanstack/react-query";
-import { post_api } from "../queries.js";
+import { useCreateEvent } from "../queries.js";
 import { Navigate } from "react-router-dom";
 import { EnsureHasPermission } from "../permissions.js";
 import { IsGlobalAdmin } from "../../shared/permissions.js";
 
 export function CreateEventPage({ }) {
 
-    const createEvent = useMutation({
-        mutationFn: data =>
-            post_api('event/create', { event: data })
-    })
+    const createEvent = useCreateEvent()
 
     if (createEvent.isSuccess) {
         return <Navigate to='/' />
