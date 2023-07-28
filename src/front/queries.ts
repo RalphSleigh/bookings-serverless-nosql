@@ -27,14 +27,22 @@ export function useUser() {
     return useQuery(userQuery.queryKey, userQuery.queryFn) as QueryObserverSuccessResult<{ "user": UserContextType }>
 }
 
+export const eventsQuery = {
+    queryKey: ['events'],
+    queryFn: async () => (await axios.get("/api/events"))
+}
+
 export function useEvents() {
-    return useQuery(['events'],
-        async () => (await axios.get("/api/events")).data) as QueryObserverSuccessResult<{ "events": [Jsonify<EventType>] }>
+    return useQuery(eventsQuery.queryKey, eventsQuery.queryFn) as QueryObserverSuccessResult<{ "events": [Jsonify<EventType>] }>
+}
+
+export const userBookingsQuery = {
+    queryKey: ['user', 'bookings'],
+    queryFn: async () => (await axios.get("/api/booking/user")).data
 }
 
 export function useUsersBookings() {
-    return useQuery(['user', 'bookings'],
-        async () => (await axios.get("/api/booking/user")).data) as QueryObserverSuccessResult<{ "bookings": [Jsonify<BookingType>] }>
+    return useQuery(userBookingsQuery.queryKey, userBookingsQuery.queryFn) as QueryObserverSuccessResult<{ "bookings": [Jsonify<BookingType>] }>
 }
 
 export function useEditEvent() {
