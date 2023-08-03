@@ -23,7 +23,7 @@ export function Component() {
 
     const userItems = userData.data?.users.map(u => <MenuItem key={u.id} value={u.id}>
         <Stack direction="row" spacing={1}>
-            <Avatar imgProps={{ referrerPolicy: "no-referrer" }} sx={{ width: 22, height: 22, boxShadow: 20 }} alt={u.userName} src={u.picture || "/nope.jpg"} />
+            <Avatar imgProps={{ referrerPolicy: "no-referrer" }} sx={{ width: 22, height: 22, boxShadow: 10 }} alt={u.userName} src={u.picture || "/nope.jpg"} />
             <Typography>{u.userName}</Typography>
         </Stack>
     </MenuItem>)
