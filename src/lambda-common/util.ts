@@ -16,6 +16,12 @@ export function updateParticipantsDates(existing: Array<ParticipantType>, incomi
 
 }
 
+export function updateAssociation(db, instance, key, Association, values) {}
+export async function getEventDetails(db, id: string | number) {}
+export function getUserScopes(db, user, event, participants = true) {}
+export async function getBookingAndCombineScopes(db, user, booking) {}
+export async function getBookingsAndCombineScopes(db, user, event) {}
+
 /* export function updateAssociation(db, instance, key, Association, values) {
 
     let ops:any[] = [];
@@ -30,6 +36,7 @@ export function updateParticipantsDates(existing: Array<ParticipantType>, incomi
 	})];
 	return Promise.all(ops);
 };
+
 
 
 export async function getEventDetails(db: db, id: string | number) {
