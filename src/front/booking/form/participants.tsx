@@ -1,23 +1,23 @@
 import { FormGroup, Grid, Paper, TextField, Typography, Box, Button, FormControlLabel, Switch, MenuItem, Select, FormControl, InputLabel, Fab } from "@mui/material";
 import React, { useContext, useState } from "react";
 //import { validate } from "./validate.js";
-import { BookingType, UserType } from "../../../lambda-common/onetable.js";
+import { BookingType, JsonParticipantType, UserType } from "../../../lambda-common/onetable.js";
 import { cloneDeep, merge } from 'lodash'
 import { Close } from '@mui/icons-material';
+import { KpStructure } from "../../../shared/kp/kp_class.js";
+import { PartialDeep } from "type-fest";
 
-
-export function ParticipantsForm({ participants, update }: { participants: BookingType['participants'], update: any }) {
+export function ParticipantsForm({ participants, update, kp }: { participants: Array<PartialDeep<JsonParticipantType>>, update: any, kp: KpStructure }) {
 
     const addNewParticipant = e => {
         update([...participants, {}])
     }
 
-    const updateParticipant = i => section => field => e => {
+    const updateParticipant = i => section => field => value=> {
         const newParticipants = cloneDeep(participants)
         const participantToUpdate = newParticipants[i]
-        merge(participantToUpdate, {[section]: {[field]: e.target.value}})
+        merge(participantToUpdate, {[section]: {[field]: value}})
         update(newParticipants)
-        e.preventDefault()
     }
 
     const deleteParticipant = i => e => {
@@ -29,7 +29,7 @@ export function ParticipantsForm({ participants, update }: { participants: Booki
         e.preventDefault()
     }
 
-    const participantsList = participants.map((p, i) => <ParticipantForm key={i} participant={p} update={updateParticipant(i)} deleteParticipant={deleteParticipant(i)} />)
+    const participantsList = participants.map((p, i) => <ParticipantForm key={i} participant={p} kp={kp} update={updateParticipant(i)} deleteParticipant={deleteParticipant(i)} />)
 
     return <Grid container spacing={0} sx={{ mt: 2 }}>
         <Grid xs={12} p={0} item>
@@ -40,7 +40,13 @@ export function ParticipantsForm({ participants, update }: { participants: Booki
     </Grid>
 }
 
-function ParticipantForm({ participant, update, deleteParticipant }: { participant: BookingType['participants'][0], update: any, deleteParticipant: any }) {
+function ParticipantForm({ participant, kp, update, deleteParticipant }: { participant: PartialDeep<JsonParticipantType>, kp: KpStructure, update: any, deleteParticipant: any }) {
+
+    const updateParticipantField = section => field => e => {
+        update(section)(field)(e.target.value)
+        e.preventDefault()
+    }
+
     return <Paper elevation={6} sx={{ mt: 2 }}>
         <Box p={2}>
             <Fab sx={{ float: "right"}} size="small" color="error" aria-label="add" onClick={deleteParticipant}>
@@ -48,7 +54,8 @@ function ParticipantForm({ participant, update, deleteParticipant }: { participa
             </Fab>
             <Typography variant="h4">Hmmm</Typography>
             <FormGroup>
-                <TextField sx={{ mt: 2 }} required id="outlined-required" label="Name" value={participant.basic?.name || ''} onChange={update('basic')('name')} />
+                <TextField sx={{ mt: 2 }} required id="outlined-required" label="Name" value={participant.basic?.name || ''} onChange={updateParticipantField('basic')('name')} />
+                <kp.ParticipantFormElement data={participant.kp || {}} update={update('kp')} />
             </FormGroup>
         </Box>
     </Paper>

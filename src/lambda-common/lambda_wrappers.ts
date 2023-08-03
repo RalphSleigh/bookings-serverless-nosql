@@ -3,14 +3,14 @@ import { get_config } from './config.js';
 import { flush_logs, log } from './logging.js';
 import { serializeError } from 'serialize-error';
 import { get_user_from_event } from './user.js';
-import { UserType } from './onetable.js';
+import { UserResponseType} from './onetable.js';
 import { PermissionError } from '../shared/permissions.js';
 
 export type LambdaJSONHandlerEvent = Pick<APIGatewayProxyEvent, Exclude<keyof APIGatewayProxyEvent, 'body'>> & { 
     body: any
 }
 
-export type LambdaJSONHandlerFunction = (lambda_event: LambdaJSONHandlerEvent, config: { [index: string]: any }, user: UserType | undefined) => Promise<any>
+export type LambdaJSONHandlerFunction = (lambda_event: LambdaJSONHandlerEvent, config: { [index: string]: any }, user: UserResponseType) => Promise<any>
 
 export function lambda_wrapper_json(
     handler: LambdaJSONHandlerFunction):

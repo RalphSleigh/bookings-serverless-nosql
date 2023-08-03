@@ -48,7 +48,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
             userId: 'me'}); */
 
         try {
-            const user_instance = await get_user_from_login(id_token.sub, id_token.name ?? "default", "google", config)
+            const user_instance = await get_user_from_login(id_token.sub, id_token.name ?? "default", "google", config, id_token.picture)
 
             if (!user_instance) {
                 return {

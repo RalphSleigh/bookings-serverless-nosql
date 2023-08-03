@@ -1,10 +1,11 @@
 import { FormGroup, Grid, Paper, TextField, Typography, Box, Button, FormControlLabel, Switch, MenuItem, Select, FormControl, InputLabel } from "@mui/material";
 import React, { useContext, useState } from "react";
 //import { validate } from "./validate.js";
-import { BookingType, UserType } from "../../../lambda-common/onetable.js";
+import { BookingType, JsonBookingType, JsonEventType, UserType } from "../../../lambda-common/onetable.js";
 import { ParticipantsForm } from "./participants.js";
+import { kp } from "../../../shared/kp/kp.js"
 
-export function BookingForm({ data, user, update, submit, mode}: {data: Partial<BookingType>, user: UserType, update: React.Dispatch<React.SetStateAction<Partial<BookingType>>>,  submit: () => void, mode: "create" | "edit"}) {
+export function BookingForm({ data, event, user, update, submit, mode}: {data: Partial<JsonBookingType>, event: JsonEventType, user: UserType, update: React.Dispatch<React.SetStateAction<Partial<JsonBookingType>>>,  submit: () => void, mode: "create" | "edit"}) {
 
     const updateField = field => e => {
         update({ ...data, [field]: e.target.value })
@@ -28,6 +29,8 @@ export function BookingForm({ data, user, update, submit, mode}: {data: Partial<
         submit()
         e.preventDefault()
     }
+
+    const kpConfig = kp[event.kpMode] || kp.basic
 
     return <Grid container spacing={0}>
         <Grid xs={12} p={2} item>
@@ -54,7 +57,7 @@ export function BookingForm({ data, user, update, submit, mode}: {data: Partial<
                                 */}
                                 </FormGroup>
 
-                            <ParticipantsForm participants={data.participants || [{}] } update={updateNested('participants')}/>    
+                            <ParticipantsForm participants={data.participants || [{}] } update={updateNested('participants')} kp={kpConfig}/>    
                             <Button sx={{ mt: 2 }} variant="contained" onClick={create}>{mode == "create" ? "Submit" : "Submit" }</Button>
                         </form>
                     </Box>

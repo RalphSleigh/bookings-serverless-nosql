@@ -1,12 +1,11 @@
 import { isPast } from "date-fns";
-import { BookingType, EventType, UserType } from "../lambda-common/onetable.js";
+import { BookingType, EventType, JsonBookingType, JsonEventType, JsonUserResponseType, UserResponseType, UserType } from "../lambda-common/onetable.js";
 import { parseDate } from "./util.js";
-import { Jsonify } from "type-fest";
 
 type PermissionData = {
-    user: UserType | undefined
-    event?: EventType | Jsonify<EventType>
-    booking?: BookingType | Jsonify<BookingType>
+    user: UserResponseType | JsonUserResponseType
+    event?: EventType | JsonEventType
+    booking?: BookingType | JsonBookingType
 }
 
 type PartiallyRequired<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>
@@ -39,7 +38,7 @@ export class Permission<T> {
 }
 
 export const IsLoggedIn = new Permission<PermissionData>(data => {
-    return data.user !== undefined
+    return data.user !== null
 }, "User must be logged in")
 
 export const IsGlobalAdmin = new Permission<PermissionData>(data => {

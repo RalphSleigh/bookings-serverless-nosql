@@ -62,7 +62,7 @@ handlerSetup('/api/env', 'env/getEnv')
 
 handlerSetup('/api/user', 'user/getUser')
 handlerSetup('/api/user/logout', 'user/logout')
-//handlerSetup('/api/users/:id', 'user/list/handler')
+handlerSetup('/api/user/list/:eventId', 'user/listUsers')
 
 handlerSetup('/api/events', 'events/getEvents')
 handlerSetup('/api/event/create', 'events/createEvent', 'POST')
@@ -75,6 +75,7 @@ handlerSetup('/api/event/edit', 'events/editEvent', 'POST')
 handlerSetup('/api/event/:id/manage/bookings', 'events/manage/getEventBookings')
 handlerSetup('/api/event/:id/manage/bookings/:timestamp', 'events/manage/getEventHistoricalBookings')
 handlerSetup('/api/event/:id/manage/timeline', 'events/manage/getEventTimeline')
+handlerSetup('/api/event/:id/manage/roles', 'events/manage/getRoles')
 
 handlerSetup('/api/booking/user', 'bookings/getUsersBookings')
 handlerSetup('/api/booking/create', 'bookings/createBooking', "POST")

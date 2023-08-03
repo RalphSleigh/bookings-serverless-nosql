@@ -1,7 +1,22 @@
 import _ from 'lodash';
-import { db } from './orm'
+import { ParticipantType } from './onetable.js';
+//import { db } from './orm'
 
-export function updateAssociation(db, instance, key, Association, values) {
+export function updateParticipantsDates(existing: Array<ParticipantType>, incoming: Array<ParticipantType>) {
+    const now = new Date()
+
+    incoming.forEach(p => {
+        p.created = p.created ? new Date(p.created) : now
+        p.updated = p.updated ? new Date(p.updated) : now
+
+        const unchanged = existing.find(old => _.isEqual(old, p))
+        if(unchanged === undefined) p.updated = now
+    })
+
+
+}
+
+/* export function updateAssociation(db, instance, key, Association, values) {
 
     let ops:any[] = [];
 	//delete no longer present
@@ -118,3 +133,4 @@ export async function getBookingAndCombineScopes(db, user, booking) {
 
     return [obj]
 }
+ */

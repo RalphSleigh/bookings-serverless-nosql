@@ -45,12 +45,12 @@ variable "lambda_definitions" {
       path   = "user/logout"
       method = "get"
     },
-    /*user_list = {
-      name     = "user_list"
-      code_dir = "user/list"
-      path     = "users/{id}"
-      method   = "get"
-    },*/
+    user_list = {
+      name   = "user_list"
+      code   = "user/listUsers"
+      path   = "user/list/{eventId}"
+      method = "get"
+    },
     events = {
       name   = "events"
       code   = "events/getEvents"
@@ -68,7 +68,7 @@ variable "lambda_definitions" {
       code   = "events/editEvent"
       path   = "event/edit"
       method = "post"
-    }, 
+    },
     event_bookings = {
       name   = "events_bookings"
       code   = "events/manage/getEventBookings"
@@ -87,7 +87,13 @@ variable "lambda_definitions" {
       path   = "event/{id}/manage/timeline"
       method = "get"
     },
-/*handlerSetup('/api/event/:id/manage/timeline', 'events/manage/getTimeline')
+    event_roles = {
+      name   = "events_roles"
+      code   = "events/manage/getRoles"
+      path   = "event/{id}/manage/timelrolesine"
+      method = "get"
+    },
+    /*handlerSetup('/api/event/:id/manage/timeline', 'events/manage/getTimeline')
     events_delete = {
       name     = "events_delete"
       code_dir = "events/delete"

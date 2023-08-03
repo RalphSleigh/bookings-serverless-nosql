@@ -1,11 +1,10 @@
-import React, { useContext } from "react";
-import { useCreateBooking, eventBookingsQuery, eventTimelineQuery, useEvents, eventBookingsQueryType, eventTimelineQueryType, useHistoricalEventBookings } from "../queries.js";
+import React, { useContext, useTransition } from "react";
+import { useCreateBooking, eventBookingsQuery, eventTimelineQuery, useEvents, eventBookingsQueryType, eventTimelineQueryType, useHistoricalEventBookings, useEventTimeline } from "../queries.js";
 import { Navigate, Outlet, useOutletContext, useParams, useSearchParams } from "react-router-dom";
 import { EnsureHasPermission } from "../permissions.js";
 import { CanBookIntoEvent, CanManageEvent } from "../../shared/permissions.js";
 import { UserContext } from "../user/userContext.js";
-import { Jsonify } from 'type-fest'
-import { BookingType, EventBookingTimelineType, EventType } from "../../lambda-common/onetable.js";
+import { BookingType, EventBookingTimelineType, EventType, JsonBookingType, JsonEventType } from "../../lambda-common/onetable.js";
 import { UseQueryOptions, useQueries } from "@tanstack/react-query";
 
 export function Component({ }) {
@@ -15,32 +14,21 @@ export function Component({ }) {
     const event = eventsData.events.find(e => e.id === eventId)
     if (!event) return <Navigate to='/' />
 
-    const [bookingData, timelineData ] = useQueries<[eventBookingsQueryType, eventTimelineQueryType]>({queries: [eventBookingsQuery(eventId), eventTimelineQuery(eventId)]})
-    const bookings = bookingData.data?.bookings
-    const timeline = useTimeline(timelineData.data?.timeline.events)
+    const  { timeline: timelineData } = useEventTimeline(eventId).data
+
+    //const [bookingData, timelineData = useQueries<[eventBookingsQueryType, eventTimelineQueryType]>({queries: [eventBookingsQuery(eventId), eventTimelineQuery(eventId)]})
+    //const bookings = bookingData.data?.bookings
+    const timeline = useTimeline(timelineData.events)
 
     //Simple case, give all the latest data
-    if(timeline.latest) return <EnsureHasPermission permission={CanManageEvent} event={event}>
-            <Outlet context={{event, bookings, timeline}}/>
+    return <EnsureHasPermission permission={CanManageEvent} event={event}>
+            <Outlet context={{event, timeline}}/>
         </EnsureHasPermission>
-     
-    //ok, we need the historical data
-
-    return <TimeLineDataLoader event={event} timeline={timeline}/>
 }
 
-export type manageContext = 
-    {event: Jsonify<EventType>, 
-    bookings: [Jsonify<BookingType>], 
-    timeline: ReturnType<typeof useTimeline>,
-    timelineLocation: string,
-    setSearchParams: ReturnType<typeof useSearchParams>[1]}
-
-function TimeLineDataLoader({event, timeline}){
-    const  { data: horisticalData } = useHistoricalEventBookings(event.id, Date.parse(timeline.position.time).toString())
-    return <EnsureHasPermission permission={CanManageEvent} event={event}>
-            <Outlet context={{event, bookings: horisticalData.bookings, timeline}}/>
-        </EnsureHasPermission>
+export type manageLoaderContext = {
+    event: JsonEventType, 
+    timeline: ReturnType<typeof useTimeline>
 }
 
 function useTimeline(timelineData) {
@@ -52,6 +40,7 @@ function useTimeline(timelineData) {
 
     const value = searchParams.get("viewDate") ? parseInt(searchParams.get("viewDate")!) : timelineData.length
     const latest = value === timelineData.length
+
     return {
         latest: latest,
         position: timestamps[value],
@@ -61,4 +50,9 @@ function useTimeline(timelineData) {
         forwardFn: () => setSearchParams({viewDate: (value + 1).toString()}),
         toLatest: () => setSearchParams({viewDate: timelineData.length.toString()})
     }
+}
+
+export type extobjwitharray = {
+    stuff: string,
+    thing: {ok: {hmm: string}}[]
 }

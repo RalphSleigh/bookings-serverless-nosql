@@ -1,7 +1,8 @@
-import { BookingType, EventBookingTimelineType, EventType, table } from '../../lambda-common/onetable.js';
+import { BookingType, EventBookingTimelineType, EventType, OnetableBookingType, table } from '../../lambda-common/onetable.js';
 import { CanBookIntoEvent } from '../../shared/permissions.js';
 import { lambda_wrapper_json } from '../../lambda-common/lambda_wrappers.js';
 import { Model } from 'dynamodb-onetable';
+import { updateParticipantsDates } from '../../lambda-common/util.js';
 
 /*
 export const lambdaHandlerfsdf = lambda_wrapper_json(
@@ -20,7 +21,7 @@ export const lambdaHandlerfsdf = lambda_wrapper_json(
     })
 */
 
-const BookingModel: Model<BookingType> = table.getModel('Booking')
+const BookingModel: Model<OnetableBookingType> = table.getModel('Booking')
 const EventModel: Model<EventType> = table.getModel('Event')
 const EventBookingTimelineModel = table.getModel<EventBookingTimelineType>('EventBookingTimeline')
 
@@ -37,6 +38,9 @@ export const lambdaHandler = lambda_wrapper_json(
             booking.userId = current_user.id
             booking.version = "latest"
             booking.deleted = false
+
+            updateParticipantsDates([], booking.participants)
+
             const newBooking = await BookingModel.create(booking)
 
             //create historical version

@@ -6,6 +6,7 @@ import { UtcDatePicker, parseDate } from "../util.js";
 import { DateTimePicker } from "@mui/x-date-pickers";
 import { FeeStructure } from "../../shared/fee/feeStructure.js";
 import { fees } from "../../shared/fee/fee.js";
+import { kp } from "../../shared/kp/kp.js"
 
 export function EventForm({ data: inputData, submit, mode}: {data: any, submit: (data) => void, mode: "create" | "edit"}) {
     const user = useContext(UserContext)
@@ -34,6 +35,10 @@ export function EventForm({ data: inputData, submit, mode}: {data: any, submit: 
         e.preventDefault()
     }
 
+    const kpOptions = Object.entries(kp).map(([key, value]) => <MenuItem key={key} value={key}>
+    {value.kpName}
+    </MenuItem>)
+
     const feeOptions = Object.entries(fees).map(([key, value]) => <MenuItem key={key} value={key}>
         {value.feeName}
     </MenuItem>)
@@ -53,6 +58,13 @@ export function EventForm({ data: inputData, submit, mode}: {data: any, submit: 
                                 <UtcDatePicker sx={{ mt: 2 }} label="End Date" value={data.endDate} onChange={updateDate('endDate')} />
                                 <DateTimePicker sx={{ mt: 2 }} label="Booking Deadline" value={parseDate(data.bookingDeadline)} onChange={updateDate('bookingDeadline')} />
                                 <FormControlLabel sx={{ mt: 2 }} control={<Switch checked={data.bigCampMode || false} onChange={updateSwitch('bigCampMode')}/>} label="Big Camp Mode" />
+                                <FormControl fullWidth sx={{ mt: 2 }}>
+                                    <InputLabel id="fee-select-label">KP Structure</InputLabel>
+                                    <Select value={data.kpMode || "default"} label="KP  Structure" onChange={update("kpMode")} labelId="kp-select-label">
+                                    {data.kpMode ? null : <MenuItem key="default" value="default">Please select</MenuItem>}
+                                    {kpOptions}
+                                </Select>
+                                </FormControl>
                                 <FormControl fullWidth sx={{ mt: 2 }}>
                                     <InputLabel id="fee-select-label">Fee Structure</InputLabel>
                                     <Select value={data.feeStructure || "default"} label="Fee Structure" onChange={update("feeStructure")} labelId="fee-select-label">

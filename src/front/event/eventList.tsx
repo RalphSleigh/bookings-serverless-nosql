@@ -2,10 +2,9 @@ import { Button, Fab, Link, Paper, Typography } from "@mui/material";
 import { Unstable_Grid2 as Grid } from '@mui/material';
 import React, { useContext } from "react";
 import { Add } from '@mui/icons-material';
-import { BookingType, EventType } from "../../lambda-common/onetable.js";
+import { BookingType, EventType, JsonBookingType, JsonEventType } from "../../lambda-common/onetable.js";
 import { useEvents, useUsersBookings } from "../queries.js";
 import { isSameMonth, format, parseISO } from "date-fns";
-import type { Jsonify } from 'type-fest';
 import { CanEditEvent, CanEditOwnBooking, CanManageEvent, IsGlobalAdmin } from "../../shared/permissions.js";
 import { IfHasPermission } from "../permissions.js";
 import { parseDate, toLocalDate } from "../util.js";
@@ -39,7 +38,7 @@ export function EventList(props) {
     </>
 }
 
-function EventCard({ event, booking }: { event: Jsonify<EventType>, booking?: Jsonify<BookingType> }) {
+function EventCard({ event, booking }: { event: JsonEventType, booking?: JsonBookingType }) {
 
     const startDate = toLocalDate(event.startDate)!
     const endDate = toLocalDate(event.endDate)!
@@ -63,7 +62,7 @@ function EventCard({ event, booking }: { event: Jsonify<EventType>, booking?: Js
     </Paper>
 }
 
-function BookingButton({ event, booking }: { event: Jsonify<EventType>, booking?: Jsonify<BookingType> }) {
+function BookingButton({ event, booking }: { event: JsonEventType, booking?: JsonBookingType }) {
     const user = useContext(UserContext)
     if (!user) return <Button variant="contained" sx={{ float: "right" }} component={RouterLink} to="/login">Log in to Book</Button>
 

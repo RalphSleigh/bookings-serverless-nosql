@@ -1,8 +1,6 @@
 import { QueryObserverSuccessResult, UseQueryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
-import { Jsonify } from 'type-fest'
-import { BookingType, EventBookingTimelineType, EventType } from '../lambda-common/onetable.js'
-import { UserContextType } from './user/userContext.js'
+import { BookingType, EventBookingTimelineType, EventType, JsonBookingType, JsonEventBookingTimelineType, JsonEventType, JsonRoleType, JsonUserResponseType, JsonUserType } from '../lambda-common/onetable.js'
 
 export function useEnv() {
     return useQuery(['env'],
@@ -15,7 +13,7 @@ export const userQuery = {
 }
 
 export function useUser() {
-    return useQuery(userQuery.queryKey, userQuery.queryFn) as QueryObserverSuccessResult<{ "user": UserContextType }>
+    return useQuery(userQuery.queryKey, userQuery.queryFn) as QueryObserverSuccessResult<{ "user": JsonUserResponseType }>
 }
 
 export const eventsQuery = {
@@ -24,7 +22,7 @@ export const eventsQuery = {
 }
 
 export function useEvents() {
-    return useQuery(eventsQuery.queryKey, eventsQuery.queryFn) as QueryObserverSuccessResult<{ "events": [Jsonify<EventType>] }>
+    return useQuery(eventsQuery.queryKey, eventsQuery.queryFn) as QueryObserverSuccessResult<{ "events": [JsonEventType] }>
 }
 
 export const userBookingsQuery = {
@@ -43,7 +41,7 @@ export function useCreateEvent() {
 }
 
 export function useUsersBookings() {
-    return useQuery(userBookingsQuery.queryKey, userBookingsQuery.queryFn) as QueryObserverSuccessResult<{ "bookings": [Jsonify<BookingType>] }>
+    return useQuery(userBookingsQuery.queryKey, userBookingsQuery.queryFn) as QueryObserverSuccessResult<{ "bookings": [JsonBookingType] }>
 }
 
 export function useEditEvent() {
@@ -58,7 +56,7 @@ export function useEditEvent() {
 
 export function useCreateBooking() {
     const queryClient = useQueryClient()
-    return useMutation<{ booking: Jsonify<BookingType> }, any, BookingType, any>(
+    return useMutation<{ booking: JsonBookingType }, any, JsonBookingType, any>(
         async data => (await axios.post('/api/booking/create', { booking: data })).data,
         {  
             onSuccess: () => { 
@@ -69,7 +67,7 @@ export function useCreateBooking() {
 
 export function useEditBooking() {
     const queryClient = useQueryClient()
-    return useMutation<{ booking: Jsonify<BookingType> }, any, BookingType, any>(
+    return useMutation<{ booking: JsonBookingType }, any, JsonBookingType, any>(
         async data => (await axios.post('/api/booking/edit', { booking: data })).data,
         {  
             onSuccess: () => { 
@@ -86,7 +84,12 @@ export const eventBookingsQuery = eventId => {
     }
 }
 
-export type eventBookingsQueryType = UseQueryOptions<{ "bookings": [Jsonify<BookingType>] }, any>
+export function useEventBookings(eventId) {
+    const query = eventBookingsQuery(eventId)
+    return useQuery(query.queryKey, query.queryFn) as QueryObserverSuccessResult<{ "bookings": [JsonBookingType] }>
+}
+
+export type eventBookingsQueryType = UseQueryOptions<{ "bookings": [JsonBookingType] }, any>
 
 /* export function useEventBookings(eventId) {
     return useQuery([eventId, 'bookings'],
@@ -100,7 +103,12 @@ export const eventTimelineQuery = eventId => {
     }
 }
 
-export type eventTimelineQueryType = UseQueryOptions<{ "timeline": Jsonify<EventBookingTimelineType> }, any>
+export function useEventTimeline(eventId) {
+    const query = eventTimelineQuery(eventId)
+    return useQuery(query.queryKey, query.queryFn) as QueryObserverSuccessResult<{ "timeline": JsonEventBookingTimelineType }>
+}
+
+export type eventTimelineQueryType = UseQueryOptions<{ "timeline": JsonEventBookingTimelineType }, any>
 /* export function useEventTimeline(eventId) {
     return useQuery([eventId, 'bookings'],
         async () => (await axios.get(`/api/event/${eventId}/manage/timeline`)).data) as QueryObserverSuccessResult<{ "timeline": Jsonify<EventBookingTimelineType> }>
@@ -108,5 +116,29 @@ export type eventTimelineQueryType = UseQueryOptions<{ "timeline": Jsonify<Event
 
 export function useHistoricalEventBookings(eventId, timestamp) {
     return useQuery([eventId, 'bookings', timestamp],
-        async () => (await axios.get(`/api/event/${eventId}/manage/bookings/${timestamp}`)).data) as QueryObserverSuccessResult<{ "bookings": [Jsonify<BookingType>] }>
+        async () => (await axios.get(`/api/event/${eventId}/manage/bookings/${timestamp}`)).data) as QueryObserverSuccessResult<{ "bookings": [JsonBookingType] }>
 }
+
+export const eventRolesQuery = eventId => {
+    return {
+        queryKey: [eventId, 'roles'],
+        queryFn: async () => (await axios.get(`/api/event/${eventId}/manage/roles`)).data
+    }
+}
+
+export function useEventRoles(eventId) {
+    const query = eventRolesQuery(eventId)
+    return useQuery(query.queryKey, query.queryFn) as QueryObserverSuccessResult<{ "roles": [JsonRoleType] }>
+}
+
+export type eventRolesQueryType = UseQueryOptions<{ "roles": [JsonRoleType] }, any>
+
+//This does not depend on the eventId, but we use it to make checking permission simpler
+export const allUsersQuery = eventId => {
+    return {
+        queryKey: ['users'],
+        queryFn: async () => (await axios.get(`/api/user/list/${eventId}`)).data
+    }
+}
+
+export type allUsersQueryType = UseQueryOptions<{ "users": [JsonUserType] }, any>

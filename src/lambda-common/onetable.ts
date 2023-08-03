@@ -1,6 +1,7 @@
 import { Dynamo } from 'dynamodb-onetable/Dynamo'
 import { Table, Entity } from 'dynamodb-onetable'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+import { Jsonify } from 'type-fest'
 
 const client = new Dynamo({
     client: new DynamoDBClient({
@@ -25,15 +26,18 @@ const schema = {
             password: { type: String },
             email: { type: String },
             source: { type: String },
+            picture: { type: String },
             admin: { type: Boolean, required: true, default: 'false' },
             created: { type: Date },
             updated: { type: Date },
         },
         Role: {
             pk: { type: String, value: 'role' },
-            sk: { type: String, value: 'bookings:${}' },
-            user: { type: String, required: true },
-            event: { type: String },
+            sk: { type: String, value: '${eventid}:${id}' },
+            userIdVersion: { type: String, value: '${userId}:${id}' },
+            id: { type: String, generate: 'uid', required: true },
+            userId: { type: String, required: true },
+            eventId: { type: String, required: true },
             created: { type: Date },
             updated: { type: Date },
         },
@@ -47,6 +51,7 @@ const schema = {
             startDate: { type: Date, required: true },
             endDate: { type: Date, required: true },
             bookingDeadline: { type: Date, required: true },
+            kpMode: {type: String, required: true, enum:['basic', 'vcamp']},
             bigCampMode: { type: Boolean, required: true, default: 'false' },
             feeStructure: { type: String, required: true },
             created: { type: Date },
@@ -73,6 +78,15 @@ const schema = {
                             //},
                             required: true
                         },
+                        kp: {
+                            type: Object,
+                            //Currently unsupported
+                            //schema: {
+                            //    name: { type: String, required: true }
+                            //},
+                        },
+                        created: { type: Date, required: true },
+                        updated: { type: Date, required: true }
                     }
 
                 },
@@ -105,10 +119,49 @@ const schema = {
     },
 }
 
+interface ParticipantFields {
+    created: Date,
+    updated: Date
+}
+
+interface ParticipantBasicType {
+    basic: {
+        name: string
+    }
+}
+
+interface ParticipantKpType {
+    kp: {
+        diet: "omnivore" | "pescatarian" | "vegetarian" | "vegan"
+    }
+}
+
+export type ParticipantType = ParticipantFields & ParticipantBasicType & Partial<ParticipantKpType>
+
+export type JsonParticipantType = Jsonify<ParticipantFields> & ParticipantBasicType & Partial<ParticipantKpType>
+
 export type UserType = Entity<typeof schema.models.User>
 export type EventType = Entity<typeof schema.models.Event>
-export type BookingType = Entity<typeof schema.models.Booking>
+export type RoleType = Entity<typeof schema.models.Role>
+
+export type FoundUserResponseType = (UserType & { roles: Array<RoleType> })
+export type UserResponseType = FoundUserResponseType | null
+
+export type OnetableBookingType = Entity<typeof schema.models.Booking>
+
+export type BookingType = Omit<OnetableBookingType, 'participants'> & {participants: Array<ParticipantType>}
 export type EventBookingTimelineType = Entity<typeof schema.models.EventBookingTimeline>
+
+export type JsonUserType = Jsonify<UserType>
+export type JsonUserResponseType = Jsonify<UserResponseType>
+export type JsonEventType = Jsonify<EventType>
+export type JsonBookingType = Omit<Jsonify<BookingType>, 'participants'> & {participants: Array<JsonParticipantType>}
+export type JsonEventBookingTimelineType = Jsonify<EventBookingTimelineType>
+export type JsonRoleType = Jsonify<RoleType>
+
+
+
+
 
 //@ts-ignore
 export const table = new Table({

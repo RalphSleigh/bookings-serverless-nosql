@@ -1,9 +1,10 @@
 import { Model } from 'dynamodb-onetable';
 import { lambda_wrapper_json } from '../../lambda-common/lambda_wrappers.js';
-import { BookingType, EventBookingTimelineType, EventType, table } from '../../lambda-common/onetable.js';
+import { BookingType, EventBookingTimelineType, EventType, OnetableBookingType, table } from '../../lambda-common/onetable.js';
 import { CanEditBooking, CanEditEvent } from '../../shared/permissions.js';
+import { updateParticipantsDates } from '../../lambda-common/util.js';
 
-const BookingModel: Model<BookingType> = table.getModel('Booking')
+const BookingModel: Model<OnetableBookingType> = table.getModel('Booking')
 const EventModel: Model<EventType> = table.getModel('Event')
 const EventBookingTimelineModel = table.getModel<EventBookingTimelineType>('EventBookingTimeline')
 
@@ -11,13 +12,16 @@ export const lambdaHandler = lambda_wrapper_json(
     async (lambda_event, config, current_user) => {
 
         const newData = lambda_event.body.booking
-
-        const existingLatestBooking = await BookingModel.get({eventId: newData.eventId, userId: newData.userId, version: "latest" })
+        //@ts-ignore
+        const existingLatestBooking = await BookingModel.get({eventId: newData.eventId, userId: newData.userId, version: "latest" }) as BookingType
         
         const event = await EventModel.get({id: existingLatestBooking?.eventId})
 
         if(existingLatestBooking && event) {
             CanEditBooking.throw({user: current_user, event: event, booking: existingLatestBooking})
+
+            updateParticipantsDates(existingLatestBooking.participants, newData.participants)
+
             //const version = new Date()
             const newLatest = await BookingModel.update({...existingLatestBooking, ...newData}, {partial: false})
             //@ts-ignore

@@ -78,7 +78,7 @@ const router = createBrowserRouter([{
                         lazy: () => import('../manage/participants.js')
                     },{
                         path: "roles",
-                        lazy: () => import('../manage/participants.js')
+                        lazy: () => import('../manage/roles.js')
                     }]
                 }]
             }

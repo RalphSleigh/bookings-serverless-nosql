@@ -2,10 +2,9 @@ import React from 'react';
 import { createContext } from 'react';
 import { useUser } from '../queries.js'
 
-import type { UserType } from '../../lambda-common/onetable.js'
-export type UserContextType = UserType | undefined
+import type { JsonUserResponseType, UserType } from '../../lambda-common/onetable.js'
 
-export const UserContext = createContext<UserContextType>(undefined);
+export const UserContext = createContext<JsonUserResponseType>(null);
 
 
 export function UserContextProvider(props) {
