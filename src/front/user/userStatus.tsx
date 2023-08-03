@@ -10,7 +10,7 @@ export function UserStatus(props) {
     if (user) {
         return <>
             <Typography variant="body1">{user.userName}</Typography>
-            <Avatar imgProps={{ referrerPolicy: "no-referrer" }} sx={{ width: 28, height: 28, ml: 1, boxShadow: 20 }} alt={user.userName} src={user.picture || undefined} />
+            <Avatar imgProps={{ referrerPolicy: "no-referrer" }} sx={{ width: 28, height: 28, ml: 1, boxShadow: 20 }} alt={user.userName} src={user.picture || "/nope.jpg"} />
             <IconButton sx={{ ml: 1 }} component={'a'} href="/api/user/logout" color="inherit">
                 <Logout />
             </IconButton>
