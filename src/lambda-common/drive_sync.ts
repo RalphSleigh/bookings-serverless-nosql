@@ -28,11 +28,9 @@ export async function syncEventToDrive(eventId, config) {
             } catch (e: any) {
                 if (e.code === 401) {
                     await UserModel.update({ remoteId: user.remoteId }, { remove: ['tokens'] })
-                    return
                 } else {
                     console.log(`ERROR syncing drive for ${user.userName} event ${event?.name}`)
                     console.log(e)
-                    throw e
                 }
             }
         }
