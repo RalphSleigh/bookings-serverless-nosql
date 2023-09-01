@@ -48,14 +48,32 @@ export const IsGlobalAdmin = new Permission<PermissionData>(data => {
 export const CanEditEvent = new Permission<EventPermissionData>(data => {
     IsLoggedIn.throw(data)
     if (IsGlobalAdmin.if(data)) return true
-    return data.event.owner === data.user!.id
+    return false
 }, "User can't edit event")
 
 export const CanManageEvent = new Permission<EventPermissionData>(data => {
     IsLoggedIn.throw(data)
     if (IsGlobalAdmin.if(data)) return true
-    return data.event.owner === data.user!.id
+    if (hasRoleOnEvent(data.user, data.event, "view")) return true
+    if (hasRoleOnEvent(data.user, data.event, "kp")) return true
+    if (hasRoleOnEvent(data.user, data.event, "manage")) return true
+    return false
 }, "User can't manage event")
+
+export const CanManageWholeEvent = new Permission<EventPermissionData>(data => {
+    IsLoggedIn.throw(data)
+    if (IsGlobalAdmin.if(data)) return true
+    if (hasRoleOnEvent(data.user, data.event, "manage")) return true
+    return false
+}, "User can't manage whole event")
+
+export const CanCreateRole = new Permission<EventPermissionData>(data => {
+    return CanManageWholeEvent.if(data)
+}, "User can't create role")
+
+export const CanDeleteRole = new Permission<EventPermissionData>(data => {
+    return CanManageWholeEvent.if(data)
+}, "User can't delete role")
 
 export const CanBookIntoEvent = new Permission<EventPermissionData>(data => {
     IsLoggedIn.throw(data)
@@ -77,3 +95,6 @@ export const CanEditBooking = new Permission<BookingPermissionData>(data => {
     return CanManageEvent.if(data)
 }, "User can't edit booking")
 
+const hasRoleOnEvent = (user, event, role) => {
+    return !!user.roles.find(r => r.eventId === event.id && r.role === role)
+}

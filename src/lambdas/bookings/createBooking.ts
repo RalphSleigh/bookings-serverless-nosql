@@ -3,6 +3,7 @@ import { CanBookIntoEvent } from '../../shared/permissions.js';
 import { lambda_wrapper_json } from '../../lambda-common/lambda_wrappers.js';
 import { Model } from 'dynamodb-onetable';
 import { updateParticipantsDates } from '../../lambda-common/util.js';
+import { syncEventToDrive } from '../../lambda-common/drive_sync.js';
 
 /*
 export const lambdaHandlerfsdf = lambda_wrapper_json(
@@ -51,6 +52,8 @@ export const lambdaHandler = lambda_wrapper_json(
             //update timeline
             EventBookingTimelineModel.update({eventId: booking.eventId}, {set: {events: 'list_append(if_not_exists(events, @{emptyList}), @{newEvent})'},
             substitutions: {newEvent: [{userId: current_user.id, time: newBooking.created.toISOString()}], emptyList: []}})
+
+            syncEventToDrive(event.id, config)
 
             return {}
         } else {

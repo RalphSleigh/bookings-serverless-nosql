@@ -61,7 +61,7 @@ export function useCreateBooking() {
         {  
             onSuccess: () => { 
                 queryClient.invalidateQueries(['user', 'bookings'])
-                queryClient.invalidateQueries(['bookings'])
+                queryClient.invalidateQueries(['manage'])
         }})
 }
 
@@ -72,14 +72,14 @@ export function useEditBooking() {
         {  
             onSuccess: () => { 
                 queryClient.invalidateQueries(['user', 'bookings'])
-                queryClient.invalidateQueries(['bookings'])
+                queryClient.invalidateQueries(['manage'])
         }}
     )
 }
 
 export const eventBookingsQuery = eventId => {
     return {
-        queryKey: [eventId, 'bookings'],
+        queryKey: ['manage', eventId, 'bookings'],
         queryFn: async () => (await axios.get(`/api/event/${eventId}/manage/bookings`)).data
     }
 }
@@ -98,7 +98,7 @@ export type eventBookingsQueryType = UseQueryOptions<{ "bookings": [JsonBookingT
 
 export const eventTimelineQuery = eventId => {
     return {
-        queryKey: [eventId, 'timeline'],
+        queryKey: ['manage', eventId, 'timeline'],
         queryFn: async () => (await axios.get(`/api/event/${eventId}/manage/timeline`)).data
     }
 }
@@ -115,13 +115,13 @@ export type eventTimelineQueryType = UseQueryOptions<{ "timeline": JsonEventBook
 } */
 
 export function useHistoricalEventBookings(eventId, timestamp) {
-    return useQuery([eventId, 'bookings', timestamp],
+    return useQuery(['manage', eventId, 'bookings', timestamp],
         async () => (await axios.get(`/api/event/${eventId}/manage/bookings/${timestamp}`)).data) as QueryObserverSuccessResult<{ "bookings": [JsonBookingType] }>
 }
 
 export const eventRolesQuery = eventId => {
     return {
-        queryKey: [eventId, 'roles'],
+        queryKey: ['manage', eventId, 'roles'],
         queryFn: async () => (await axios.get(`/api/event/${eventId}/manage/roles`)).data
     }
 }
@@ -142,3 +142,36 @@ export const allUsersQuery = eventId => {
 }
 
 export type allUsersQueryType = UseQueryOptions<{ "users": [JsonUserType] }, any>
+
+export function useCreateRole(eventId) {
+    const queryClient = useQueryClient()
+    return useMutation<{ role: JsonRoleType }, any, JsonRoleType, any>(
+        async data => (await axios.post(`/api/event/${eventId}/manage/roles/create`, { role: data })).data,
+        {  
+            onSuccess: () => { 
+                queryClient.invalidateQueries(['manage', eventId, 'roles'])
+        }}
+    )
+}
+
+export function useDeleteRole(eventId) {
+    const queryClient = useQueryClient()
+    return useMutation<{ role: string }, any, string, any>(
+        async data => (await axios.post(`/api/event/${eventId}/manage/roles/delete`, { role: data })).data,
+        {  
+            onSuccess: () => { 
+                queryClient.invalidateQueries(['manage', eventId, 'roles'])
+        }}
+    )
+}
+
+export function useDisableDriveSync() {
+    const queryClient = useQueryClient()
+    return useMutation<any, any, string, any>(
+        async data => (await axios.post(`/api/user/disableDriveSync`)).data,
+        {  
+            onSuccess: () => { 
+                queryClient.invalidateQueries(['user'])
+        }}
+    )
+}

@@ -39,6 +39,12 @@ variable "lambda_definitions" {
       path   = "user"
       method = "get"
     },
+    userDisableDriveSync = {
+      name   = "userDisableDriveSync"
+      code   = "user/disableDriveSync"
+      path   = "user/disableDriveSync"
+      method = "post"
+    },
     user_logout = {
       name   = "user_logout"
       code   = "user/logout"
@@ -90,9 +96,21 @@ variable "lambda_definitions" {
     event_roles = {
       name   = "events_roles"
       code   = "events/manage/getRoles"
-      path   = "event/{id}/manage/timelrolesine"
+      path   = "event/{id}/manage/roles"
       method = "get"
     },
+    event_roles_create = {
+      name   = "event_roles_create"
+      code   = "events/manage/createRole"
+      path   = "event/{id}/manage/roles/create"
+      method = "post"
+    },
+    event_roles_delete = {
+      name   = "event_roles_delete"
+      code   = "events/manage/deleteRole"
+      path   = "event/{id}/manage/roles/delete"
+      method = "post"
+    }
     /*handlerSetup('/api/event/:id/manage/timeline', 'events/manage/getTimeline')
     events_delete = {
       name     = "events_delete"
@@ -248,6 +266,18 @@ variable "lambda_definitions" {
       name   = "auth_google_callback"
       code   = "auth/google/callback"
       path   = "auth/google/callback"
+      method = "get"
+    },
+    auth_google_drive_redirect = {
+      name   = "auth_google_drive_redirect"
+      code   = "auth/google_drive/redirect"
+      path   = "auth/google_drive/redirect"
+      method = "get"
+    },
+    auth_google_drive_callback = {
+      name   = "auth_google_drive_callback"
+      code   = "auth/google_drive/callback"
+      path   = "auth/google_drive/callback"
       method = "get"
     }, /*
     auth_facebook_redirect = {

@@ -1,18 +1,27 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useOutletContext } from "react-router-dom";
 import { JsonParticipantType } from "../../lambda-common/onetable.js";
 import { managePageContext } from "./managePage.js";
 import { Grid } from "@mui/material";
+import { Fields } from "../../shared/participantFields.js";
+import { DataGrid } from "@mui/x-data-grid";
 
 export function Component() {
     const { event, bookings } = useOutletContext<managePageContext>()
 
     const participants = bookings.reduce<JsonParticipantType[]>((a, c) => {
         return [...a, ...c.participants]
-    }, []).map((p, i) => <p key={i}>{p.basic.name}</p>)
+    }, [])
+
+    const columns = new Fields(event).getColumnDefs()
+
+    const rows = useMemo(() => participants.map((p,i) => {
+        return { participant: p, id: i }
+    }), [participants])
 
     return <Grid xs={12} p={2} item>
-        {participants}
+        
+        <DataGrid rowSelection={false} pageSizeOptions={[100]} rows={rows} columns={columns} />
     </Grid>
 
 }

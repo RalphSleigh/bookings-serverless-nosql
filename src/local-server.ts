@@ -61,6 +61,7 @@ const handlerSetup = (url: string, lambda_path: string, method: string = "GET") 
 handlerSetup('/api/env', 'env/getEnv')
 
 handlerSetup('/api/user', 'user/getUser')
+handlerSetup('/api/user/disableDriveSync', 'user/disableDriveSync', "POST")
 handlerSetup('/api/user/logout', 'user/logout')
 handlerSetup('/api/user/list/:eventId', 'user/listUsers')
 
@@ -76,6 +77,8 @@ handlerSetup('/api/event/:id/manage/bookings', 'events/manage/getEventBookings')
 handlerSetup('/api/event/:id/manage/bookings/:timestamp', 'events/manage/getEventHistoricalBookings')
 handlerSetup('/api/event/:id/manage/timeline', 'events/manage/getEventTimeline')
 handlerSetup('/api/event/:id/manage/roles', 'events/manage/getRoles')
+handlerSetup('/api/event/:id/manage/roles/create', 'events/manage/createRole', "POST")
+handlerSetup('/api/event/:id/manage/roles/delete', 'events/manage/deleteRole', "POST")
 
 handlerSetup('/api/booking/user', 'bookings/getUsersBookings')
 handlerSetup('/api/booking/create', 'bookings/createBooking', "POST")
@@ -95,7 +98,6 @@ handlerSetup('/api/booking/edit', 'bookings/editBooking', "POST")
 //handlerSetup('/api/application/decline', 'application/decline/handler', "POST")
 //handlerSetup('/api/application/approve', 'application/approve/handler', "POST")
 
-//handlerSetup('/api/role/create', 'role/create/handler', "POST")
 //handlerSetup('/api/role/delete', 'role/delete/handler', "POST")
 
 //handlerSetup('/api/payment/add', 'payment/add/handler', "POST")
@@ -109,6 +111,9 @@ handlerSetup('/api/booking/edit', 'bookings/editBooking', "POST")
 
 handlerSetup('/api/auth/google/redirect', 'auth/google/redirect')
 handlerSetup('/api/auth/google/callback', 'auth/google/callback')
+
+handlerSetup('/api/auth/google_drive/redirect', 'auth/google_drive/redirect')
+handlerSetup('/api/auth/google_drive/callback', 'auth/google_drive/callback')
 
 //handlerSetup('/api/auth/facebook/redirect', 'auth/facebook/redirect/handler')
 //handlerSetup('/api/auth/facebook/callback', 'auth/facebook/callback/handler')

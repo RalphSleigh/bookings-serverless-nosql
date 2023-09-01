@@ -9,7 +9,7 @@ export const lambdaHandler = lambda_wrapper_json(
     async (lambda_event, config, current_user) => {
         IsGlobalAdmin.throw({user: current_user})
 
-        const newEvent = await EventModel.create({...lambda_event.body.event, owner: current_user!.id})
+        const newEvent = await EventModel.create({...lambda_event.body.event})
         const newEventBookingTimeline = await EventBookingTimelineModel.create({eventId: newEvent.id, events: []})
 
         return {}

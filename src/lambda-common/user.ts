@@ -3,6 +3,7 @@ import { log } from './logging.js'
 import jwt from 'jsonwebtoken'
 import cookie from 'cookie'
 import { RoleType, table, UserResponseType, UserType, FoundUserResponseType } from './onetable.js'
+import { useGridRowSelection } from '@mui/x-data-grid/internals'
 
 const UserModel = table.getModel<UserType>('User')
 const RoleModel = table.getModel<RoleType>('Role')
@@ -20,11 +21,11 @@ export async function get_user_from_event(event: APIGatewayProxyEvent, config): 
 
         const token = jwt.verify(jwt_string, config.JWT_SECRET) as { remoteId: string }
 
-        const user = await UserModel.get({ remoteId: token.remoteId }) as UserResponseType
-
+        const user = await UserModel.get({ remoteId: token.remoteId }) as UserType | undefined
         if (user) {
-            user.roles = await RoleModel.find({ userIdVersion: { begins: user?.id } }, { index: 'ls1' })
-            return user
+            const userResponse: FoundUserResponseType = {...user, tokens: !!user.tokens, roles: []}
+            userResponse.roles = await RoleModel.find({ userIdVersion: { begins: user?.id } }, { index: 'ls1' })
+            return userResponse
         } else {
             throw "no user found for ID???"
         }

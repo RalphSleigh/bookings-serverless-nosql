@@ -30,6 +30,8 @@ export function BookingForm({ data, event, user, update, submit, mode}: {data: P
         e.preventDefault()
     }
 
+    const districtField = event.bigCampMode ? <TextField sx={{ mt: 2 }} required id="outlined-required" label="District" value={data.district || ''} onChange={updateField('district')} /> : null
+
     const kpConfig = kp[event.kpMode] || kp.basic
 
     return <Grid container spacing={0}>
@@ -40,6 +42,7 @@ export function BookingForm({ data, event, user, update, submit, mode}: {data: P
                         <form>
                             <FormGroup>
                                 <TextField sx={{ mt: 2 }} required id="outlined-required" label="Booking Contact Name" value={data.contactName || ''} onChange={updateField('contactName')} />
+                                {districtField}
                                 {/*
                                 <TextField sx={{ mt: 2 }} multiline minRows={3} id="outlined-required" label="Description" value={data.description || ''} onChange={update('description')} />
                                 <UtcDatePicker sx={{ mt: 2 }} label="Start Date" value={data.startDate} onChange={updateDate('startDate')} />

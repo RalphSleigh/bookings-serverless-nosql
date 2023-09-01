@@ -1,13 +1,16 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Outlet, useOutletContext, useResolvedPath, useLocation } from "react-router-dom";
 import { manageLoaderContext } from "./manageLoader.js";
-import { Button, ButtonGroup, Grid, Link, Tab, Tabs, TextField } from "@mui/material";
-import { useEventBookings, useHistoricalEventBookings } from "../queries.js";
-import { JsonBookingType, JsonEventType } from "../../lambda-common/onetable.js";
+import { Button, ButtonGroup, FormControlLabel, Grid, Link, Switch, Tab, Tabs, TextField } from "@mui/material";
+import { useDisableDriveSync, useEventBookings, useHistoricalEventBookings } from "../queries.js";
+import { JsonBookingType, JsonEventType, JsonUserResponseType } from "../../lambda-common/onetable.js";
 import { SuspenseWrapper } from "../suspense.js";
+import { UserContext } from "../user/userContext.js";
+import { CanManageWholeEvent } from "../../shared/permissions.js";
 
 export function Component() {
     const { event, timeline } = useOutletContext<manageLoaderContext>()
+    const user = useContext(UserContext)!
 
     const location = useLocation()
 
@@ -22,10 +25,11 @@ export function Component() {
             <Tabs value={!location.pathname.endsWith("manage") ? location.pathname : participantPath.pathname}>
                 <Tab label="Participants" value={participantPath.pathname} href={participantPath.pathname} component={Link} />
                 <Tab label="Bookings" value={bookingsPath.pathname} href={bookingsPath.pathname} component={Link} />
-                <Tab label="Roles" value={rolesPath.pathname} href={rolesPath.pathname} component={Link} />
+                <PermissionTab user={user} event={event} permission={CanManageWholeEvent} label="Roles" value={rolesPath.pathname} href={rolesPath.pathname} component={Link} />
             </Tabs>
         </Grid>
         {shouldShowSearch(location) ? <Grid xs={12} p={2} item>
+            <SyncWidget user={user} />
             <TextField sx={{ mr: 1, mt: 1 }} size="small" margin="dense" label="Participant search" />
             <TextField sx={{ mr: 1, mt: 1 }} size="small" margin="dense" label="Booking search" />
             <ButtonGroup variant="outlined" sx={{ mr: 1, mt: 1 }} aria-label="outlined button group">
@@ -34,6 +38,7 @@ export function Component() {
                 <Button disabled={timeline.forwardEnabled} onClick={timeline.forwardFn}>{'>'}</Button>
                 <Button disabled={timeline.forwardEnabled} onClick={timeline.toLatest}>{'>>'}</Button>
             </ButtonGroup>
+
         </Grid> : null}
 
             <SuspenseWrapper>
@@ -58,4 +63,28 @@ function LatestDataLoader({ event, timeline }) {
 function TimeLineDataLoader({ event, timeline }) {
     const { bookings } = useHistoricalEventBookings(event.id, Date.parse(timeline.position.time).toString()).data
     return <Outlet context={{ event, bookings, timeline }} />
+}
+
+const  PermissionTab: React.FC<any> = props => {
+    const { user, event, permission, ...rest } = props 
+    if(permission.if({user, event})) return <Tab {...rest} />
+    else return null
+}
+
+const SyncWidget: React.FC<{user: JsonUserResponseType}> = props => {
+
+    const disableDriveSync = useDisableDriveSync()
+
+    const {user} = props
+    if(!user || user.source !== "google") return null
+
+    const change = e => {
+        if(user.tokens) {
+            disableDriveSync.mutate("")
+        } else {
+            window.location.href = "/api/auth/google_drive/redirect"
+        }
+    }
+
+    return <FormControlLabel sx={{ float: "right" }} control={<Switch checked={user.tokens} onChange={change}/>} label="Drive Sync" />
 }

@@ -20,7 +20,7 @@ export function EditOwnBookingLoader({ }) {
     const booking = bookings.find(b => b.eventId === event.id)
     if (!booking) return <Navigate to='/' />
 
-    return <EnsureHasPermission permission={CanEditOwnBooking} event={event} user={user}>
+    return <EnsureHasPermission permission={CanEditOwnBooking} event={event} user={user} booking={booking}>
         <EditOwnBookingPage event={event} booking={booking} user={user} />
     </EnsureHasPermission>
 }

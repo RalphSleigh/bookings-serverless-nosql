@@ -1,7 +1,6 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { lambda_wrapper_json } from '../../../lambda-common/lambda_wrappers.js';
 import { EventBookingTimelineType, EventType, RoleType, table } from '../../../lambda-common/onetable.js';
-import { CanEditEvent, CanManageEvent } from '../../../shared/permissions.js';
+import { CanCreateRole, CanDeleteRole, CanEditEvent, CanManageEvent } from '../../../shared/permissions.js';
 import { getDate } from 'date-fns';
 
 const EventModel = table.getModel<EventType>('Event')
@@ -11,9 +10,9 @@ export const lambdaHandler = lambda_wrapper_json(
     async (lambda_event, config, current_user) => {
         const event = await EventModel.get({id: lambda_event.pathParameters?.id})
         if(event) {
-            CanManageEvent.throw({user: current_user, event: event})
-            const roles = await RoleModel.find({ sk: { begins: event.id }})
-            return { roles }
+            CanDeleteRole.throw({user: current_user, event: event})
+            const role = await RoleModel.remove({eventId: event.id, id: lambda_event.body.role})
+            return {}
         } else {
             throw new Error("Can't find event")
         }

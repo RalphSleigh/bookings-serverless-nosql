@@ -3,7 +3,7 @@ import { ParticipantType } from './onetable.js';
 //import { db } from './orm'
 
 export function updateParticipantsDates(existing: Array<ParticipantType>, incoming: Array<ParticipantType>) {
-    const now = new Date()
+    let now = new Date()
 
     incoming.forEach(p => {
         p.created = p.created ? new Date(p.created) : now
@@ -11,6 +11,7 @@ export function updateParticipantsDates(existing: Array<ParticipantType>, incomi
 
         const unchanged = existing.find(old => _.isEqual(old, p))
         if(unchanged === undefined) p.updated = now
+        now = new Date(now.getTime() + 1)
     })
 
 

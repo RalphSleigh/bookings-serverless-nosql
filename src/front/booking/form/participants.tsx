@@ -13,7 +13,7 @@ export function ParticipantsForm({ participants, update, kp }: { participants: A
         update([...participants, {}])
     }
 
-    const updateParticipant = i => section => field => value=> {
+    const updateParticipant = i => section => field => value => {
         const newParticipants = cloneDeep(participants)
         const participantToUpdate = newParticipants[i]
         merge(participantToUpdate, {[section]: {[field]: value}})
@@ -47,6 +47,10 @@ function ParticipantForm({ participant, kp, update, deleteParticipant }: { parti
         e.preventDefault()
     }
 
+    const updateSwitch = section => field => e => {
+        update(section)(field)(e.target.checked)
+    }
+
     return <Paper elevation={6} sx={{ mt: 2 }}>
         <Box p={2}>
             <Fab sx={{ float: "right"}} size="small" color="error" aria-label="add" onClick={deleteParticipant}>
@@ -56,6 +60,7 @@ function ParticipantForm({ participant, kp, update, deleteParticipant }: { parti
             <FormGroup>
                 <TextField sx={{ mt: 2 }} required id="outlined-required" label="Name" value={participant.basic?.name || ''} onChange={updateParticipantField('basic')('name')} />
                 <kp.ParticipantFormElement data={participant.kp || {}} update={update('kp')} />
+                <FormControlLabel sx={{ mt: 2 }} control={<Switch checked={participant.consent?.photo as boolean || false } onChange={updateSwitch('consent')('photo')}/>} label="Photo Consent" />                         
             </FormGroup>
         </Box>
     </Paper>

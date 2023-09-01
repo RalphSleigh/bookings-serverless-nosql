@@ -3,6 +3,7 @@ import { lambda_wrapper_json } from '../../lambda-common/lambda_wrappers.js';
 import { BookingType, EventBookingTimelineType, EventType, OnetableBookingType, table } from '../../lambda-common/onetable.js';
 import { CanEditBooking, CanEditEvent } from '../../shared/permissions.js';
 import { updateParticipantsDates } from '../../lambda-common/util.js';
+import { syncEventToDrive } from '../../lambda-common/drive_sync.js';
 
 const BookingModel: Model<OnetableBookingType> = table.getModel('Booking')
 const EventModel: Model<EventType> = table.getModel('Event')
@@ -31,6 +32,8 @@ export const lambdaHandler = lambda_wrapper_json(
             substitutions: {newEvent: [{userId: newVersion.userId, time: newLatest.updated.toISOString()}], emptyList: []}})
 
             console.log(`Edited booking ${newData.eventId}-${newData.userId}`);
+
+            syncEventToDrive(event.id, config)
             return {};
         } else {
             throw new Error("Can't find booking or event")
