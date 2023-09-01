@@ -24,11 +24,14 @@ export async function syncEventToDrive(eventId, config) {
             const participants = getParticipantRecords(filtered)
             try {
                 await syncToDrive(event!, user.tokens, participants, config)
+                console.log(`Synced drive for ${user.userName} event ${event?.name}`)
             } catch (e: any) {
                 if (e.code === 401) {
                     await UserModel.update({ remoteId: user.remoteId }, { remove: ['tokens'] })
                     return
                 } else {
+                    console.log(`ERROR syncing drive for ${user.userName} event ${event?.name}`)
+                    console.log(e)
                     throw e
                 }
             }
