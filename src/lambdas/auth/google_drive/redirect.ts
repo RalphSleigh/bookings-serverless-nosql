@@ -33,7 +33,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
         const url = oauth2Client.generateAuthUrl({
             // 'online' (default) or 'offline' (gets refresh_token)
             access_type: 'offline',
-            prompt: "force",
+            prompt: "consent",
 
             // If you only need one scope you can pass it as a string
             scope: scopes
