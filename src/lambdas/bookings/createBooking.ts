@@ -53,7 +53,7 @@ export const lambdaHandler = lambda_wrapper_json(
             EventBookingTimelineModel.update({eventId: booking.eventId}, {set: {events: 'list_append(if_not_exists(events, @{emptyList}), @{newEvent})'},
             substitutions: {newEvent: [{userId: current_user.id, time: newBooking.created.toISOString()}], emptyList: []}})
 
-            syncEventToDrive(event.id, config)
+            await syncEventToDrive(event.id, config)
 
             return {}
         } else {

@@ -33,7 +33,7 @@ export const lambdaHandler = lambda_wrapper_json(
 
             console.log(`Edited booking ${newData.eventId}-${newData.userId}`);
 
-            syncEventToDrive(event.id, config)
+            await syncEventToDrive(event.id, config)
             return {};
         } else {
             throw new Error("Can't find booking or event")
