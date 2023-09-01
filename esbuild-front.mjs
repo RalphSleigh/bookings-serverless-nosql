@@ -19,5 +19,5 @@ await esbuild.build({
     '.svg': 'dataurl',
     '.gif': 'dataurl',
   },
-  watch: true
+  watch: false
 })
