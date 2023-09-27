@@ -31,8 +31,8 @@ resource "aws_dynamodb_table" "bookings_table" {
 resource "aws_dynamodb_table" "config_table" {
   name           = "Config"
   billing_mode   = "PROVISIONED"
-  read_capacity  = 20
-  write_capacity = 20
+  read_capacity  = 4
+  write_capacity = 4
   hash_key       = "pk"
   range_key      = "key"
 
