@@ -1,10 +1,10 @@
 import { isPast } from "date-fns";
-import { BookingType, EventType, JsonBookingType, JsonEventType, JsonUserResponseType, UserResponseType, UserType } from "../lambda-common/onetable.js";
+import { BookingType, OnetableEventType, JsonBookingType, JsonEventType, JsonUserResponseType, UserResponseType, UserType } from "../lambda-common/onetable.js";
 import { parseDate } from "./util.js";
 
 type PermissionData = {
     user: UserResponseType | JsonUserResponseType
-    event?: EventType | JsonEventType
+    event?: OnetableEventType | JsonEventType
     booking?: BookingType | JsonBookingType
 }
 

@@ -54,7 +54,22 @@ const schema = {
             bookingDeadline: { type: Date, required: true },
             kpMode: { type: String, required: true, enum: ['basic', 'vcamp'] },
             bigCampMode: { type: Boolean, required: true, default: 'false' },
-            feeStructure: { type: String, required: true },
+            attendanceStructure: { type: String, required: true, enum: ['whole'] },
+            attendanceData: {
+                type: Object, schema: {
+                    mask: { type: Number }
+                }
+            },
+            feeStructure: { type: String, required: true, enum: ['ealing', 'flat', 'free'] },
+            feeData: {
+                type: Object, required: true, schema: {
+                    fee: { type: Number },
+                    ealingAccompanied: { type: Number },
+                    ealingUnaccompanied: { type: Number },
+                    ealingDiscountAccompanied: { type: Number },
+                    ealingDiscountUnaccompanied: { type: Number },
+                }
+            },
             created: { type: Date },
             updated: { type: Date },
         },
@@ -67,6 +82,8 @@ const schema = {
             userId: { type: String, required: true },
             eventId: { type: String, required: true },
             contactName: { type: String, required: true },
+            contactEmail: { type: String, required: true },
+            contactPhone: { type: String, required: true },
             district: { type: String },
             participants: {
                 type: Array, items: {
@@ -88,6 +105,13 @@ const schema = {
                             //},
                         },
                         consent: {
+                            type: Object,
+                            //Currently unsupported
+                            //schema: {
+                            //    name: { type: String, required: true }
+                            //},
+                        },
+                        medical: {
                             type: Object,
                             //Currently unsupported
                             //schema: {
@@ -141,13 +165,21 @@ interface ParticipantFields {
 
 interface ParticipantBasicType {
     basic: {
-        name: string
+        name: string,
+        dob: Date
     }
 }
 
 interface ParticipantKpType {
     kp: {
-        diet: "omnivore" | "pescatarian" | "vegetarian" | "vegan"
+        diet: "omnivore" | "pescatarian" | "vegetarian" | "vegan",
+        details: string
+    }
+}
+
+interface ParticipantMedicalType {
+    medical: {
+        details: string | undefined
     }
 }
 
@@ -157,12 +189,39 @@ interface ParticipantConsentType {
     }
 }
 
-export type ParticipantType = ParticipantFields & ParticipantBasicType & Partial<ParticipantKpType> & Partial<ParticipantConsentType>
+export type OnetableEventType = Entity<typeof schema.models.Event>
 
-export type JsonParticipantType = Jsonify<ParticipantFields> & ParticipantBasicType & Partial<ParticipantKpType> & Partial<ParticipantConsentType>
+interface EalingFeeEventType {
+    feeStructure: "ealing"
+    feeData: {
+        ealingAccompanied: number
+        ealingUnaccompanied: number
+        ealingDiscountAccompanied: number
+        ealingDiscountUnaccompanied: number
+    }
+}
+
+interface FlatFeeEventType {
+    feeStructure: "flat"
+    feeData: {
+        fee: number
+    }
+}
+
+interface FreeFeeEventType {
+    feeStructure: "free"
+    feeData: {
+    }
+}
+
+export type EventType = (OnetableEventType & EalingFeeEventType) | (OnetableEventType & FlatFeeEventType)| (OnetableEventType & FreeFeeEventType)
+export type JsonEventType = Jsonify<EventType>
+
+export type ParticipantType = ParticipantFields & ParticipantBasicType & Partial<ParticipantKpType> & Partial<ParticipantConsentType> & Partial<ParticipantMedicalType>
+
+export type JsonParticipantType = Jsonify<ParticipantFields> & ParticipantBasicType & Partial<ParticipantKpType> & Partial<ParticipantConsentType> & Partial<ParticipantMedicalType>
 
 export type UserType = Entity<typeof schema.models.User>
-export type EventType = Entity<typeof schema.models.Event>
 export type RoleType = Entity<typeof schema.models.Role>
 export type UserDriveTokensType = Entity<typeof schema.models.UserDriveTokens>
 
@@ -176,7 +235,7 @@ export type EventBookingTimelineType = Entity<typeof schema.models.EventBookingT
 
 export type JsonUserType = Jsonify<UserType>
 export type JsonUserResponseType = Jsonify<UserResponseType>
-export type JsonEventType = Jsonify<EventType>
+
 export type JsonBookingType = Omit<Jsonify<BookingType>, 'participants'> & { participants: Array<JsonParticipantType> }
 export type JsonEventBookingTimelineType = Jsonify<EventBookingTimelineType>
 export type JsonRoleType = SetOptional<Jsonify<RoleType>, 'id'>

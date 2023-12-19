@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useEditBooking } from "../queries.js";
 import { Navigate, useParams } from "react-router-dom";
 import { BookingForm } from "./form/form.js";
@@ -14,10 +14,10 @@ export function EditOwnBookingPage({event, booking, user}) {
         return <Navigate to='/' />
     }
 
-    const submit = () => {
+    const submit = useCallback(() => {
         console.log(bookingData)
         editBooking.mutate(bookingData as JsonBookingType)
-    }
+    }, [])
 
     return <BookingForm data={bookingData} user={user} event={event} update={setBookingData} submit={submit} mode={"edit"} />
 }

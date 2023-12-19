@@ -19,7 +19,7 @@ export function CreateEventPage({ }) {
     }
 
     return <EnsureHasPermission permission={IsGlobalAdmin}>
-        <EventForm data={{}} submit={submit} mode={"create"} />
+        <EventForm data={{feeData: {}}} submit={submit} mode={"create"} />
     </EnsureHasPermission>
 }
 
