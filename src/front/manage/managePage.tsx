@@ -9,6 +9,7 @@ import { UserContext } from "../user/userContext.js";
 import { CanManageWholeEvent } from "../../shared/permissions.js";
 import { addComputedFieldsToBookingsQueryResult, bookingsBookingSearch, bookingsParticipantSearch, useDebounceState } from "../util.js";
 import { JsonBookingWithExtraType } from "../../shared/computedDataTypes.js";
+import { ReactErrorBoundary } from "../app/errors.js";
 
 export function Component() {
     const { event, timeline } = useOutletContext<manageLoaderContext>()
@@ -43,10 +44,10 @@ export function Component() {
             </Tabs>
         </Grid>
         {shouldShowSearch(location) ? <Grid xs={12} p={2} item>
-            <FormControlLabel sx={{ float: "right" }} control={<Switch checked={displayDeleted} onChange={() => setDisplayDeleted(!displayDeleted)}/>} label="Show Cancelled" />
+            <FormControlLabel sx={{ float: "right" }} control={<Switch checked={displayDeleted} onChange={() => setDisplayDeleted(!displayDeleted)} />} label="Show Cancelled" />
             <SyncWidget user={user} />
-            <TextField sx={{ mr: 1, mt: 1 }} size="small" margin="dense" label="Participant search" value={participantSearch} onChange={updateParticipantSearch}/>
-            <TextField sx={{ mr: 1, mt: 1 }} size="small" margin="dense" label="Booking search" value={bookingSearch} onChange={updateBookingSearch}/>
+            <TextField sx={{ mr: 1, mt: 1 }} size="small" margin="dense" label="Participant search" value={participantSearch} onChange={updateParticipantSearch} />
+            <TextField sx={{ mr: 1, mt: 1 }} size="small" margin="dense" label="Booking search" value={bookingSearch} onChange={updateBookingSearch} />
             <ButtonGroup variant="outlined" sx={{ mr: 1, mt: 1 }} aria-label="outlined button group">
                 <Button disabled={timeline.backEnabled} onClick={timeline.backFn}>{'<'}</Button>
                 <Button>{timeline.position.time}</Button>
@@ -56,9 +57,9 @@ export function Component() {
 
         </Grid> : null}
 
-            <SuspenseWrapper>
-                    <Loader event={event} timeline={timeline} displayDeleted={displayDeleted} participantSearch={debouncedParticipantSearch} bookingSearch={debouncedBookingSearch}/>
-            </SuspenseWrapper>
+        <SuspenseWrapper>
+                <Loader event={event} timeline={timeline} displayDeleted={displayDeleted} participantSearch={debouncedParticipantSearch} bookingSearch={debouncedBookingSearch} />
+        </SuspenseWrapper>
     </Grid >
 }
 
@@ -91,26 +92,26 @@ function TimeLineDataLoader({ event, timeline, displayDeleted, participantSearch
 
 const MemoTimeLineDataLoader = React.memo(TimeLineDataLoader)
 
-const  PermissionTab: React.FC<any> = props => {
-    const { user, event, permission, ...rest } = props 
-    if(permission.if({user, event})) return <Tab {...rest} />
+const PermissionTab: React.FC<any> = props => {
+    const { user, event, permission, ...rest } = props
+    if (permission.if({ user, event })) return <Tab {...rest} />
     else return null
 }
 
-const SyncWidget: React.FC<{user: JsonUserResponseType}> = props => {
+const SyncWidget: React.FC<{ user: JsonUserResponseType }> = props => {
 
     const disableDriveSync = useDisableDriveSync()
 
-    const {user} = props
-    if(!user || user.source !== "google") return null
+    const { user } = props
+    if (!user || user.source !== "google") return null
 
     const change = e => {
-        if(user.tokens) {
+        if (user.tokens) {
             disableDriveSync.mutate("")
         } else {
             window.location.href = "/api/auth/google_drive/redirect"
         }
     }
 
-    return <FormControlLabel sx={{ float: "right" }} control={<Switch checked={user.tokens} onChange={change}/>} label="Drive Sync" />
+    return <FormControlLabel sx={{ float: "right" }} control={<Switch checked={user.tokens} onChange={change} />} label="Drive Sync" />
 }

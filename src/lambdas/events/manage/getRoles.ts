@@ -9,10 +9,15 @@ const RoleModel = table.getModel<RoleType>('Role')
 
 export const lambdaHandler = lambda_wrapper_json(
     async (lambda_event, config, current_user) => {
-        const event = await EventModel.get({id: lambda_event.pathParameters?.id})
-        if(event) {
-            CanManageEvent.throw({user: current_user, event: event})
-            const roles = await RoleModel.find({ sk: { begins: event.id }})
+        return {
+            statusCode: 401,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: "Not implemented" })
+        }
+        const event = await EventModel.get({ id: lambda_event.pathParameters?.id })
+        if (event) {
+            CanManageEvent.throw({ user: current_user, event: event })
+            const roles = await RoleModel.find({ sk: { begins: event.id } })
             return { roles }
         } else {
             throw new Error("Can't find event")

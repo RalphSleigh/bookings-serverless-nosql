@@ -29,14 +29,18 @@ import { EditOwnBookingLoader } from '../booking/editOwnBookingLoader.js';
 import { UserPage } from '../user/userPage.js';
 import { ThanksLoader } from '../booking/thanksLoader.js';
 import { ReactErrorBoundary, RouterErrorBoundary } from './errors.js';
+import { SnackBarProvider } from './toasts.js';
 
 const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
-            suspense: true,
             staleTime: 1000 * 60 * 5,
-            throwOnError: true
-        },
+            retry: (failureCount, error) => {//@ts-ignore
+                if (error.response && error.response.status === 401) return false
+                if (failureCount > 2) return false
+                return true
+            }
+        }
     },
 })
 
@@ -190,7 +194,9 @@ export function App() {
                         <SuspenseWrapper>
                             <EnvContextProvider>
                                 <UserContextProvider>
-                                    <RouterProvider router={router} />
+                                    <SnackBarProvider>
+                                        <RouterProvider router={router} />
+                                    </SnackBarProvider>
                                 </UserContextProvider>
                             </EnvContextProvider>
                         </SuspenseWrapper>

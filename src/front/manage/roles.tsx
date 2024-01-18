@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { allUsersQueryType, eventRolesQueryType, allUsersQuery, eventRolesQuery, useCreateRole, useDeleteRole } from "../queries.js";
 import { managePageContext } from "./managePage.js";
-import { useQueries } from "@tanstack/react-query";
+import { useQueries, useSuspenseQueries } from "@tanstack/react-query";
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
 import { Avatar, Badge, Box, Button, FormControl, FormControlLabel, Grid, IconButton, InputLabel, MenuItem, Select, SelectChangeEvent, Stack, TextField, Typography, useTheme } from "@mui/material";
@@ -11,7 +11,7 @@ import { JsonUserType } from "../../lambda-common/onetable.js";
 
 export function Component() {
     const { event, bookings } = useOutletContext<managePageContext>()
-    const [userData, roleData] = useQueries<[allUsersQueryType, eventRolesQueryType]>({ queries: [allUsersQuery(event.id), eventRolesQuery(event.id)] })
+    const [userData, roleData] = useSuspenseQueries<[allUsersQueryType, eventRolesQueryType]>({ queries: [allUsersQuery(event.id), eventRolesQuery(event.id)] })
 
     const [userId, setUserId] = useState<string>("")
     const [role, setRole] = useState<string>("")

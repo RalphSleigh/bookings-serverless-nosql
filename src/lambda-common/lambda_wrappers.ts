@@ -39,6 +39,9 @@ export function lambda_wrapper_json(
             since("done permissions") 
             */   
             const response = await handler(lambda_event, config, user)
+
+            if(response.statusCode) return response //we want a raw response
+
             return {
                 statusCode: 200,
                 headers: {"Content-Type":"application/json"},
@@ -54,8 +57,9 @@ export function lambda_wrapper_json(
                 log(e)
                 return {
                     statusCode: 401,
+                    headers: {"Content-Type":"application/json"},
                     body: JSON.stringify({
-                        message: e instanceof Error ? e.message : 'Permission Erro',
+                        message: e instanceof Error ? e.message : 'Permission Error',
                     }),
                 };
             }

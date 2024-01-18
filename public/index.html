@@ -21,6 +21,7 @@
                     credentials: "same-origin",
                     body: jsonString
                 };
+                console.log("LOGGING FROM WINDOW LISTENER")
                 fetch('/api/error', options)
                 return false
             } catch (e) {

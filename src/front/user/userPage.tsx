@@ -6,6 +6,7 @@ import { GoogleLoginButton, FacebookLoginButton, MicrosoftLoginButton, YahooLogi
 import { UserContext } from "./userContext.js";
 import { useEditUser } from "../queries.js";
 import { getMemoUpdateFunctions } from "../../shared/util.js";
+import { SnackBarContext } from "../app/toasts.js";
 
 export function UserPage(props) {
 
