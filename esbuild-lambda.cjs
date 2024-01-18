@@ -40,7 +40,7 @@ esbuild
         platform: 'node',
         //sourcemap: 'inline',
         target: ['node18'],
-        external: ['sequelize', 'aws-sdk','lodash', 'aws-lambda','@aws-sdk/*','dynamodb-onetable', 'react-html-email', 'bcryptjs'],
+        external: ['sequelize', 'aws-sdk','lodash', 'aws-lambda','@aws-sdk/*','dynamodb-onetable', 'react-html-email', 'bcryptjs', 'mariadb'],
         metafile: true,
         banner: {
             js: `
