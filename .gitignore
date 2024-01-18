@@ -51,6 +51,8 @@ public/*.gif
 .idea*
 meta.json
 
+cert/
+
 public/bundle.app.js
 public/bundle.app.js.map
 public/bundle.vendor.js

@@ -6,19 +6,31 @@ import { EnsureHasPermission } from "../permissions.js";
 import { CanBookIntoEvent } from "../../shared/permissions.js";
 import { BookingType, JsonBookingType } from "../../lambda-common/onetable.js";
 
-export function CreateBookingPage({event, user}) {
+export function CreateBookingPage({ event, user }) {
     const createBooking = useCreateBooking()
-    const [bookingData, setBookingData] = useState<Partial<JsonBookingType>>({eventId: event.id})
-
-    if (createBooking.isSuccess) {
-        return <Navigate to='/' />
-    }
+    const [bookingData, setBookingData] = useState<Partial<JsonBookingType>>({ eventId: event.id })
 
     const submit = useCallback(() => {
-        console.log(bookingData)
-        createBooking.mutate(bookingData as JsonBookingType)
+        setBookingData(data => {
+            console.log(data)
+            createBooking.mutate(data as JsonBookingType)
+            return data
+        })
     }, [])
 
-    return <BookingForm data={bookingData} user={user} event={event} update={setBookingData} submit={submit} mode={"create"} />
+    if (createBooking.isSuccess) {
+        return <Navigate to={`/event/${event.id}/thanks`} />
+    }
+
+    return <BookingForm 
+    data={bookingData} 
+    user={user} 
+    event={event} 
+    update={setBookingData} 
+    submit={submit} 
+    mode={"create"} 
+    deleteBooking={() => {}}
+    submitLoading={createBooking.isLoading}
+    deleteLoading={false}/>
 }
 

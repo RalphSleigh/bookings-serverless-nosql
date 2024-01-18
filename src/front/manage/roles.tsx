@@ -5,8 +5,9 @@ import { managePageContext } from "./managePage.js";
 import { useQueries } from "@tanstack/react-query";
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
-import { Avatar, Box, Button, FormControl, FormControlLabel, Grid, IconButton, InputLabel, MenuItem, Select, SelectChangeEvent, Stack, TextField, Typography } from "@mui/material";
+import { Avatar, Badge, Box, Button, FormControl, FormControlLabel, Grid, IconButton, InputLabel, MenuItem, Select, SelectChangeEvent, Stack, TextField, Typography, useTheme } from "@mui/material";
 import { Close } from "@mui/icons-material";
+import { JsonUserType } from "../../lambda-common/onetable.js";
 
 export function Component() {
     const { event, bookings } = useOutletContext<managePageContext>()
@@ -36,14 +37,16 @@ export function Component() {
         e.preventDefault()
     }
 
-    const userItems = userData.data?.users.map(u => <MenuItem key={u.id} value={u.id}>
-        <Stack direction="row" spacing={1}>
-            <Avatar imgProps={{ referrerPolicy: "no-referrer" }} sx={{ width: 26, height: 26, boxShadow: 5 }} alt={u.userName} src={u.picture || "/nope.jpg"} />
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <Typography>{u.userName}</Typography>
-            </Box>
-        </Stack>
-    </MenuItem>)
+    const userItems = userData.data?.users.map(u => {
+        return <MenuItem key={u.id} value={u.id}>
+            <Stack direction="row" spacing={1}>
+                <WoodcraftAvatar user={u} />
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Typography>{u.userName}</Typography>
+                </Box>
+            </Stack>
+        </MenuItem>
+    })
 
     const columns: GridColDef[] = [
         { field: 'user', headerName: 'User', flex: 10, sortComparator: userSortComparator, renderCell: renderUserCell },
@@ -97,8 +100,10 @@ export function Component() {
 
 const renderUserCell = props => {
     const { value: u } = props
+    if (u === undefined) return <Typography>User not found</Typography>
+    const theme = useTheme()
     return <Stack direction="row" spacing={1}>
-        <Avatar imgProps={{ referrerPolicy: "no-referrer" }} sx={{ width: 26, height: 26, boxShadow: 5 }} alt={u.userName} src={u.picture || "/nope.jpg"} />
+        <WoodcraftAvatar user={u} />
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Typography>{u.userName}</Typography>
         </Box>
@@ -111,8 +116,22 @@ const renderDeleteCell = (deleteRole, mutation) => props => {
     </IconButton>
 }
 
-
-
 const userSortComparator = (a, b) => {
     return a.userName.localeCompare(b.userName)
+}
+
+const WoodcraftAvatar: React.FC<{user: JsonUserType}>  = props => {
+    const { user } = props
+    return (user.isWoodcraft ?
+        <Badge
+            overlap="circular"
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            badgeContent={
+                <Avatar alt="Woodcraft Account" src="/logo-avatar.png" sx={{ width: 16, height: 16, border: "2px solid #fff" }} />
+            }
+        >
+            <Avatar imgProps={{ referrerPolicy: "no-referrer" }} sx={{ width: 26, height: 26, boxShadow: 5 }} alt={user.userName || ""} src={user.picture || "/nope.jpg"} />
+        </Badge>
+        :
+        <Avatar imgProps={{ referrerPolicy: "no-referrer" }} sx={{ width: 26, height: 26, boxShadow: 5 }} alt={user.userName || ""} src={user.picture || "/nope.jpg"} />)
 }

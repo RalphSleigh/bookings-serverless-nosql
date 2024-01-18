@@ -9,7 +9,6 @@
                     file: message.filename,
                     line: message.lineno,
                     column: message.colno,
-                    stack: message.error ? message.error.stack : ''
                 };
 
                 const jsonString = JSON.stringify(jsonMessage);
@@ -23,11 +22,11 @@
                     body: jsonString
                 };
                 fetch('/api/error', options)
+                return false
             } catch (e) {
                 console.error(e)
                 // ah well we tried
             }
-
         });
     </script>
 

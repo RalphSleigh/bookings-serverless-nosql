@@ -4,6 +4,8 @@ import express from 'express'
 //@ts-ignore
 import { execute } from 'lambda-local'
 import bodyParser from 'body-parser'
+import fs from 'fs';
+import https from 'https';
 
 import * as urllib from 'url';
 const __dirname = urllib.fileURLToPath(new URL('.', import.meta.url));
@@ -61,6 +63,7 @@ const handlerSetup = (url: string, lambda_path: string, method: string = "GET") 
 handlerSetup('/api/env', 'env/getEnv')
 
 handlerSetup('/api/user', 'user/getUser')
+handlerSetup('/api/user/edit', 'user/edit', "POST")
 handlerSetup('/api/user/disableDriveSync', 'user/disableDriveSync', "POST")
 handlerSetup('/api/user/logout', 'user/logout')
 handlerSetup('/api/user/list/:eventId', 'user/listUsers')
@@ -84,7 +87,7 @@ handlerSetup('/api/booking/user', 'bookings/getUsersBookings')
 handlerSetup('/api/booking/create', 'bookings/createBooking', "POST")
 //handlerSetup('/api/booking/:id', 'bookings/get/handler')
 handlerSetup('/api/booking/edit', 'bookings/editBooking', "POST")
-//handlerSetup('/api/booking/delete', 'bookings/delete/handler', "POST")
+handlerSetup('/api/booking/delete', 'bookings/deletebooking', "POST")
 //handlerSetup('/api/booking/event/:id', 'bookings/event/handler')
 //handlerSetup('/api/booking/syncmax', 'bookings/syncmax/handler', "POST")
 
@@ -115,16 +118,16 @@ handlerSetup('/api/auth/google/callback', 'auth/google/callback')
 handlerSetup('/api/auth/google_drive/redirect', 'auth/google_drive/redirect')
 handlerSetup('/api/auth/google_drive/callback', 'auth/google_drive/callback')
 
-//handlerSetup('/api/auth/facebook/redirect', 'auth/facebook/redirect/handler')
-//handlerSetup('/api/auth/facebook/callback', 'auth/facebook/callback/handler')
+handlerSetup('/api/auth/facebook/redirect', 'auth/facebook/redirect')
+handlerSetup('/api/auth/facebook/callback', 'auth/facebook/callback')
 
-//handlerSetup('/api/auth/yahoo/redirect', 'auth/yahoo/redirect/handler')
-//handlerSetup('/api/auth/yahoo/callback', 'auth/yahoo/callback/handler')
+handlerSetup('/api/auth/yahoo/redirect', 'auth/yahoo/redirect')
+handlerSetup('/api/auth/yahoo/callback', 'auth/yahoo/callback')
 
-//handlerSetup('/api/auth/microsoft/redirect', 'auth/microsoft/redirect/handler')
-//handlerSetup('/api/auth/microsoft/callback', 'auth/microsoft/callback/handler')
+handlerSetup('/api/auth/microsoft/redirect', 'auth/microsoft/redirect')
+handlerSetup('/api/auth/microsoft/callback', 'auth/microsoft/callback')
 
-handlerSetup('/api/error', 'error/reportError')
+handlerSetup('/api/error', 'error/reportError', "POST")
 
 
 app.use('/', express.static(path.join(__dirname, '../public'), {fallthrough: true, index: "index.html"}));
@@ -135,4 +138,12 @@ app.get('*', function (req, res) {  //serve index.html on deep paths
   return res.status(404).end()
 });
 
-app.listen(3000, () => console.log('listening on port: 3000'))
+const httpsOptions = {
+  key: fs.readFileSync('./cert/cert.key'),
+  cert: fs.readFileSync('./cert/cert.pem')
+}
+
+const server = https.createServer(httpsOptions, app)
+    .listen(443, () => {
+        console.log('server running at ' + 443)
+    })

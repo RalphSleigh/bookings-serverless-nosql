@@ -1,4 +1,4 @@
-import { JsonEventType } from "../../lambda-common/onetable.js";
+import { EventType, JsonEventType } from "../../lambda-common/onetable.js";
 import { Ealing } from "./ealing.js";
 import { FeeStructure } from "./feeStructure.js";
 import { Flat } from "./flat.js";
@@ -20,6 +20,6 @@ export const maybeGetFee = (event: Partial<JsonEventType>): FeeInstance | null =
     else return null
 }
 
-export const getFee = (event: JsonEventType): FeeInstance => {
+export const getFee = (event: JsonEventType | EventType): FeeInstance => {
     return fees[event.feeStructure]
 }

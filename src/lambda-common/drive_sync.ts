@@ -1,12 +1,12 @@
 import { sheets, auth } from "@googleapis/sheets"
 import { drive } from '@googleapis/drive'
-import { BookingType, EventType, FoundUserResponseType, ParticipantType, RoleType, UserDriveTokensType, UserType, table } from "./onetable.js"
+import { BookingType, EventType, FoundUserResponseType, OnetableEventType, ParticipantType, RoleType, UserType, UserWithRoles, table } from "./onetable.js"
 import { filterDataByRoles } from "./roles.js"
-import { Fields, CSVCurrent } from "../shared/participantFields.js"
+import { ParticipantFields, CSVCurrent } from "../shared/participantFields.js"
+import { User } from "discord.js"
 
-const EventModel = table.getModel<EventType>('Event')
+const EventModel = table.getModel<OnetableEventType>('Event')
 const RoleModel = table.getModel<RoleType>('Role')
-const UserDriveTokensModel = table.getModel<UserDriveTokensType>('UserDriveTokens')
 const BookingModel = table.getModel<BookingType>('Booking')
 const UserModel = table.getModel<UserType>('User')
 
@@ -19,11 +19,12 @@ export async function syncEventToDrive(eventId, config) {
         const userRoles = roles.filter(r => r.userId === user.id)
         if (userRoles.length > 0) {
             const BookingModel = table.getModel<BookingType>('Booking')
+            const fullUser: UserWithRoles =  { roles: userRoles, ...user }
             const bookings = await BookingModel.find({ sk: { begins: `event:${eventId}:version` } }) as BookingType[]
-            const filtered = filterDataByRoles(event!, bookings, { roles: userRoles, ...user, tokens: !!user.tokens })
+            const filtered = filterDataByRoles(event!, bookings, fullUser)
             const participants = getParticipantRecords(filtered)
             try {
-                await syncToDrive(event!, user.tokens, participants, config)
+                await syncToDrive(event!, fullUser, participants, config)
                 console.log(`Synced drive for ${user.userName} event ${event?.name}`)
             } catch (e: any) {
                 if (e.code === 401) {
@@ -41,11 +42,11 @@ type CSVParticipant = ParticipantType & {current: boolean}
 
 function getParticipantRecords(bookings: BookingType[]): CSVParticipant[] {
     bookings.sort((a,b) => a.version.localeCompare(b.version!))
-    console.log(bookings)
+    //console.log(bookings)
     const participants: Record<string, CSVParticipant> = {}
     for(const booking of bookings) {
         for(const participant of booking.participants){
-            participants[participant.created.toISOString()] = {...participant, current: booking.version === "latest"}
+            participants[participant.created.toISOString()] = {...participant, current: booking.version === "latest" && !booking.deleted}
         }
     }
 
@@ -57,14 +58,14 @@ function getParticipantRecords(bookings: BookingType[]): CSVParticipant[] {
     return result.sort((a, b) => a.created.getTime() - b.created.getTime())
 }
 
-async function syncToDrive(event: EventType, tokens: object, data, config) {
+async function syncToDrive(event: OnetableEventType, user: UserWithRoles, data, config) {
     const oauth2Client = new auth.OAuth2(
         config.GOOGLE_CLIENT_ID,
         config.GOOGLE_CLIENT_SECRET,
         `${config.BASE_URL}api/auth/google_drive/callback`
     );
 
-    oauth2Client.setCredentials(tokens)
+    oauth2Client.setCredentials(user.tokens!)
 
     const sheets_instance = sheets({ version: 'v4', auth: oauth2Client })
     //@ts-ignore
@@ -87,12 +88,13 @@ async function syncToDrive(event: EventType, tokens: object, data, config) {
     }
     console.log(sheetId)
 
-    const fields = new Fields(event)
+    const fields = new ParticipantFields(event)
     fields.fields.push(new CSVCurrent(event))
 
-    const headers = fields.getCSVHeaders()
-    const participants = data.map(p => fields.getCSVValues(p))
+    const headers = fields.getCSVHeaders(user)
+    const participants = data.map(p => fields.getCSVValues(p, user))
     
+
     await sheets_instance.spreadsheets.values.batchUpdate({ spreadsheetId: sheetId, requestBody: { valueInputOption: "RAW", data: [{ range: "Sheet1!A1", values: [headers, ...participants] }] } })
     //await sheets_instance.spreadsheets.values.batchUpdate({spreadsheetId: sheetId, requestBody: {data: {range:"Sheet1!A1", values:[headers]}}})
 }

@@ -1,7 +1,26 @@
+import { Box, Button, Grid, Paper, Typography } from "@mui/material";
 import React from "react";
+import { useNavigate } from "react-router-dom";
+
+import { GoogleLoginButton, FacebookLoginButton, MicrosoftLoginButton, YahooLoginButton } from "react-social-login-buttons";
 
 export function LoginPage(props) {
-    return <><h1>LOGIN</h1>
-    <a href="/api/auth/google/redirect">Google</a>
-    </>
+
+    const navigate = useNavigate()
+
+    return <Grid container spacing={0}>
+        <Grid xs item></Grid>
+        <Grid p={2} item>
+            <Paper elevation={3}>
+                <Box p={2}>
+                    <Typography variant="body1">Please use one of these providers to log in:</Typography>
+                    <GoogleLoginButton onClick={() => window.location.href = "/api/auth/google/redirect"}/>
+                    <FacebookLoginButton onClick={() => window.location.href = "/api/auth/facebook/redirect"} />
+                    <MicrosoftLoginButton onClick={() => window.location.href = "/api/auth/microsoft/redirect"} />
+                    <YahooLoginButton onClick={() => window.location.href = "/api/auth/yahoo/redirect"} />
+                </Box>
+            </Paper>
+        </Grid>
+        <Grid xs item></Grid>
+    </Grid>
 }

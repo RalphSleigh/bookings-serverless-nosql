@@ -51,8 +51,3 @@ function useTimeline(timelineData) {
         toLatest: () => setSearchParams({viewDate: timelineData.length.toString()})
     }
 }
-
-export type extobjwitharray = {
-    stuff: string,
-    thing: {ok: {hmm: string}}[]
-}

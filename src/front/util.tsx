@@ -1,13 +1,11 @@
 import { DatePicker } from "@mui/x-date-pickers"
-import { parseISO } from "date-fns"
+import { differenceInYears, parseISO } from "date-fns"
 import { zonedTimeToUtc } from 'date-fns-tz'
 import React from "react"
-
-export function parseDate(date: Date | string | undefined): Date | null {
-    if (!date) return null
-    if (date instanceof Date) return date
-    return parseISO(date)
-}
+import { JsonBookingType, JsonEventType, JsonParticipantType } from "../lambda-common/onetable.js"
+import { getAgeGroup } from "../shared/woodcraft.js"
+import { JsonParticipantWithExtraType, JsonBookingWithExtraType } from "../shared/computedDataTypes.js"
+import { parseDate } from "../shared/util.js"
 
 export function toUtcDate(date: Date | string | undefined): Date | null {
 
@@ -36,42 +34,44 @@ export function UtcDatePicker(props) {
     return <DatePicker value={toLocalDate(value)} onChange={convertOnChange}  {...rest} isRequired />
 }
 
-export function getMemoUpdateFunctions(update) {
-    return React.useMemo(() => ({
-        updateField: field => e => {
-            update(data => ({ ...data, [field]: e.target.value }))
-            e.preventDefault()
-        },
-        updateParticipantDate:  field => e => {
-            update(data => ({ ...data, [field]: e}))
-        },
-        updateSwitch: field => e => {
-            update(data => ({ ...data, [field]: e.target.checked }))
-        },
-        addEmptyObjectToArray: e => {
-            update(data => ([...data, {}]))
-        },
-        updateArrayItem: i => {
-            return subdataFunction => {
-                update(data => {
-                    const newData = [...data]
-                    newData[i] = subdataFunction(newData[i])
-                    return newData
-                })
-            }
-        },
-        deleteArrayItem: i => {
-            update(data => {
-                const newData = [...data]
-                newData.splice(i, 1)
-                return newData
-            })
-        },
-        updateSubField: subfield => {
-            return subdataFunction => {
-                update(data => ({...data, [subfield]: subdataFunction(data[subfield])}))
-            }
-        },
-    }), [])
+const addComputedFieldToParticipant = (booking, startDate) => (p: JsonParticipantType): JsonParticipantWithExtraType => {
+    const age = differenceInYears(startDate, parseDate(p.basic.dob)!)
+    return {...p, age, ageGroup: getAgeGroup(age), booking}
 }
 
+export function addComputedFieldsToBookingsQueryResult(bookings: [JsonBookingType], event: JsonEventType): JsonBookingWithExtraType[] {
+    const startDate = parseDate(event.startDate)!
+    return bookings.map(b => {
+        return {...b, participants: b.participants.map(addComputedFieldToParticipant(b, startDate))}
+    }) as [JsonBookingWithExtraType]
+}
+
+export function useDebounceState<T>(defaultValue: T, delay: number): [T, T, (T) => void] {
+    const [value, setValue] = React.useState(defaultValue)
+    const [debouncedValue, setDebouncedValue] = React.useState(defaultValue)
+
+    React.useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            setDebouncedValue(value)
+        }, delay)
+        return () => clearTimeout(timeoutId)
+    }, [value, delay])
+
+    return [value, debouncedValue, setValue]
+}
+
+export function bookingsParticipantSearch(bookings: JsonBookingWithExtraType[], search: string): JsonBookingWithExtraType[] {
+    return bookings
+    .map(b => {
+        const filteredParicipants = b.participants.filter(p => p.basic.name.toLowerCase().includes(search.toLowerCase()))
+        return {...b, participants: filteredParicipants}
+    })
+    .filter(b => b.participants.length > 0)
+}
+
+export function bookingsBookingSearch(bookings: JsonBookingWithExtraType[], search: string): JsonBookingWithExtraType[] {
+    return bookings
+    .filter(b => {
+        return b.basic.contactName.toLowerCase().includes(search.toLowerCase()) || b.basic.contactEmail.toLowerCase().includes(search.toLowerCase()) || b.basic.district?.toLowerCase().includes(search.toLowerCase())
+    })
+}

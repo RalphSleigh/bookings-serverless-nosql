@@ -1,9 +1,10 @@
-import { BookingType, EventBookingTimelineType, EventType, OnetableBookingType, table } from '../../lambda-common/onetable.js';
+import { BookingType, EventBookingTimelineType, EventType, OnetableBookingType, OnetableEventType, table } from '../../lambda-common/onetable.js';
 import { CanBookIntoEvent } from '../../shared/permissions.js';
 import { lambda_wrapper_json } from '../../lambda-common/lambda_wrappers.js';
 import { Model } from 'dynamodb-onetable';
 import { updateParticipantsDates } from '../../lambda-common/util.js';
 import { syncEventToDrive } from '../../lambda-common/drive_sync.js';
+import { queueEmail } from '../../lambda-common/email.js';
 
 /*
 export const lambdaHandlerfsdf = lambda_wrapper_json(
@@ -23,7 +24,7 @@ export const lambdaHandlerfsdf = lambda_wrapper_json(
 */
 
 const BookingModel: Model<OnetableBookingType> = table.getModel('Booking')
-const EventModel: Model<EventType> = table.getModel('Event')
+const EventModel: Model<OnetableEventType> = table.getModel('Event')
 const EventBookingTimelineModel = table.getModel<EventBookingTimelineType>('EventBookingTimeline')
 
 export const lambdaHandler = lambda_wrapper_json(
@@ -50,8 +51,16 @@ export const lambdaHandler = lambda_wrapper_json(
             await BookingModel.create(newBooking)
 
             //update timeline
-            EventBookingTimelineModel.update({eventId: booking.eventId}, {set: {events: 'list_append(if_not_exists(events, @{emptyList}), @{newEvent})'},
+            await EventBookingTimelineModel.update({eventId: booking.eventId}, {set: {events: 'list_append(if_not_exists(events, @{emptyList}), @{newEvent})'},
             substitutions: {newEvent: [{userId: current_user.id, time: newBooking.created.toISOString()}], emptyList: []}})
+
+            await queueEmail({
+                template: "confirmation",
+                recipient: current_user,
+                event: event as EventType,
+                booking: newBooking as BookingType,
+                bookingOwner: current_user,
+            }, config)
 
             await syncEventToDrive(event.id, config)
 

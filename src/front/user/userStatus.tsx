@@ -9,8 +9,12 @@ export function UserStatus(props) {
     const user = useContext(UserContext)
     if (user) {
         return <>
-            <Typography variant="body1">{user.userName}</Typography>
-            <Avatar imgProps={{ referrerPolicy: "no-referrer" }} sx={{ width: 28, height: 28, ml: 1, boxShadow: 20 }} alt={user.userName} src={user.picture || "/nope.jpg"} />
+            <Link underline="hover" href="/user" color="inherit">
+                <Typography variant="body1">{user.userName ?? ''}</Typography>
+            </Link>
+            <RouterLink to="/user" style={{textDecoration:"none"}}>
+                <Avatar imgProps={{ referrerPolicy: "no-referrer" }} sx={{ width: 28, height: 28, ml: 1, boxShadow: 20 }} alt={user?.userName ?? undefined} src={user.picture || "/nope.jpg"} />
+            </RouterLink>
             <IconButton sx={{ ml: 1 }} component={'a'} href="/api/user/logout" color="inherit">
                 <Logout />
             </IconButton>

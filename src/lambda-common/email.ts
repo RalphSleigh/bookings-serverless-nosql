@@ -1,3 +1,117 @@
+import { LambdaClient, InvokeCommand } from "@aws-sdk/client-lambda";
+import am_in_lambda from "./am_in_lambda.js"
+import { log } from "./logging.js"
+import { BookingType, EventType, OnetableBookingType, OnetableEventType, UserType } from "./onetable.js"
+import { emails, getEmailTemplate } from "./emails/emails.js";
+import { convert } from "html-to-text";
+import MailComposer from 'nodemailer/lib/mail-composer/index.js'
+import { auth, gmail } from '@googleapis/gmail'
+import { ConfigType } from "./config.js";
+import { backOff } from 'exponential-backoff';
+import { render } from '@react-email/render';
+
+export type EmailData = {
+    template: keyof emails
+    recipient: UserType
+    event: EventType
+    booking: BookingType
+    bookingOwner: UserType
+}
+
+export async function queueEmail(data: EmailData, config: any) {
+    console.log("queueing emails")
+    console.log(data)
+
+    if (!config.EMAIL_ENABLED) {
+        log(`Not sending email ${data.template} to ${data.recipient.email} as email is disabled`)
+        return true
+    }
+    else if (am_in_lambda()) {
+        log(`Sending email ${data.template} to ${data.recipient.email} via lambda`)
+        await triggerEmailLambda(data, config)
+    } else {
+        log(`Sending email ${data.template} to ${data.recipient.email}`)
+        sendEmail(data, config)
+    }
+}
+
+async function triggerEmailLambda(data: EmailData, config: any) {
+    const client = new LambdaClient({})
+    const command = new InvokeCommand({
+        FunctionName: 'function_email',
+        InvocationType: "Event",
+        Payload: JSON.stringify(data)
+    })
+    await client.send(command)
+}
+
+let jwtPromise: Promise<any>
+let jwtClient: any
+
+function getGmailAuth(config: ConfigType): Promise<any> {
+    if (!jwtPromise) {
+        jwtClient = new auth.JWT(
+            config.EMAIL_CLIENT_EMAIL,
+            '',
+            config.EMAIL_PRIVATE_KEY,
+            ['https://www.googleapis.com/auth/gmail.send'],
+            config.EMAIL_FROM
+        )
+        jwtPromise = jwtClient.authorize()
+    }
+    return jwtClient
+}
+
+export async function sendEmail(data: EmailData, config: any) {
+    try {
+        const { recipient, event } = data
+
+        const template = getEmailTemplate(data.template)
+        const subject = template.subject(data)
+        const htmlEmail = template.HTLMBody(data, config)
+        const htmlEmailText = render(htmlEmail)
+        const textEmailText = render(htmlEmail, { plainText: true })
+
+        const mail_options = {
+            from: `Woodcraft Folk Bookings <${config.EMAIL_FROM}>`,
+            sender: config.EMAIL_FROM,
+            replyTo: event.replyTo,
+            to: recipient.email,
+            subject: subject,
+            html: htmlEmailText,
+            text: textEmailText
+        }
+
+        const message = await new MailComposer(mail_options).compile().build()
+        const auth = getGmailAuth(config)
+        await jwtPromise
+        const gmail_instance = gmail({ version: 'v1', auth: jwtClient });
+
+        await backOff(() => {
+            console.log("send attempt")
+            return gmail_instance.users.messages.send(
+                {
+                    auth: jwtClient,
+                    userId: 'bookings-auto@woodcraft.org.uk',
+                    media: {
+                        body: message,
+                        mimeType: "message/rfc822"
+                    }
+                })
+        }, { startingDelay: 2000, numOfAttempts: 2 })
+
+    } catch (e) {
+        console.log("error in sendEmail")
+        console.log(e)
+        throw e
+    }
+}
+
+
+
+/*
+
+
 import { db, orm } from './orm.js';
 import { backOff } from 'exponential-backoff';
 import { Op } from 'sequelize';
@@ -188,3 +302,5 @@ export function get_email_client(config, wrapper = true) {
 }
 
 
+
+*/

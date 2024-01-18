@@ -1,5 +1,5 @@
 import { isPast } from "date-fns";
-import { BookingType, OnetableEventType, JsonBookingType, JsonEventType, JsonUserResponseType, UserResponseType, UserType } from "../lambda-common/onetable.js";
+import { BookingType, OnetableEventType, JsonBookingType, JsonEventType, JsonUserResponseType, UserResponseType, UserType, EventType } from "../lambda-common/onetable.js";
 import { parseDate } from "./util.js";
 
 type PermissionData = {
@@ -40,6 +40,11 @@ export class Permission<T> {
 export const IsLoggedIn = new Permission<PermissionData>(data => {
     return data.user !== null
 }, "User must be logged in")
+
+export const CanEditUser = new Permission<PermissionData>(data => {
+    IsLoggedIn.throw(data)
+    return !data.user!.isWoodcraft
+}, "User can't edit user")
 
 export const IsGlobalAdmin = new Permission<PermissionData>(data => {
     return IsLoggedIn.if(data) && data.user!.admin
@@ -94,6 +99,13 @@ export const CanEditBooking = new Permission<BookingPermissionData>(data => {
     if (CanEditOwnBooking.if(data)) return true
     return CanManageEvent.if(data)
 }, "User can't edit booking")
+
+export const CanDeleteBooking = new Permission<BookingPermissionData>(data => {
+    IsLoggedIn.throw(data)
+    if (IsGlobalAdmin.if(data)) return true
+    if (CanEditOwnBooking.if(data)) return true
+    return CanManageWholeEvent.if(data)
+}, "User can't delete booking")
 
 const hasRoleOnEvent = (user, event, role) => {
     return !!user.roles.find(r => r.eventId === event.id && r.role === role)

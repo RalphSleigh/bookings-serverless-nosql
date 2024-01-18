@@ -30,6 +30,5 @@ export const lambdaHandler = lambda_wrapper_json(
     })
     const filtered = filterDataByRoles(event, latestBookingsBeforeTimestamp, current_user)
     return { bookings: filtered };
-    return { bookings: latestBookingsBeforeTimestamp };
     }
 )

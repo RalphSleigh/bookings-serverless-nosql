@@ -1,5 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
-import { get_config } from './config.js';
+import { ConfigType, get_config } from './config.js';
 import { flush_logs, log } from './logging.js';
 import { serializeError } from 'serialize-error';
 import { get_user_from_event } from './user.js';
@@ -10,7 +10,7 @@ export type LambdaJSONHandlerEvent = Pick<APIGatewayProxyEvent, Exclude<keyof AP
     body: any
 }
 
-export type LambdaJSONHandlerFunction = (lambda_event: LambdaJSONHandlerEvent, config: { [index: string]: any }, user: UserResponseType) => Promise<any>
+export type LambdaJSONHandlerFunction = (lambda_event: LambdaJSONHandlerEvent, config: ConfigType, user: UserResponseType) => Promise<any>
 
 export function lambda_wrapper_json(
     handler: LambdaJSONHandlerFunction):
@@ -78,7 +78,7 @@ export function lambda_wrapper_json(
     }
 }
 
-export async function lambda_wrapper_raw(handler: (config: { [index: string]: any }) => Promise<APIGatewayProxyResult>): Promise<APIGatewayProxyResult> {
+export async function lambda_wrapper_raw(handler: (config: ConfigType) => Promise<APIGatewayProxyResult>): Promise<APIGatewayProxyResult> {
     try {
         const config = await get_config()
         return await handler(config)

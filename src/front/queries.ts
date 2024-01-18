@@ -16,6 +16,16 @@ export function useUser() {
     return useQuery(userQuery.queryKey, userQuery.queryFn) as QueryObserverSuccessResult<{ "user": JsonUserResponseType }>
 }
 
+export function useEditUser() {
+    const queryClient = useQueryClient()
+    return useMutation<{ booking: JsonUserType }, any, JsonUserType, any>(
+        async data => (await axios.post('/api/user/edit', { user: data })),
+        {  
+            onSuccess: () => { 
+                queryClient.invalidateQueries(['user'])
+        }})
+}
+
 export const eventsQuery = {
     queryKey: ['events'],
     queryFn: async () => (await axios.get("/api/events")).data
@@ -69,6 +79,18 @@ export function useEditBooking() {
     const queryClient = useQueryClient()
     return useMutation<{ booking: JsonBookingType }, any, JsonBookingType, any>(
         async data => (await axios.post('/api/booking/edit', { booking: data })).data,
+        {  
+            onSuccess: () => { 
+                queryClient.invalidateQueries(['user', 'bookings'])
+                queryClient.invalidateQueries(['manage'])
+        }}
+    )
+}
+
+export function useDeleteBooking() {
+    const queryClient = useQueryClient()
+    return useMutation<{}, any, {eventId: string, userId: string}, any>(
+        async data => (await axios.post('/api/booking/delete', { booking: {eventId: data.eventId, userId: data.userId } })).data,
         {  
             onSuccess: () => { 
                 queryClient.invalidateQueries(['user', 'bookings'])
@@ -175,3 +197,4 @@ export function useDisableDriveSync() {
         }}
     )
 }
+

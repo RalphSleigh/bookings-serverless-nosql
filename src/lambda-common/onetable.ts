@@ -22,12 +22,12 @@ const schema = {
             sk: { type: String, value: 'user' },
             id: { type: String, generate: 'uid', required: true },
             remoteId: { type: String, required: true },
-            userName: { type: String, required: true },
-            password: { type: String },
-            email: { type: String },
-            source: { type: String },
-            picture: { type: String },
+            source: { type: String, required: true, enum: ['google', 'facebook', 'microsoft', 'yahoo']},
+            isWoodcraft: {type: Boolean, required: true, default: 'false'},
             admin: { type: Boolean, required: true, default: 'false' },
+            userName: { type: String },
+            email: { type: String },
+            picture: { type: String },
             tokens: { type: Object },
             created: { type: Date },
             updated: { type: Date },
@@ -52,6 +52,7 @@ const schema = {
             startDate: { type: Date, required: true },
             endDate: { type: Date, required: true },
             bookingDeadline: { type: Date, required: true },
+            replyTo: { type: String, required: true },
             kpMode: { type: String, required: true, enum: ['basic', 'vcamp'] },
             bigCampMode: { type: Boolean, required: true, default: 'false' },
             attendanceStructure: { type: String, required: true, enum: ['whole'] },
@@ -64,11 +65,23 @@ const schema = {
             feeData: {
                 type: Object, required: true, schema: {
                     fee: { type: Number },
+                    paymentInstructions: { type: String },
                     ealingAccompanied: { type: Number },
                     ealingUnaccompanied: { type: Number },
                     ealingDiscountAccompanied: { type: Number },
                     ealingDiscountUnaccompanied: { type: Number },
                 }
+            },
+            customQuestions: {
+                required: true,
+                type: Array,
+                items: {
+                    type: Object,
+                    schema: {
+                        questionType: { type: String, required: true, enum: ['yesnochoice', 'text'] },
+                        questionLabel: { type: String, required: true }
+                    }
+                },
             },
             created: { type: Date },
             updated: { type: Date },
@@ -81,10 +94,14 @@ const schema = {
             deleted: { type: Boolean, required: true },
             userId: { type: String, required: true },
             eventId: { type: String, required: true },
-            contactName: { type: String, required: true },
-            contactEmail: { type: String, required: true },
-            contactPhone: { type: String, required: true },
-            district: { type: String },
+            basic: {
+                type: Object, required: true, schema: {
+                    contactName: { type: String, required: true },
+                    contactEmail: { type: String, required: true },
+                    contactPhone: { type: String, required: true },
+                    district: { type: String },
+                }
+            },
             participants: {
                 type: Array, items: {
                     type: Object,
@@ -125,6 +142,16 @@ const schema = {
                 },
                 required: true
             },
+            emergency: {
+                type: Object,
+                schema: {
+                    name: { type: String, required: true },
+                    phone: { type: String, required: true }
+                },
+            },
+            customQuestions: {
+                type: Array
+            },
             created: { type: Date, required: true },
             updated: { type: Date, required: true },
         },
@@ -144,12 +171,6 @@ const schema = {
             },
             created: { type: Date },
             updated: { type: Date },
-        },
-        UserDriveTokens: {
-            pk: { type: String, value: 'userdrivetokens' },
-            sk: { type: String, value: 'user:${userId}' },
-            userId: { type: String, required: true },
-            tokens: { type: Object, required: true }
         }
     } as const,
     params: {
@@ -191,40 +212,44 @@ interface ParticipantConsentType {
 
 export type OnetableEventType = Entity<typeof schema.models.Event>
 
-interface EalingFeeEventType {
+export interface EalingFeeEventType {
     feeStructure: "ealing"
     feeData: {
         ealingAccompanied: number
         ealingUnaccompanied: number
         ealingDiscountAccompanied: number
         ealingDiscountUnaccompanied: number
+        paymentInstructions: string
     }
 }
 
-interface FlatFeeEventType {
+export interface FlatFeeEventType {
     feeStructure: "flat"
     feeData: {
         fee: number
     }
 }
 
-interface FreeFeeEventType {
+export interface FreeFeeEventType {
     feeStructure: "free"
     feeData: {
     }
 }
 
-export type EventType = (OnetableEventType & EalingFeeEventType) | (OnetableEventType & FlatFeeEventType)| (OnetableEventType & FreeFeeEventType)
+export type EventType = (OnetableEventType & EalingFeeEventType) | (OnetableEventType & FlatFeeEventType) | (OnetableEventType & FreeFeeEventType)
 export type JsonEventType = Jsonify<EventType>
 
 export type ParticipantType = ParticipantFields & ParticipantBasicType & Partial<ParticipantKpType> & Partial<ParticipantConsentType> & Partial<ParticipantMedicalType>
 
-export type JsonParticipantType = Jsonify<ParticipantFields> & ParticipantBasicType & Partial<ParticipantKpType> & Partial<ParticipantConsentType> & Partial<ParticipantMedicalType>
+export type JsonParticipantType = Jsonify<ParticipantFields> & Jsonify<ParticipantBasicType> & Partial<ParticipantKpType> & Partial<ParticipantConsentType> & Partial<ParticipantMedicalType>
+
+export type JsonParticipantWithBasicType = Partial<Omit<JsonParticipantType, 'basic'>> & Jsonify<ParticipantBasicType> 
+
 
 export type UserType = Entity<typeof schema.models.User>
 export type RoleType = Entity<typeof schema.models.Role>
-export type UserDriveTokensType = Entity<typeof schema.models.UserDriveTokens>
 
+export type UserWithRoles = UserType & { roles: Array<RoleType> }
 export type FoundUserResponseType = (Omit<UserType, "tokens"> & { roles: Array<RoleType>, tokens: boolean })
 export type UserResponseType = FoundUserResponseType | null
 
@@ -239,10 +264,6 @@ export type JsonUserResponseType = Jsonify<UserResponseType>
 export type JsonBookingType = Omit<Jsonify<BookingType>, 'participants'> & { participants: Array<JsonParticipantType> }
 export type JsonEventBookingTimelineType = Jsonify<EventBookingTimelineType>
 export type JsonRoleType = SetOptional<Jsonify<RoleType>, 'id'>
-
-
-
-
 
 //@ts-ignore
 export const table = new Table({

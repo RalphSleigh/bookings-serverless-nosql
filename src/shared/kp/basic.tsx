@@ -1,15 +1,15 @@
 import React from "react";
-import { KpStructure } from "./kp_class.js";
+import { KpStructure, kpValidationResults } from "./kp_class.js";
 import { JsonParticipantType } from "../../lambda-common/onetable.js";
 import { FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material";
-import { getMemoUpdateFunctions } from "../../front/util.js";
+import { getMemoUpdateFunctions } from "../util.js";
 
 export class Basic implements KpStructure {
     kpName = "Basic"
     ParticipantFormElement({ data = {}, update }: { data: Partial<Required<JsonParticipantType>["kp"]>, update: any }) {
 
 
-        const { updateField, updateSwitch, updateParticipantDate, updateSubField } = getMemoUpdateFunctions(update)
+        const { updateField } = getMemoUpdateFunctions(update)
 
         const capitalizeWord = (word: string) => {
             return word.charAt(0).toUpperCase() + word.slice(1);
@@ -20,14 +20,22 @@ export class Basic implements KpStructure {
         </MenuItem>)
 
         return <>
-            <FormControl fullWidth>
+            <FormControl required fullWidth>
                 <InputLabel id="diet-select-label">Diet</InputLabel>
                 <Select value={data.diet || "default"} label="Diet" required onChange={updateField("diet")} labelId="diet-select-label">
                     {data.diet ? null : <MenuItem key="default" value="default">Please select</MenuItem>}
                     {kpOptions}
                 </Select>
             </FormControl>
-            <TextField sx={{ mt: 2 }} multiline fullWidth minRows={2} id="outlined" label="Any other requirements or allergies?" value={data.details || ''} onChange={updateField('details')} />
+            <TextField sx={{ mt: 2 }} multiline fullWidth minRows={2} id="outlined" label="Additional dietary requirement or food related allergies:" value={data.details || ''} onChange={updateField('details')} />
         </>
+    }
+
+    public validate(participant: Partial<JsonParticipantType>): kpValidationResults {
+        const results: kpValidationResults = []
+        if(participant.basic?.name) {
+            if(!participant.kp?.diet) results.push(`Please select a diet for ${participant.basic?.name}`)
+        }
+        return results
     }
 }

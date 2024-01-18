@@ -1,5 +1,5 @@
 import { lambda_wrapper_json } from '../../../lambda-common/lambda_wrappers.js';
-import { BookingType, EventType, table } from '../../../lambda-common/onetable.js';
+import { BookingType, EventType, OnetableEventType, table } from '../../../lambda-common/onetable.js';
 import { filterDataByRoles } from '../../../lambda-common/roles.js';
 import { CanManageEvent } from '../../../shared/permissions.js';
 
@@ -13,7 +13,7 @@ import { CanManageEvent } from '../../../shared/permissions.js';
  *
  */
 
-const EventModel = table.getModel<EventType>('Event')
+const EventModel = table.getModel<OnetableEventType>('Event')
 const BookingModel = table.getModel<BookingType>('Booking')
 
 export const lambdaHandler = lambda_wrapper_json(

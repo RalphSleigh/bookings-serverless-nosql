@@ -39,6 +39,12 @@ variable "lambda_definitions" {
       path   = "user"
       method = "get"
     },
+    user_edit = {
+      name   = "user_edit"
+      code   = "user/edit"
+      path   = "user"
+      method = "post"
+    },
     userDisableDriveSync = {
       name   = "userDisableDriveSync"
       code   = "user/disableDriveSync"
@@ -153,13 +159,13 @@ variable "lambda_definitions" {
       code   = "bookings/editBooking"
       path   = "booking/edit"
       method = "post"
-    }, /*
+    }, 
     bookings_delete = {
       name     = "bookings_delete"
-      code_dir = "bookings/delete"
+      code_dir = "bookings/deleteBooking"
       path     = "booking/delete"
       method   = "post"
-    },
+    },/*
     bookings_syncmax = {
       name     = "bookings_syncmax"
       code_dir = "bookings/syncmax"
@@ -279,7 +285,7 @@ variable "lambda_definitions" {
       code   = "auth/google_drive/callback"
       path   = "auth/google_drive/callback"
       method = "get"
-    }, /*
+    }, 
     auth_facebook_redirect = {
       name     = "auth_facebook_redirect"
       code_dir = "auth/facebook/redirect"
@@ -291,7 +297,7 @@ variable "lambda_definitions" {
       code_dir = "auth/facebook/callback"
       path     = "auth/facebook/callback"
       method   = "get"
-    },
+    },/*
     auth_yahoo_redirect = {
       name     = "auth_yahoo_redirect"
       code_dir = "auth/yahoo/redirect"

@@ -1,5 +1,5 @@
 import { isValid } from "date-fns"
-import { parseDate } from "../util.js"
+import { parseDate } from "../../shared/util.js"
 
 export function validate(data) {
     if(['name', 'feeStructure'].map(item => stringExistsAndNotEmpty(data[item])).filter(i => !i).length > 0) return false

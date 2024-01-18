@@ -14,7 +14,7 @@ export const lambdaHandler = lambda_wrapper_json(
         const event = await EventModel.get({id: lambda_event.body.event.id})
         if(event) {
             CanEditEvent.throw({user: current_user, event: event})
-        await EventModel.update(lambda_event.body.event)
+        await EventModel.update(lambda_event.body.event, {partial: false})
         return {};
         } else {
             throw new Error("Can't find event")

@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useMemo } from "react";
 import { Outlet, useOutletContext, useResolvedPath, useLocation } from "react-router-dom";
 import { manageLoaderContext } from "./manageLoader.js";
 import { Button, ButtonGroup, FormControlLabel, Grid, Link, Switch, Tab, Tabs, TextField } from "@mui/material";
@@ -7,6 +7,8 @@ import { JsonBookingType, JsonEventType, JsonUserResponseType } from "../../lamb
 import { SuspenseWrapper } from "../suspense.js";
 import { UserContext } from "../user/userContext.js";
 import { CanManageWholeEvent } from "../../shared/permissions.js";
+import { addComputedFieldsToBookingsQueryResult, bookingsBookingSearch, bookingsParticipantSearch, useDebounceState } from "../util.js";
+import { JsonBookingWithExtraType } from "../../shared/computedDataTypes.js";
 
 export function Component() {
     const { event, timeline } = useOutletContext<manageLoaderContext>()
@@ -18,7 +20,19 @@ export function Component() {
     const bookingsPath = useResolvedPath('bookings')
     const rolesPath = useResolvedPath('roles')
 
-    const Loader = timeline.latest ? LatestDataLoader : TimeLineDataLoader
+    const [displayDeleted, setDisplayDeleted] = React.useState<boolean>(false)
+    const [participantSearch, debouncedParticipantSearch, setParticipantSearch] = useDebounceState<string>("", 500)
+    const [bookingSearch, debouncedBookingSearch, setBookingSearch] = useDebounceState<string>("", 500)
+
+    const updateParticipantSearch = e => {
+        setParticipantSearch(e.target.value)
+    }
+
+    const updateBookingSearch = e => {
+        setBookingSearch(e.target.value)
+    }
+
+    const Loader = timeline.latest ? MemoLatestDataLoader : MemoTimeLineDataLoader
 
     return <Grid container spacing={0}>
         <Grid xs={12} item>
@@ -29,9 +43,10 @@ export function Component() {
             </Tabs>
         </Grid>
         {shouldShowSearch(location) ? <Grid xs={12} p={2} item>
+            <FormControlLabel sx={{ float: "right" }} control={<Switch checked={displayDeleted} onChange={() => setDisplayDeleted(!displayDeleted)}/>} label="Show Cancelled" />
             <SyncWidget user={user} />
-            <TextField sx={{ mr: 1, mt: 1 }} size="small" margin="dense" label="Participant search" />
-            <TextField sx={{ mr: 1, mt: 1 }} size="small" margin="dense" label="Booking search" />
+            <TextField sx={{ mr: 1, mt: 1 }} size="small" margin="dense" label="Participant search" value={participantSearch} onChange={updateParticipantSearch}/>
+            <TextField sx={{ mr: 1, mt: 1 }} size="small" margin="dense" label="Booking search" value={bookingSearch} onChange={updateBookingSearch}/>
             <ButtonGroup variant="outlined" sx={{ mr: 1, mt: 1 }} aria-label="outlined button group">
                 <Button disabled={timeline.backEnabled} onClick={timeline.backFn}>{'<'}</Button>
                 <Button>{timeline.position.time}</Button>
@@ -42,7 +57,7 @@ export function Component() {
         </Grid> : null}
 
             <SuspenseWrapper>
-                <Loader event={event} timeline={timeline} />
+                    <Loader event={event} timeline={timeline} displayDeleted={displayDeleted} participantSearch={debouncedParticipantSearch} bookingSearch={debouncedBookingSearch}/>
             </SuspenseWrapper>
     </Grid >
 }
@@ -52,18 +67,29 @@ function shouldShowSearch(location) {
 }
 
 export type managePageContext = manageLoaderContext & {
-    bookings: Array<JsonBookingType>
+    bookings: Array<JsonBookingWithExtraType>
+    displayDeleted: boolean
 }
 
-function LatestDataLoader({ event, timeline }) {
+function LatestDataLoader({ event, timeline, displayDeleted, participantSearch, bookingSearch }) {
     const { bookings } = useEventBookings(event.id).data
-    return <Outlet context={{ event, bookings, timeline }} />
+    const enhancedBookings = addComputedFieldsToBookingsQueryResult(bookings, event)
+    const bookingSearchedBookings = bookingsBookingSearch(enhancedBookings, bookingSearch)
+    const searchedBookings = bookingsParticipantSearch(bookingSearchedBookings, participantSearch)
+    return <Outlet context={{ event, bookings: searchedBookings, timeline, displayDeleted }} />
 }
 
-function TimeLineDataLoader({ event, timeline }) {
+const MemoLatestDataLoader = React.memo(LatestDataLoader)
+
+function TimeLineDataLoader({ event, timeline, displayDeleted, participantSearch, bookingSearch }) {
     const { bookings } = useHistoricalEventBookings(event.id, Date.parse(timeline.position.time).toString()).data
-    return <Outlet context={{ event, bookings, timeline }} />
+    const enhancedBookings = addComputedFieldsToBookingsQueryResult(bookings, event)
+    const bookingSearchedBookings = bookingsBookingSearch(enhancedBookings, bookingSearch)
+    const searchedBookings = bookingsParticipantSearch(bookingSearchedBookings, participantSearch)
+    return <Outlet context={{ event, bookings: searchedBookings, timeline, displayDeleted }} />
 }
+
+const MemoTimeLineDataLoader = React.memo(TimeLineDataLoader)
 
 const  PermissionTab: React.FC<any> = props => {
     const { user, event, permission, ...rest } = props 
