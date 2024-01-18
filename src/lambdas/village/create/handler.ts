@@ -4,7 +4,7 @@ import { Op } from 'sequelize';
 import { add_village, book_event, book_into_organisation } from '../../../lambda-common/permissions';
 import { BookingModel } from '../../../lambda-common/models/booking';
 import feeFactory from '../../../shared/fee/feeFactory';
-import { get_email_client } from '../../../lambda-common/email';
+/* import { get_email_client } from '../../../lambda-common/email'; */
 import * as confirmation from '../../../lambda-common/emails/confirmation'
 import * as manager_booking_created from '../../../lambda-common/emails/managerBookingCreated'
 import { getEventDetails } from '../../../lambda-common/util';

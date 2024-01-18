@@ -3,7 +3,7 @@ import { Op } from 'sequelize';
 import { lambda_wrapper_json, user, orm } from '../../../lambda-common'
 import { decide_application } from '../../../lambda-common/permissions';
 import { get_user_from_event } from '../../../lambda-common/user';
-import { get_email_client } from '../../../lambda-common/email';
+/* import { get_email_client } from '../../../lambda-common/email'; */
 import * as applicationApproved from '../../../lambda-common/emails/applicationApproved'
 import { getEventDetails } from '../../../lambda-common/util';
 import { ApplicationModel } from '../../../lambda-common/models/application';
@@ -44,9 +44,9 @@ export const lambdaHandler = lambda_wrapper_json([decide_application],
 
         await postToDiscord(config, `${current_user.userName} approved application from ${user!.userName}. ${app_string}`)
 
-        const email = get_email_client(config)
+/*         const email = get_email_client(config)
         const values = { event: event, user: user };
-        await email.single(user!.email, applicationApproved, values);
+        await email.single(user!.email, applicationApproved, values); */
 
         return { events: [event] }
     })
