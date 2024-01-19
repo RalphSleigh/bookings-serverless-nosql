@@ -36,7 +36,7 @@ variable "lambda_definitions" {
     user = {
       name   = "user"
       code   = "user/getUser"
-      path   = "user/getUser"
+      path   = "user"
       method = "get"
     },
     user_edit = {
