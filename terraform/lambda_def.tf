@@ -36,13 +36,13 @@ variable "lambda_definitions" {
     user = {
       name   = "user"
       code   = "user/getUser"
-      path   = "user"
+      path   = "user/getUser"
       method = "get"
     },
     user_edit = {
       name   = "user_edit"
       code   = "user/edit"
-      path   = "user"
+      path   = "user/edit"
       method = "post"
     },
     userDisableDriveSync = {
