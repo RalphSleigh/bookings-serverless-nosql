@@ -3,6 +3,7 @@ import React from "react";
 import { JsonEventType, JsonUserResponseType } from "../../lambda-common/onetable.js";
 import { JsonBookingWithExtraType } from "../../shared/computedDataTypes.js";
 import { getFee } from "../../shared/fee/fee.js";
+import { Link } from "react-router-dom";
 
 const capitalizeWord = (word: string) => {
     return word.charAt(0).toUpperCase() + word.slice(1);
@@ -23,7 +24,7 @@ export function ThanksPage({ event, booking, user }: { event: JsonEventType, boo
             <Paper elevation={3}>
                 <Box p={2}>
                     <Typography variant="h4">{`Thanks for booking for  ${event.name}`}</Typography>
-                    <Typography mt={2} variant="body1">You can come back and <a href={`/event/${event.id}/edit-my-booking`}>edit</a> your booking at any time before the deadline</Typography>
+                    <Typography mt={2} variant="body1">You can come back and <Link to={`/event/${event.id}/edit-my-booking`}>edit</Link> your booking at any time before the deadline</Typography>
                     <Typography mt={2} variant="h5">Campers booked</Typography>
                     <TableContainer component={Paper} sx={{ mt: 2, p: 1 }}>
                         <Table size="small">
