@@ -17,7 +17,6 @@ resource "aws_s3_object" "email_lambda_code" {
 }
 
 resource "aws_cloudwatch_log_group" "email_lambda_log_group" {
-  for_each          = local.filtered_lambdas
   name              = "/aws/lambda/function_email"
   retention_in_days = 14
 }
