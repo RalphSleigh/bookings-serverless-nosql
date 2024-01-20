@@ -76,3 +76,8 @@ resource "aws_iam_role_policy_attachment" "lambda_sqs_role_policy" {
   role       = aws_iam_role.email_lambda_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
 }
+
+resource "aws_iam_role_policy_attachment" "email_standard_lambda_policy_attachment" {
+  role       = aws_iam_role.email_lambda_role.name
+  policy_arn = aws_iam_policy.lambda_execution_policy.arn
+}
