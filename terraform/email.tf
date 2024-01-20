@@ -68,7 +68,7 @@ data "aws_iam_policy_document" "email_lambda_role_iam_policy" {
 
 resource "aws_iam_role" "email_lambda_role" {
   name               = "EmailLambdaRole"
-  assume_role_policy = data.aws_iam_policy_document.ses_bounces_lambda_role_iam_policy.json
+  assume_role_policy = data.aws_iam_policy_document.email_lambda_role_iam_policy.json
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_sqs_role_policy" {
