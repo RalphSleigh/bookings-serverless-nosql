@@ -1,5 +1,6 @@
 resource "aws_sqs_queue" "email_queue" {
   name                      = "email-queue"
+  visibility_timeout_seconds = 300
 }
 
 
@@ -54,6 +55,7 @@ resource "aws_lambda_event_source_mapping" "event_source_mapping" {
   enabled          = true
   function_name    = aws_lambda_function.email_lambda.arn
   batch_size       = 1
+  visibility_timeout_seconds = 300
 }
 
 data "aws_iam_policy_document" "email_lambda_role_iam_policy" {
