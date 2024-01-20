@@ -1,33 +1,15 @@
-/* import { get_config } from "../../lambda-common"
-import { get_email_client } from "../../lambda-common/email"
+import { DeleteMessageCommand, SQSClient } from "@aws-sdk/client-sqs";
 
-//@ts-ignore
-import emails from "../../lambda-common/emails/*"
+ const lambdaHandler = async (event: any): Promise<any> => {
+    console.log(event);
 
+    // Delete the event from SQS
+    const client = new SQSClient({});
+    await client.send(
+        new DeleteMessageCommand({
+            QueueUrl: process.env.EMAIL_QUEUE_URL,
+            ReceiptHandle: event.ReceiptHandle,
+        }))
 
-export const lambdaHandler = async (event: any): Promise<any> => {
-
-    console.log(event)
-
-    const config = await get_config()
-    const email = get_email_client(config, false)
-    
-    const template = emails.find(t => t.name == event.email.name)
-
-    console.log(emails)
-    console.log(template)
-
-    switch(event.email.type) {
-        case "single":
-            await email.single(event.email.to, template, event.email.values)
-            break;
-        case "manager":
-            await email.toManagers(template, event.email.values)
-        }
-}
- */
-
-export const lambdaHandler = async (event: any): Promise<any> => {
-    console.log(event)
-    return true
+    return true;
 }
