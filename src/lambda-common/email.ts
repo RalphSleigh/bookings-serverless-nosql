@@ -1,9 +1,8 @@
 import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
 import am_in_lambda from "./am_in_lambda.js"
 import { log } from "./logging.js"
-import { BookingType, EventType, OnetableBookingType, OnetableEventType, UserType } from "./onetable.js"
+import { BookingType, EventType, UserType } from "./onetable.js"
 import { emails, getEmailTemplate } from "./emails/emails.js";
-import { convert } from "html-to-text";
 import MailComposer from 'nodemailer/lib/mail-composer/index.js'
 import { auth, gmail } from '@googleapis/gmail'
 import { ConfigType } from "./config.js";
@@ -37,8 +36,8 @@ export async function queueEmail(data: EmailData, config: any) {
 
 async function triggerEmailSQS(data: EmailData, config: any) {
     const sqsClient = new SQSClient({});
-    const queueUrl = process.env.SQS_QUEUE_URL;
 
+    console.log(process.env.EMAIL_QUEUE_URL)
     const command = new SendMessageCommand({
         QueueUrl: process.env.EMAIL_QUEUE_URL,
         MessageBody: JSON.stringify(data)
