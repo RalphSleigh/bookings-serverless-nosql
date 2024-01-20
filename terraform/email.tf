@@ -23,7 +23,7 @@ resource "aws_cloudwatch_log_group" "email_lambda_log_group" {
 
 resource "aws_lambda_function" "email_lambda" {
   function_name = "function_email"
-  role          = aws_iam_role.iam_for_lambda.arn
+  role          = aws_iam_role.email_lambda_role.arn
   handler       = "email.lambdaHandler"
 
   s3_bucket = aws_s3_bucket.lambda_code.id
