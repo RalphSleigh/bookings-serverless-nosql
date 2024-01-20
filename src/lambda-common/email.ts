@@ -36,8 +36,6 @@ export async function queueEmail(data: EmailData, config: any) {
 
 async function triggerEmailSQS(data: EmailData, config: any) {
     const sqsClient = new SQSClient({});
-
-    console.log(process.env.EMAIL_QUEUE_URL)
     const command = new SendMessageCommand({
         QueueUrl: process.env.EMAIL_QUEUE_URL,
         MessageBody: JSON.stringify(data)
