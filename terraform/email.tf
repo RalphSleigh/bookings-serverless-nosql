@@ -1,19 +1,19 @@
 resource "aws_sqs_queue" "email_queue" {
-  name                      = "email-queue"
+  name                       = "email-queue"
   visibility_timeout_seconds = 300
 }
 
 
 data "archive_file" "email_lambda_zip" {
-  type               = "zip"
+  type        = "zip"
   source_file = "${path.module}/../dist-lambda/lambdas/email/email.mjs"
-  output_path        = "${path.module}/files/email-lambda.zip"
+  output_path = "${path.module}/files/email-lambda.zip"
 }
 
 resource "aws_s3_object" "email_lambda_code" {
-  bucket   = aws_s3_bucket.lambda_code.id
-  key      = data.archive_file.email_lambda_zip.output_md5
-  source   = data.archive_file.email_lambda_zip.output_path
+  bucket = aws_s3_bucket.lambda_code.id
+  key    = data.archive_file.email_lambda_zip.output_md5
+  source = data.archive_file.email_lambda_zip.output_path
 }
 
 resource "aws_cloudwatch_log_group" "email_lambda_log_group" {
@@ -55,7 +55,6 @@ resource "aws_lambda_event_source_mapping" "event_source_mapping" {
   enabled          = true
   function_name    = aws_lambda_function.email_lambda.arn
   batch_size       = 1
-  visibility_timeout_seconds = 300
 }
 
 data "aws_iam_policy_document" "email_lambda_role_iam_policy" {
