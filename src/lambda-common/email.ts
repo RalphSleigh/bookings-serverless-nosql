@@ -1,4 +1,4 @@
-import { LambdaClient, InvokeCommand } from "@aws-sdk/client-lambda";
+import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
 import am_in_lambda from "./am_in_lambda.js"
 import { log } from "./logging.js"
 import { BookingType, EventType, OnetableBookingType, OnetableEventType, UserType } from "./onetable.js"
@@ -28,21 +28,23 @@ export async function queueEmail(data: EmailData, config: any) {
     }
     else if (am_in_lambda()) {
         log(`Sending email ${data.template} to ${data.recipient.email} via lambda`)
-        await triggerEmailLambda(data, config)
+        await triggerEmailSQS(data, config)
     } else {
         log(`Sending email ${data.template} to ${data.recipient.email}`)
         sendEmail(data, config)
     }
 }
 
-async function triggerEmailLambda(data: EmailData, config: any) {
-    const client = new LambdaClient({})
-    const command = new InvokeCommand({
-        FunctionName: 'function_email',
-        InvocationType: "Event",
-        Payload: JSON.stringify(data)
-    })
-    await client.send(command)
+async function triggerEmailSQS(data: EmailData, config: any) {
+    const sqsClient = new SQSClient({});
+    const queueUrl = config.SQS_QUEUE_URL;
+
+    const command = new SendMessageCommand({
+        QueueUrl: process.env.EMAIL_QUEUE_URL,
+        MessageBody: JSON.stringify(data)
+    });
+
+    await sqsClient.send(command);
 }
 
 let jwtPromise: Promise<any>

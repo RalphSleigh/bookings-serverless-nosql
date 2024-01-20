@@ -1,7 +1,9 @@
 import { BookingConfirmationEmail } from "./bookingConfirmation.js";
+import { BookingEditedEmail } from "./bookingEdited.js";
 
 const emails = {
-    confirmation: new BookingConfirmationEmail()
+    confirmation: new BookingConfirmationEmail(),
+    edited: new BookingEditedEmail()
 }
 
 export type emails = typeof emails

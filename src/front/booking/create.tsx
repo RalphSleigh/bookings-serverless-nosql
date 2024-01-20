@@ -30,7 +30,7 @@ export function CreateBookingPage({ event, user }) {
     submit={submit} 
     mode={"create"} 
     deleteBooking={() => {}}
-    submitLoading={createBooking.isLoading}
+    submitLoading={createBooking.isPending}
     deleteLoading={false}/>
 }
 

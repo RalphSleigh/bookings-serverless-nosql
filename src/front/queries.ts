@@ -52,6 +52,7 @@ export const userBookingsQuery = {
 
 export function useCreateEvent() {
     const queryClient = useQueryClient()
+    const setSnackbar = useContext(SnackBarContext)
     return useMutation(
         {
             mutationFn: async data => (await axios.post('/api/event/create', { event: data })),
@@ -59,7 +60,8 @@ export function useCreateEvent() {
                 queryClient.invalidateQueries({
                     queryKey: ['events']
                 })
-            }
+            },
+            onError: snackbarError(setSnackbar)
         });
 }
 
@@ -69,6 +71,7 @@ export function useUsersBookings() {
 
 export function useEditEvent() {
     const queryClient = useQueryClient()
+    const setSnackbar = useContext(SnackBarContext)
     return useMutation(
         {
             mutationFn: async data => (await axios.post('/api/event/edit', { event: data })),
@@ -76,12 +79,14 @@ export function useEditEvent() {
                 queryClient.invalidateQueries({
                     queryKey: ['events']
                 })
-            }
+            },
+            onError: snackbarError(setSnackbar)
         });
 }
 
 export function useCreateBooking() {
     const queryClient = useQueryClient()
+    const setSnackbar = useContext(SnackBarContext)
     return useMutation<{ booking: JsonBookingType }, any, JsonBookingType, any>(
         {
             mutationFn: async data => (await axios.post('/api/booking/create', { booking: data })).data,
@@ -92,12 +97,14 @@ export function useCreateBooking() {
                 queryClient.invalidateQueries({
                     queryKey: ['manage']
                 })
-            }
+            },
+            onError: snackbarError(setSnackbar)
         });
 }
 
 export function useEditBooking() {
     const queryClient = useQueryClient()
+    const setSnackbar = useContext(SnackBarContext)
     return useMutation<{ booking: JsonBookingType }, any, JsonBookingType, any>(
         {
             mutationFn: async data => (await axios.post('/api/booking/edit', { booking: data })).data,
@@ -108,13 +115,15 @@ export function useEditBooking() {
                 queryClient.invalidateQueries({
                     queryKey: ['manage']
                 })
-            }
+            },
+            onError: snackbarError(setSnackbar)
         }
     );
 }
 
 export function useDeleteBooking() {
     const queryClient = useQueryClient()
+    const setSnackbar = useContext(SnackBarContext)
     return useMutation<{}, any, { eventId: string, userId: string }, any>(
         {
             mutationFn: async data => (await axios.post('/api/booking/delete', { booking: { eventId: data.eventId, userId: data.userId } })).data,
@@ -125,7 +134,8 @@ export function useDeleteBooking() {
                 queryClient.invalidateQueries({
                     queryKey: ['manage']
                 })
-            }
+            },
+            onError: snackbarError(setSnackbar)
         }
     );
 }
@@ -197,6 +207,7 @@ export type allUsersQueryType = UseQueryOptions<{ "users": [JsonUserType] }, any
 
 export function useCreateRole(eventId) {
     const queryClient = useQueryClient()
+    const setSnackbar = useContext(SnackBarContext)
     return useMutation<{ role: JsonRoleType }, any, JsonRoleType, any>(
         {
             mutationFn: async data => (await axios.post(`/api/event/${eventId}/manage/roles/create`, { role: data })).data,
@@ -204,13 +215,15 @@ export function useCreateRole(eventId) {
                 queryClient.invalidateQueries({
                     queryKey: ['manage', eventId, 'roles']
                 })
-            }
+            },
+            onError: snackbarError(setSnackbar)
         }
     );
 }
 
 export function useDeleteRole(eventId) {
     const queryClient = useQueryClient()
+    const setSnackbar = useContext(SnackBarContext)
     return useMutation<{ role: string }, any, string, any>(
         {
             mutationFn: async data => (await axios.post(`/api/event/${eventId}/manage/roles/delete`, { role: data })).data,
@@ -218,13 +231,15 @@ export function useDeleteRole(eventId) {
                 queryClient.invalidateQueries({
                     queryKey: ['manage', eventId, 'roles']
                 })
-            }
+            },
+            onError: snackbarError(setSnackbar)
         }
     );
 }
 
 export function useDisableDriveSync() {
     const queryClient = useQueryClient()
+    const setSnackbar = useContext(SnackBarContext)
     return useMutation<any, any, string, any>(
         {
             mutationFn: async data => (await axios.post(`/api/user/disableDriveSync`)).data,
@@ -232,7 +247,8 @@ export function useDisableDriveSync() {
                 queryClient.invalidateQueries({
                     queryKey: ['user']
                 })
-            }
+            },
+            onError: snackbarError(setSnackbar)
         }
     );
 }

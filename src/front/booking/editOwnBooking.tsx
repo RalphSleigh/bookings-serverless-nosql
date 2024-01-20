@@ -39,7 +39,7 @@ export function EditOwnBookingPage({ event, booking, user }) {
     submit={submit} 
     deleteBooking={deleteBookingFn} 
     mode={bookingData.deleted ? "rebook" : "edit"}
-    submitLoading={editBooking.isLoading}
-    deleteLoading={deleteBooking.isLoading} />
+    submitLoading={editBooking.isPending}
+    deleteLoading={deleteBooking.isPending} />
 }
 

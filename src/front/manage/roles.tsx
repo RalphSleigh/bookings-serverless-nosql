@@ -90,7 +90,7 @@ export function Component() {
             </FormControl>
         </Grid>
         <Grid xs={4} p={1} item>
-            <Button disabled={userId === "" || role === "" || createRole.isLoading} variant="contained" sx={{ mt: 0.8 }} size="large" onClick={submit}>Add Role</Button>
+            <Button disabled={userId === "" || role === "" || createRole.isPending} variant="contained" sx={{ mt: 0.8 }} size="large" onClick={submit}>Add Role</Button>
         </Grid>
         <Grid xs={12} p={1} item>
             <DataGrid rowSelection={false} pageSizeOptions={[100]} rows={rows} columns={columns} />
@@ -111,7 +111,7 @@ const renderUserCell = props => {
 }
 
 const renderDeleteCell = (deleteRole, mutation) => props => {
-    return <IconButton disabled={mutation.isLoading} onClick={deleteRole(props.value)} color="warning">
+    return <IconButton disabled={mutation.isPending} onClick={deleteRole(props.value)} color="warning">
         <Close />
     </IconButton>
 }

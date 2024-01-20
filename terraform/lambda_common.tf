@@ -21,12 +21,12 @@ EOF
 data "aws_caller_identity" "current" {}
 
 data "aws_iam_policy_document" "lambda_exec_role_policy" {
+
   statement {
-     actions = [
-      "lambda:InvokeFunction",
-      "lambda:InvokeAsync"
-     ]
-     resources = ["arn:aws:lambda:eu-west-2:${data.aws_caller_identity.current.account_id}:*:*"]
+    actions = [
+      "sqs:SendMessage"
+    ]
+    resources = [aws_sqs_queue.email_queue.arn]
   }
 
   statement {

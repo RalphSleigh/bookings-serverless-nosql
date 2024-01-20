@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Navigate, useLocation, useRouteError } from "react-router-dom";
+import { Navigate, isRouteErrorResponse, useLocation, useRouteError } from "react-router-dom";
 import { SnackBarContext } from "./toasts.js";
 
 function logError(message, stack) {
@@ -28,24 +28,31 @@ function logError(message, stack) {
 }
 
 export function RouterErrorBoundary() {
-    let error = useRouteError() as any
+    const error = useRouteError() as any
+    const setSnackbar = React.useContext(SnackBarContext)
+    const location = useLocation()
+
     useEffect(() => {
         console.log("LOGGING FROM ROUTER ERROR BOUNDARY")
         logError(error, "")
     }, [error])
 
-    const setSnackbar = React.useContext(SnackBarContext)
-
-    const location = useLocation()
     if (location.pathname !== "/") {
-        if (error.response?.status === 401) {
-            useEffect(() => {
-                setSnackbar({ message: `Permission Denied: ${error.response.data.message}`, severity: 'warning' })
-            })
-            return <Navigate to='/' />
+        if (error.response) {
+            if (error.response.status === 401) {
+                useEffect(() => {
+                    setSnackbar({ message: `Permission Denied: ${error.response.data.message}`, severity: 'warning' })
+                }, [error])
+            } else {
+                useEffect(() => {
+                    setSnackbar({ message: `Server Error (${error.response.status}): ${error.response.data.message}`, severity: 'error' })
+                }, [error])
+            }
         }
+        return <Navigate to='/' />
     }
-    return <div>Oops, something went wrong, maybe <a href="/">refreshing</a> the page will help</div>
+
+    return <div>Oops, something went wrong, maybe <a href="/">refreshing</a> the page will help.</div>
 }
 
 export class ReactErrorBoundary extends React.Component<{ children }, { hasError: boolean }> {

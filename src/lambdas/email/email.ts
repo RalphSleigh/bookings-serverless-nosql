@@ -28,5 +28,6 @@ export const lambdaHandler = async (event: any): Promise<any> => {
  */
 
 export const lambdaHandler = async (event: any): Promise<any> => {
-    return {ok:"o"}
+    console.log(event)
+    return true
 }

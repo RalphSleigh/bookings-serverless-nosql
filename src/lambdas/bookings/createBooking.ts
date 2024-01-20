@@ -29,8 +29,8 @@ const EventBookingTimelineModel = table.getModel<EventBookingTimelineType>('Even
 
 export const lambdaHandler = lambda_wrapper_json(
     async (lambda_event, config, current_user) => {
-        const booking = lambda_event.body.booking
-        
+
+        const booking = lambda_event.body.booking as BookingType
         const event = await EventModel.get({id: booking.eventId})
         
         if(event && current_user) {
@@ -68,37 +68,5 @@ export const lambdaHandler = lambda_wrapper_json(
         } else {
             throw new Error("Can't find event")
         }    
-        /*
-        console.log("Booing create call happened creating")
-        let newBooking = lambda_event.body as any;
-        newBooking.guestUUID = ""
-        newBooking.userId = newBooking.userId || current_user.id;
-        newBooking.maxParticipants = newBooking.participants.length;
-        newBooking.participants.forEach(p => {
-            delete p.internalExtra
-        });
 
-        let booking = await db.booking.create(newBooking, {
-            include: [{
-                association: 'participants'
-            }]
-        })
-
-        booking = await db.booking.findOne({ where: { id: booking.id }, include: [{ model: db.participant }, { model: db.event }] }) as BookingModel
-
-        console.log(`Created new booking id ${booking.id} for ${booking.userName}`);
-
-        const email = get_email_client(config)
-        const fees = feeFactory(booking.event);
-
-        await postToDiscord(config, `${current_user.userName} (${booking.district}) created a booking for event ${booking.event!.name}, they have booked ${booking.participants!.length} people`)
-
-        const emailData: any = booking.get({ plain: true });
-        emailData.editURL = config.BASE_URL + "/event/" + emailData.eventId + "/book";
-        emailData.user = current_user;
-        await email.single(booking.userEmail, confirmation, emailData);
-        await email.toManagers(manager_booking_created, emailData);
-
-        return { bookings: [booking] }
-        */
     })

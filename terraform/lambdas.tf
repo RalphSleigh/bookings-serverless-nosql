@@ -38,6 +38,7 @@ resource "aws_lambda_function" "lambda" {
     variables = {
       workspace = terraform.workspace
       log_arm   = resource.aws_cloudwatch_log_stream.booking_system_logs.arn
+      EMAIL_QUEUE_URL = aws_sqs_queue.email_queue.id
     }
   }
 

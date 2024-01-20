@@ -1,19 +1,14 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { lambda_wrapper_json } from '../../../lambda-common/lambda_wrappers.js';
-import { EventBookingTimelineType, EventType, RoleType, table } from '../../../lambda-common/onetable.js';
+import { EventBookingTimelineType, EventType, OnetableEventType, RoleType, table } from '../../../lambda-common/onetable.js';
 import { CanEditEvent, CanManageEvent } from '../../../shared/permissions.js';
 import { getDate } from 'date-fns';
 
-const EventModel = table.getModel<EventType>('Event')
+const EventModel = table.getModel<OnetableEventType>('Event')
 const RoleModel = table.getModel<RoleType>('Role')
 
 export const lambdaHandler = lambda_wrapper_json(
     async (lambda_event, config, current_user) => {
-        return {
-            statusCode: 401,
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: "Not implemented" })
-        }
         const event = await EventModel.get({ id: lambda_event.pathParameters?.id })
         if (event) {
             CanManageEvent.throw({ user: current_user, event: event })

@@ -35,10 +35,10 @@ export const lambdaHandler = lambda_wrapper_json(
             console.log(`Edited booking ${newData.eventId}-${newData.userId}`);
 
             await queueEmail({
-                template: "confirmation",
+                template: "edited",
                 recipient: current_user,
-                event: event,
-                booking: newVersion,
+                event: event as EventType,
+                booking: newLatest as BookingType,
                 bookingOwner: current_user,
             }, config)
 
