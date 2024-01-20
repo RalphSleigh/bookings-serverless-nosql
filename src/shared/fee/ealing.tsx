@@ -6,7 +6,7 @@ import { AttendanceStructure } from "../attendance/attendanceStructure.js";
 import { Whole } from "../attendance/whole.js";
 import { BookingType, EalingFeeEventType, EventType, JsonBookingType, JsonEventType } from "../../lambda-common/onetable.js";
 import { differenceInYears } from "date-fns";
-import { Markdown as EmailMarkdown} from "@react-email/markdown";
+import { Markdown as EmailMarkdown } from "@react-email/markdown";
 import { getMemoUpdateFunctions, parseDate } from "../util.js";
 
 const paymentInstructions = `Please make bank transfers to:  
@@ -160,27 +160,28 @@ export class Ealing extends FeeStructure {
         const feeData = event.feeData as EalingFeeEventType["feeData"]
         const valueHeaders = this.getValueLabels().map((l, i) => <th key={i}>{l}</th>)
         return (<>
-        <EmailMarkdown children={feeData.paymentInstructions} 
-        markdownCustomStyles={{
-            p: { fontSize: "14px" },
-          }}
-        />
-        <table>
-            <thead>
-                <tr>
-                    <th></th>
-                    {valueHeaders}
-                </tr>
-            </thead>
-            <tbody>
-                {this.getFeeLines(event, booking).map((row, i) => (
-                    <tr key={i}>
-                        <td>My Booking: {row.description}</td>
-                        {row.values.map((v, i) => <td key={i}>{currency(v)}</td>)}
+            {feeData.paymentInstructions ?
+                <EmailMarkdown children={feeData.paymentInstructions}
+                    markdownCustomStyles={{
+                        p: { fontSize: "14px" },
+                    }}
+                /> : null}
+            <table>
+                <thead>
+                    <tr>
+                        <th></th>
+                        {valueHeaders}
                     </tr>
-                ))}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {this.getFeeLines(event, booking).map((row, i) => (
+                        <tr key={i}>
+                            <td>My Booking: {row.description}</td>
+                            {row.values.map((v, i) => <td key={i}>{currency(v)}</td>)}
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
         </>)
     }
 

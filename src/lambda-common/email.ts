@@ -63,7 +63,6 @@ function getGmailAuth(config: ConfigType): Promise<any> {
 
 export async function sendEmail(data: EmailData, config: any) {
     try {
-        console.log(data)
         const { recipient, event } = data
 
         const template = getEmailTemplate(data.template)
