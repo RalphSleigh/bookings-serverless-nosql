@@ -65,6 +65,8 @@ export async function sendEmail(data: EmailData, config: any) {
     try {
         const { recipient, event } = data
 
+        console.log(`Sending email ${data.template} to ${recipient.email}`)
+
         const template = getEmailTemplate(data.template)
         const subject = template.subject(data)
         const htmlEmail = template.HTLMBody(data, config)
