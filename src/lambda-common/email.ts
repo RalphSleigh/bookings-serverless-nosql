@@ -65,6 +65,11 @@ export async function sendEmail(data: EmailData, config: any) {
     try {
         const { recipient, event } = data
 
+        if(!recipient.email) {
+            console.log("no email address")
+            return
+        }
+
         console.log(`Sending email ${data.template} to ${recipient.email}`)
 
         const template = getEmailTemplate(data.template)
@@ -104,7 +109,7 @@ export async function sendEmail(data: EmailData, config: any) {
     } catch (e) {
         console.log("error in sendEmail")
         console.log(e)
-        throw e
+        if(am_in_lambda()) throw e // Only throw if we're in lambda, so it errors
     }
 }
 

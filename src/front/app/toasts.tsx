@@ -1,15 +1,15 @@
 import { Alert, Snackbar } from "@mui/material"
 import React, { createContext, useState } from "react";
 
-export type SnackbarDatatType = {
+export type SnackbarDataType = {
     message: string,
     severity: "success" | "info" | "warning" | "error"
 }
 
-export const SnackBarContext = createContext<(data: SnackbarDatatType) => void>(data => { })
+export const SnackBarContext = createContext<(data: SnackbarDataType) => void>(data => { })
 
 export function SnackBarProvider({ children }) {
-    const [snackbar, setSnackbar] = useState<SnackbarDatatType | undefined>(undefined)
+    const [snackbar, setSnackbar] = useState<SnackbarDataType | undefined>(undefined)
     const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
         if (reason === 'clickaway') {
           return;
@@ -26,7 +26,7 @@ export function SnackBarProvider({ children }) {
     )
 }
 
-const CustomSnackbar: React.FC<{ data: SnackbarDatatType, [key: string]: any }> = (props) => {
+const CustomSnackbar: React.FC<{ data: SnackbarDataType, [key: string]: any }> = (props) => {
     const { data, onClose, ...rest } = props
     return (<Snackbar onClose={onClose} {...rest}>
         <Alert

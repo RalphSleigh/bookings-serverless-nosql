@@ -7,14 +7,14 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
 import { Avatar, Badge, Box, Button, FormControl, FormControlLabel, Grid, IconButton, InputLabel, MenuItem, Select, SelectChangeEvent, Stack, TextField, Typography, useTheme } from "@mui/material";
 import { Close } from "@mui/icons-material";
-import { JsonUserType } from "../../lambda-common/onetable.js";
+import { JsonUserType, RoleType } from "../../lambda-common/onetable.js";
 
 export function Component() {
     const { event, bookings } = useOutletContext<managePageContext>()
     const [userData, roleData] = useSuspenseQueries<[allUsersQueryType, eventRolesQueryType]>({ queries: [allUsersQuery(event.id), eventRolesQuery(event.id)] })
 
     const [userId, setUserId] = useState<string>("")
-    const [role, setRole] = useState<string>("")
+    const [role, setRole] = useState<RoleType["role"] | "">("")
 
     const createRole = useCreateRole(event.id)
     const deleteRole = useDeleteRole(event.id)
@@ -24,11 +24,12 @@ export function Component() {
     };
 
     const handleRoleChange = (event: SelectChangeEvent) => {
-        setRole(event.target.value as string);
+        setRole(event.target.value as RoleType["role"] | "");
     };
 
     const submit = e => {
-        createRole.mutate({ eventId: event.id, userId, role })
+        if(role === "") return
+        createRole.mutate({ eventId: event.id, userId, role})
         e.preventDefault()
     }
 

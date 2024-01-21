@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { EventType, JsonEventType, JsonParticipantType, JsonUserResponseType, JsonUserType, OnetableEventType, ParticipantType, UserResponseType, UserWithRoles } from "../lambda-common/onetable.js";
+import { EventType, JsonEventType, JsonParticipantType, JsonUserResponseType, JsonUserType, OnetableEventType, ParticipantType, RoleType, UserResponseType, UserWithRoles } from "../lambda-common/onetable.js";
 import React from "react";
 import { GridColDef } from "@mui/x-data-grid";
 import { JsonParticipantWithExtraType } from "./computedDataTypes.js";
@@ -10,7 +10,7 @@ import { getAgeGroup } from "./woodcraft.js";
 abstract class Field {
     event: any;
     abstract fieldName: string
-    roles: string[] = ["manage", "kp", "view"]
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "Money", "KP"]
     defaultValue: string = "N/A"
 
     constructor(event: JsonEventType | OnetableEventType) {
@@ -106,7 +106,7 @@ class Photo extends Field {
 
 class Medical extends Field {
     fieldName = "Medical"
-    roles = ["manage"]
+    roles: Array<RoleType["role"]> = ["Owner", "Manage"]
     defaultValue = ""
     value (participant: JsonParticipantWithExtraType) {
         return participant.medical?.details

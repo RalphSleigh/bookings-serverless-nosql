@@ -21,7 +21,7 @@ export const lambdaHandler = lambda_wrapper_json(
         const event = await EventModel.get({ id: lambda_event.pathParameters?.id })
         if (current_user && event) {
             CanManageEvent.throw({ user: current_user, event: event })
-            const bookings = await BookingModel.find({ sk: { begins: `event:${lambda_event.pathParameters?.id}:version:latest` } }) as BookingType[]
+            const bookings = await BookingModel.find({ sk: { begins: `event:${event.id}:version:latest` } }) as BookingType[]
             const filtered = filterDataByRoles(event, bookings, current_user)
             return { bookings: filtered };
         } else {

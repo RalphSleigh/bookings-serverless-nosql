@@ -251,7 +251,7 @@ export type RoleType = Entity<typeof schema.models.Role>
 
 export type UserWithRoles = UserType & { roles: Array<RoleType> }
 export type FoundUserResponseType = (Omit<UserType, "tokens"> & { roles: Array<RoleType>, tokens: boolean })
-export type UserResponseType = FoundUserResponseType | null
+export type UserResponseType = FoundUserResponseType | undefined
 
 export type OnetableBookingType = Entity<typeof schema.models.Booking>
 

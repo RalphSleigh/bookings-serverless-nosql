@@ -18,7 +18,7 @@ export async function get_user_from_event(event: APIGatewayProxyEvent, config): 
 
         const jwt_string = cookie.parse(cookie_string)?.jwt
 
-        if (jwt_string === "") return null
+        if (jwt_string === "") return undefined
 
         const token = jwt.verify(jwt_string, config.JWT_SECRET) as { remoteId: string }
 
@@ -32,7 +32,7 @@ export async function get_user_from_event(event: APIGatewayProxyEvent, config): 
         }
     } catch (e) {
         console.log(e)
-        return null
+        return undefined
     }
 }
 
@@ -72,7 +72,7 @@ export async function get_user_from_login(id: string, source: UserType["source"]
         }
     }
 
-    const newUser = await UserModel.create({ remoteId: combinedId, userName: displayName, source: source, picture, admin: config.ENV === "dev", isWoodcraft: isWoodcraft, email: email }) as UserType & { new: boolean }
+    const newUser = await UserModel.create({ remoteId: combinedId, userName: displayName, source: source, picture, admin: config.ENV === "dev" ? isWoodcraft : false, isWoodcraft: isWoodcraft, email: email }) as UserType & { new: boolean }
 
     log(`Creating new user ${newUser.userName}`)
 

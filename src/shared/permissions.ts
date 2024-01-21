@@ -1,11 +1,12 @@
 import { isPast } from "date-fns";
-import { BookingType, OnetableEventType, JsonBookingType, JsonEventType, JsonUserResponseType, UserResponseType, UserType, EventType, RoleType } from "../lambda-common/onetable.js";
+import { BookingType, OnetableEventType, JsonBookingType, JsonEventType, JsonUserResponseType, UserResponseType, UserType, EventType, RoleType, JsonRoleType } from "../lambda-common/onetable.js";
 import { parseDate } from "./util.js";
 
 type PermissionData = {
     user?: NonNullable<UserResponseType | JsonUserResponseType>
     event?: OnetableEventType | JsonEventType
     booking?: BookingType | JsonBookingType
+    role?: RoleType | JsonRoleType
 }
 
 type PartiallyRequired<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>
@@ -41,14 +42,14 @@ export class LoggedInPermission<T extends keyof PermissionData = "user"> {
         this.message = message
     }
 
-    throw(data: PartiallyRequired<PermissionData, "user" | T>) {
+    throw(data: PartiallyRequired<PermissionData, T>) {
         IsLoggedIn.throw(data)
-        if (!this.func(data)) throw new PermissionError(this.message)
+        if (!this.func(data as PartiallyRequired<PermissionData, "user" | T>)) throw new PermissionError(this.message)
     }
 
-    if(data: PartiallyRequired<PermissionData, "user" | T>): Boolean {
+    if(data: PartiallyRequired<PermissionData, T>): Boolean {
         try {
-            return IsLoggedIn.if(data) && this.func(data)
+            return IsLoggedIn.if(data) && this.func(data as PartiallyRequired<PermissionData, "user" | T>)
         } catch (e) {
             return false
         }
@@ -56,7 +57,7 @@ export class LoggedInPermission<T extends keyof PermissionData = "user"> {
 }
 
 export const IsLoggedIn = new Permission(data => {
-    return data.user !== null
+    return !!data.user
 }, "User must be logged in")
 
 export const CanEditUser = new LoggedInPermission(data => {
@@ -78,18 +79,19 @@ export const CanManageEvent = new LoggedInPermission<"event">(data => {
     return false
 }, "User can't manage event")
 
-export const CanManageWholeEvent = new LoggedInPermission<"event">(data => {
+export const CanCreateAnyRole = new LoggedInPermission<"event">(data => {
     if (IsGlobalAdmin.if(data)) return true
-    if (hasRoleOnEvent(data.user, data.event, ["Owner", "Manage"])) return true
-    return false
-}, "User can't manage whole event")
-
-export const CanCreateRole = new LoggedInPermission<"event">(data => {
-    return CanManageWholeEvent.if(data)
+    return hasRoleOnEvent(data.user, data.event, ["Owner", "Manage"])
 }, "User can't create role")
 
-export const CanDeleteRole = new LoggedInPermission<"event">(data => {
-    return CanManageWholeEvent.if(data)
+export const CanCreateRole = new LoggedInPermission<"event" | "role">(data => {
+    if (IsGlobalAdmin.if(data)) return true
+    if (["Owner", "Manage"].includes(data.role.role)) return hasRoleOnEvent(data.user, data.event, ["Owner"])
+    return hasRoleOnEvent(data.user, data.event, ["Owner", "Manage"])
+}, "User can't create role")
+
+export const CanDeleteRole = new LoggedInPermission<"event" | "role">(data => {
+    return CanCreateRole.if(data)
 }, "User can't delete role")
 
 export const CanBookIntoEvent = new LoggedInPermission<"event">(data => {
@@ -105,16 +107,17 @@ export const CanEditOwnBooking = new LoggedInPermission<"event" | "booking">(dat
 
 export const CanEditBooking = new LoggedInPermission<"event" | "booking">(data => {
     if (IsGlobalAdmin.if(data)) return true
-    if (CanEditOwnBooking.if(data)) return true
-    return CanManageEvent.if(data)
+    return hasRoleOnEvent(data.user, data.event, ["Owner", "Manage"])
 }, "User can't edit booking")
 
+export const CanDeleteOwnBooking = new LoggedInPermission<"event" | "booking">(data => {
+    return CanEditOwnBooking.if(data)
+}, "User can't delete their booking")
+
 export const CanDeleteBooking = new LoggedInPermission<"event" | "booking">(data => {
-    if (IsGlobalAdmin.if(data)) return true
-    if (CanEditOwnBooking.if(data)) return true
-    return CanManageWholeEvent.if(data)
+    return CanEditBooking.if(data)
 }, "User can't delete booking")
 
-const hasRoleOnEvent = (user: NonNullable<UserResponseType | JsonUserResponseType>, event: OnetableEventType | JsonEventType, roles: Array<RoleType["role"]>) => {
-    return roles.find(role => ((user.roles as Array<RoleType>).find(r => r.eventId === event.id && r.role === role)))
+const hasRoleOnEvent = (user: NonNullable<UserResponseType | JsonUserResponseType>, event: OnetableEventType | JsonEventType, roles: Array<RoleType["role"]>): Boolean => {
+    return !!roles.find(role => ((user.roles as Array<RoleType>).find(r => r.eventId === event.id && r.role === role)))
 }

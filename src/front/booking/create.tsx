@@ -1,14 +1,16 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useContext, useState } from "react";
 import { useCreateBooking, useEvents } from "../queries.js";
 import { Navigate, useParams } from "react-router-dom";
 import { BookingForm } from "./form/form.js";
 import { EnsureHasPermission } from "../permissions.js";
 import { CanBookIntoEvent } from "../../shared/permissions.js";
 import { BookingType, JsonBookingType } from "../../lambda-common/onetable.js";
+import { SnackBarContext, SnackbarDataType } from "../app/toasts.js";
 
 export function CreateBookingPage({ event, user }) {
     const createBooking = useCreateBooking()
     const [bookingData, setBookingData] = useState<Partial<JsonBookingType>>({ eventId: event.id })
+    const setSnackbar = useContext(SnackBarContext)
 
     const submit = useCallback(() => {
         setBookingData(data => {
@@ -18,7 +20,10 @@ export function CreateBookingPage({ event, user }) {
         })
     }, [])
 
+    const setSnackBarFn = useCallback((data: SnackbarDataType) => { setSnackbar(data) }, [])
+
     if (createBooking.isSuccess) {
+        setSnackBarFn({ message: `Booking Created`, severity: 'success' })
         return <Navigate to={`/event/${event.id}/thanks`} />
     }
 

@@ -1,10 +1,8 @@
-import { FormGroup, Grid, Paper, TextField, Typography, Box, Button, FormControlLabel, Switch, MenuItem, Select, FormControl, InputLabel, ButtonGroup, Stack, IconButton } from "@mui/material";
+import { FormGroup, Grid, Paper, TextField, Typography, Box, Button, FormControlLabel, Switch, MenuItem, Select, FormControl, InputLabel, ButtonGroup, Stack, IconButton } from "@mui/material"
 import React, { useCallback, useContext, useState } from "react";
-//import { validate } from "./validate.js";
-import { BookingType, JsonBookingType, JsonEventType, UserType } from "../../../lambda-common/onetable.js";
+import { JsonBookingType, JsonEventType, UserType } from "../../../lambda-common/onetable.js";
 import { ParticipantsForm } from "./participants.js";
 import { kp } from "../../../shared/kp/kp.js"
-import { up } from "../../../lambda-common/migrations/01-users.js";
 import { QuickList } from "./quickList.js";
 import { MemoBookingGroupEmergenecyFields, MemoBookingIndvidualEmergencyFields } from "./emergency.js";
 import { MemoCustomQuestionFields } from "./custom.js";
@@ -14,14 +12,15 @@ import { MemoBookingPermissionSection } from "./permission.js";
 import { BookingValidationResults, validate } from "./validation.js";
 import { Lock, LockOpen, Delete, Send } from '@mui/icons-material';
 import { getMemoUpdateFunctions } from "../../../shared/util.js";
+import { LoadingButton } from '@mui/lab'
 
 const MemoParticipantsForm = React.memo(ParticipantsForm)
 
-export function BookingForm({ data, event, user, update, submit, mode, deleteBooking, submitLoading, deleteLoading}: { data: Partial<JsonBookingType>, event: JsonEventType, user: UserType, update: React.Dispatch<React.SetStateAction<Partial<JsonBookingType>>>, submit: () => void, mode: "create" | "edit" | "rebook", deleteBooking: any, submitLoading: boolean, deleteLoading: boolean }) {
+export function BookingForm({ data, event, user, update, submit, mode, deleteBooking, submitLoading, deleteLoading }: { data: Partial<JsonBookingType>, event: JsonEventType, user: UserType, update: React.Dispatch<React.SetStateAction<Partial<JsonBookingType>>>, submit: () => void, mode: "create" | "edit" | "rebook", deleteBooking: any, submitLoading: boolean, deleteLoading: boolean }) {
 
     const [permission, updatePermission] = useState({ permission: false })
     const [deleteLock, setDeleteLock] = useState(true)
-    const { updateField, updateSwitch, updateSubField } = getMemoUpdateFunctions(update)
+    const { updateSubField } = getMemoUpdateFunctions(update)
 
     const create = useCallback(e => {
         submit()
@@ -48,9 +47,18 @@ export function BookingForm({ data, event, user, update, submit, mode, deleteBoo
                     <MemoBookingPermissionSection event={event} data={permission} update={updatePermission} />
                     <BookingValidationResults validationResults={validationResults} />
                     <Stack direction="row" spacing={1} mt={2}>
-                        <Button disabled={validationResults.length > 0 || submitLoading} startIcon={<Send />} variant="contained" onClick={create}>{mode == "create" ? "Submit" : "Submit"}</Button>
+                        <LoadingButton
+                            onClick={create}
+                            endIcon={<Send />}
+                            loading={submitLoading}
+                            loadingPosition="end"
+                            variant="contained"
+                            disabled={validationResults.length > 0}
+                        >
+                            <span>Submit</span>
+                        </LoadingButton>
                         {mode === "edit" ? <><Button variant="contained" color="error" disabled={deleteLock || deleteLoading} onClick={deleteBooking} startIcon={<Delete />}>Cancel Booking</Button>
-                        <IconButton color="warning" onClick={() => setDeleteLock(!deleteLock)}>{deleteLock ? <Lock /> : <LockOpen />}</IconButton></>: null }
+                            <IconButton color="warning" onClick={() => setDeleteLock(!deleteLock)}>{deleteLock ? <Lock /> : <LockOpen />}</IconButton></> : null}
                     </Stack>
                 </form>
             </Box>

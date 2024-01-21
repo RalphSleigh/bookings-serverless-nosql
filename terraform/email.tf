@@ -3,7 +3,6 @@ resource "aws_sqs_queue" "email_queue" {
   visibility_timeout_seconds = 300
 }
 
-
 data "archive_file" "email_lambda_zip" {
   type        = "zip"
   source_file = "${path.module}/../dist-lambda/lambdas/email/email.mjs"

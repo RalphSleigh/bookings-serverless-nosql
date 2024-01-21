@@ -30,6 +30,7 @@ import { UserPage } from '../user/userPage.js';
 import { ThanksLoader } from '../booking/thanksLoader.js';
 import { ReactErrorBoundary, RouterErrorBoundary } from './errors.js';
 import { SnackBarProvider } from './toasts.js';
+import { EditBookingLoader } from '../booking/editBookingLoader.js';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -73,6 +74,9 @@ const router = createBrowserRouter([{
             }, {
                 path: "event/:eventId/edit-my-booking",
                 element: <EditOwnBookingLoader />,
+            }, {
+                path: "event/:eventId/edit-booking/:userId",
+                element: <EditBookingLoader />,
             }, {
                 path: "event/:eventId/thanks",
                 element: <ThanksLoader />,
@@ -189,8 +193,8 @@ export function App() {
         <QueryClientProvider client={queryClient}>
             <ThemeContext.Provider value={colorMode}>
                 <ThemeProvider theme={theme}>
+                    <CssBaseline enableColorScheme={true} />
                     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={enGB}>
-                        <CssBaseline enableColorScheme />
                         <SuspenseWrapper>
                             <EnvContextProvider>
                                 <UserContextProvider>

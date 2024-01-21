@@ -2,6 +2,7 @@ import { GridColDef } from "@mui/x-data-grid";
 import { BookingType, JsonBookingType, JsonEventType, JsonUserResponseType, OnetableEventType, UserWithRoles } from "../lambda-common/onetable.js";
 import { ReactNode } from 'react';
 import React from "react";
+import { Link } from "react-router-dom";
 
 abstract class Field {
     event: JsonEventType | OnetableEventType;
@@ -100,6 +101,19 @@ class EmergencyContactPhone extends Field {
     }
 }
 
+class EditLink extends Field {
+    fieldName = "Edit"
+    roles = ["Owner", "Manage"]
+    value(booking: JsonBookingType) {
+        return booking.userId
+    }
+    dataGridCellRenderer(params): ReactNode {
+        const value = this.value(params.value)
+        if (value === undefined) return this.defaultValue
+        return <Link to={`/event/${this.event.id}/edit-booking/${value}`}>Edit</Link>
+    }
+}
+
 class CustomQuestionText extends Field {
     index: number
     constructor(question: JsonEventType["customQuestions"][0], index: number, event: JsonEventType | OnetableEventType) {
@@ -132,6 +146,8 @@ export class BookingFields {
         event.customQuestions?.forEach((q, i) => {
             this.fields.push(new CustomQuestionText(q, i, event))
         })
+
+        this.fields.push(new EditLink(event))
     }
 
     getColumnDefs(user) {

@@ -6,7 +6,7 @@ import { useDisableDriveSync, useEventBookings, useHistoricalEventBookings } fro
 import { JsonBookingType, JsonEventType, JsonUserResponseType } from "../../lambda-common/onetable.js";
 import { SuspenseWrapper } from "../suspense.js";
 import { UserContext } from "../user/userContext.js";
-import { CanManageWholeEvent } from "../../shared/permissions.js";
+import { CanCreateAnyRole } from "../../shared/permissions.js";
 import { addComputedFieldsToBookingsQueryResult, bookingsBookingSearch, bookingsParticipantSearch, useDebounceState } from "../util.js";
 import { JsonBookingWithExtraType } from "../../shared/computedDataTypes.js";
 import { ReactErrorBoundary } from "../app/errors.js";
@@ -40,7 +40,7 @@ export function Component() {
             <Tabs value={!location.pathname.endsWith("manage") ? location.pathname : participantPath.pathname}>
                 <Tab label="Participants" value={participantPath.pathname} href={participantPath.pathname} component={Link} />
                 <Tab label="Bookings" value={bookingsPath.pathname} href={bookingsPath.pathname} component={Link} />
-                <PermissionTab user={user} event={event} permission={CanManageWholeEvent} label="Roles" value={rolesPath.pathname} href={rolesPath.pathname} component={Link} />
+                <PermissionTab user={user} event={event} permission={CanCreateAnyRole} label="Roles" value={rolesPath.pathname} href={rolesPath.pathname} component={Link} />
             </Tabs>
         </Grid>
         {shouldShowSearch(location) ? <Grid xs={12} p={2} item>

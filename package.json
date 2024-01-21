@@ -37,6 +37,7 @@
     "@googleapis/plus": "^0.2.0",
     "@googleapis/sheets": "^5.0.3",
     "@mui/icons-material": "^5.11.16",
+    "@mui/lab": "^5.0.0-alpha.161",
     "@mui/material": "^5.11.16",
     "@mui/x-data-grid": "^6.11.1",
     "@mui/x-date-pickers": "^6.2.1",

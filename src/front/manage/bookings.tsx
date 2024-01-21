@@ -13,13 +13,13 @@ import save from "save-file";
 import format from "date-fns/format";
 
 export function Component() {
-    const { event, bookings } = useOutletContext<managePageContext>()
+    const { event, bookings, displayDeleted } = useOutletContext<managePageContext>()
     const user = useContext(UserContext)!
     const [selectedBooking, setSelectedBooking] = React.useState<number | undefined>(undefined)
 
     const columns = new BookingFields(event).getColumnDefs(user)
 
-    const rows = useMemo(() => bookings.map((b, i) => {
+    const rows = useMemo(() => bookings.filter(b => !b.deleted || displayDeleted).map((b, i) => {
         return { booking: b, id: i }
     }), [bookings])
 
@@ -30,7 +30,7 @@ export function Component() {
     return <Grid xs={12} p={2} item>
         <Button variant="contained" onClick={() => saveCSV(event, user, bookings)}>Download CSV</Button>
         <BookingsModal selectedBooking={selectedBooking} booking={typeof selectedBooking == "number" ? bookings[selectedBooking] : undefined} handleClose={() => setSelectedBooking(undefined)} />
-        <DataGrid rowSelection={false} pageSizeOptions={[100]} rows={rows} columns={columns} onRowClick={onRowClick}/>
+        <DataGrid rowSelection={false} pageSizeOptions={[100]} rows={rows} columns={columns} onRowClick={onRowClick} getRowClassName={(params) => `participant-row-deleted-${params.row.booking.deleted}`}/>
     </Grid>
 
 }
