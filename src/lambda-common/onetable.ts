@@ -39,7 +39,7 @@ const schema = {
             id: { type: String, generate: 'uid', required: true },
             userId: { type: String, required: true },
             eventId: { type: String, required: true },
-            role: { type: String, required: true },
+            role: { type: String, required: true, enum: ['Owner','Manage','View','Money','KP','Book'] },
             created: { type: Date },
             updated: { type: Date },
         },

@@ -83,9 +83,12 @@ export function Component() {
                     value={role}
                     onChange={handleRoleChange}>
                     <MenuItem value="">Choose role</MenuItem>
-                    <MenuItem value="manage">Manage</MenuItem>
-                    <MenuItem value="kp">KP</MenuItem>
-                    <MenuItem value="view">View</MenuItem>
+                    <MenuItem value="Owner">Owner</MenuItem>
+                    <MenuItem value="Manage">Manage</MenuItem>
+                    <MenuItem value="View">View</MenuItem>
+                    <MenuItem value="Money">Money</MenuItem>
+                    <MenuItem value="KP">KP</MenuItem>
+                    <MenuItem value="Book">Book</MenuItem>
                 </Select>
             </FormControl>
         </Grid>
