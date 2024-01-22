@@ -50,4 +50,4 @@ resource "aws_backup_selection" "bookings_backup_selection" {
     aws_dynamodb_table.bookings_table
   ]
 }
-*
+*/
