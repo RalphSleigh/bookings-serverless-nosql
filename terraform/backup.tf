@@ -41,7 +41,7 @@ resource "aws_backup_plan" "bookings_backup_plan" {
 }
 
 resource "aws_backup_selection" "bookings_backup_selection" {
-  iam_role_arn = aws_iam_role.backup_role.name
+  iam_role_arn = aws_iam_role.backup_role.arn
   name         = "booking_backup_selection"
   plan_id      = aws_backup_plan.bookings_backup_plan.id
 
