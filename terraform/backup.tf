@@ -1,5 +1,5 @@
 resource "aws_backup_vault" "bookings_backup_vault" {
-  name        = "aws_iam_role.backup_role.name"
+  name        = "bookings-backup-vault"
 }
 
 data "aws_iam_policy_document" "backup_trust_policy" {
