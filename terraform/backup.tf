@@ -46,6 +46,6 @@ resource "aws_backup_selection" "bookings_backup_selection" {
   plan_id      = aws_backup_plan.bookings_backup_plan.id
 
   resources = [
-    aws_dynamodb_table.bookings_table
+    aws_dynamodb_table.bookings_table.arn
   ]
 }
