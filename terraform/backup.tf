@@ -1,4 +1,4 @@
-/*
+
 resource "aws_backup_vault" "bookings_backup_vault" {
   name        = "bookings-backup-vault"
 }
@@ -26,6 +26,7 @@ resource "aws_iam_role_policy_attachment" "backup_role_polict_attachment" {
   role       = aws_iam_role.backup_role.name
 }
 
+/*
 resource "aws_backup_plan" "bookings_backup_plan" {
   name = "tf_example_backup_plan"
 
@@ -49,4 +50,4 @@ resource "aws_backup_selection" "bookings_backup_selection" {
     aws_dynamodb_table.bookings_table
   ]
 }
-*/
+*
