@@ -1,6 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { lambda_wrapper_json, user, orm } from '../../../lambda-common'
-import { get_event_bookings } from '../../../lambda-common/permissions';
 import { getEventDetails } from '../../../lambda-common/util';
 import { warm_management } from '../../../lambda-common/warmer';
 
@@ -14,7 +13,7 @@ import { warm_management } from '../../../lambda-common/warmer';
  *
  */
 
-export const lambdaHandler = lambda_wrapper_json([get_event_bookings],
+export const lambdaHandler = lambda_wrapper_json([],
     async (lambda_event, db, config, current_user) => {
 
         const promises = warm_management()

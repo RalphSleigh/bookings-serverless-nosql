@@ -1,7 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { lambda_wrapper_json, user } from '../../../lambda-common'
 import { Op } from 'sequelize';
-import { get_booking } from '../../../lambda-common/permissions';
 
 /**
  *
@@ -13,7 +12,7 @@ import { get_booking } from '../../../lambda-common/permissions';
  *
  */
 
-export const lambdaHandler = lambda_wrapper_json([get_booking],
+export const lambdaHandler = lambda_wrapper_json([],
     async (lambda_event, db, config, current_user) => {
         const booking = await db.booking.findOne({where: {id: lambda_event.pathParameters?.id}, include: [{model: db.participant}, {model: db.event}, {model: db.payment}]})
         return {bookings:[booking]}

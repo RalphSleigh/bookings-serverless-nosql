@@ -1,7 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { ConcatenationScope, ContextExclusionPlugin } from 'webpack';
 import { lambda_wrapper_json, user, orm } from '../../../lambda-common'
-import { create_event } from '../../../lambda-common/permissions';
 
 /**
  *
@@ -13,7 +12,7 @@ import { create_event } from '../../../lambda-common/permissions';
  *
  */
 
-export const lambdaHandler = lambda_wrapper_json([create_event],
+export const lambdaHandler = lambda_wrapper_json([],
     async (lambda_event, db, config, current_user) => {
         console.log(`Deleting event ${lambda_event.body.id}`);
 

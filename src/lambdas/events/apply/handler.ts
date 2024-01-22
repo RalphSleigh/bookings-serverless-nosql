@@ -1,7 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { Op } from 'sequelize';
 import { lambda_wrapper_json, user, orm } from '../../../lambda-common'
-import { apply_to_event } from '../../../lambda-common/permissions';
 import { get_user_from_event } from '../../../lambda-common/user';
 /* import { get_email_client } from '../../../lambda-common/email'; */
 import * as applicationReceived from '../../../lambda-common/emails/applicationReceived'
@@ -20,7 +19,7 @@ import { postToDiscord } from '../../../lambda-common/discord';
  *
  */
 
-export const lambdaHandler = lambda_wrapper_json([apply_to_event],
+export const lambdaHandler = lambda_wrapper_json([],
     async (lambda_event, db, config, current_user) => {
     lambda_event.body.userId = current_user.id;
     const application = await db.application.create(lambda_event.body)

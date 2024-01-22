@@ -1,7 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { lambda_wrapper_json, user } from '../../../lambda-common'
 import { Op } from 'sequelize';
-import { add_payment, add_village, book_event, book_into_organisation } from '../../../lambda-common/permissions';
 import { BookingModel } from '../../../lambda-common/models/booking';
 import feeFactory from '../../../shared/fee/feeFactory';
 /* import { get_email_client } from '../../../lambda-common/email'; */
@@ -20,7 +19,7 @@ import { getBookingAndCombineScopes } from '../../../lambda-common/util';
  *
  */
 
-export const lambdaHandler = lambda_wrapper_json([add_payment],
+export const lambdaHandler = lambda_wrapper_json([],
     async (lambda_event, db, config, current_user) => {
 
         await db.payment.create(lambda_event.body);

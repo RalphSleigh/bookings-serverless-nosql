@@ -1,7 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { lambda_wrapper_json, user } from '../../../lambda-common'
 import { Op } from 'sequelize';
-import { add_payment, delete_booking } from '../../../lambda-common/permissions';
 import { getBookingAndCombineScopes } from '../../../lambda-common/util';
 
 /**
@@ -14,7 +13,7 @@ import { getBookingAndCombineScopes } from '../../../lambda-common/util';
  *
  */
 
-export const lambdaHandler = lambda_wrapper_json([add_payment],
+export const lambdaHandler = lambda_wrapper_json([],
     async (lambda_event, db, config, current_user) => {
 
         const booking = await db.booking.findOne({where: {id: lambda_event.body.bookingId},include: [{model:db.event}, {model: db.participant}]}) //get the booking, but we can't send this as dangerous scope.
