@@ -27,7 +27,7 @@ resource "aws_iam_role_policy_attachment" "backup_role_polict_attachment" {
 }
 
 resource "aws_backup_plan" "bookings_backup_plan" {
-  name = "tf_example_backup_plan"
+  name = "bookings_backup_plan"
 
   rule {
     rule_name         = "bookings_backup_rule"
