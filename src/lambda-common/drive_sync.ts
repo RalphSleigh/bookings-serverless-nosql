@@ -33,10 +33,14 @@ export async function queueDriveSync(eventId: string, config: ConfigType) {
 async function triggerDriveSyncSQS(eventId: string) {
     const sqsClient = new SQSClient({});
     console.log("PUTTING TO DRIVE SQS")
+    console.log(JSON.stringify({ eventId }))
     const command = new SendMessageCommand({
         QueueUrl: process.env.DRIVE_SYNC_QUEUE_URL,
         MessageBody: JSON.stringify({ eventId })
     });
+
+    console.log(command)
+    console.log(JSON.stringify(command))
 
     await sqsClient.send(command);
     console.log("DONE PUTTING TO DRIVE SQS")
