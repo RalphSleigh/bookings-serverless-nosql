@@ -17,6 +17,7 @@ export function log(message) {
     try {
         console.log(message)
         if (!am_in_lambda()) return
+        console.log("Logging to cloudwatch")
         tasks.push(client.send(new PutLogEventsCommand({
             logEvents: [{
                 message: message,

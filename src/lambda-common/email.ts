@@ -48,6 +48,7 @@ export async function queueManagerEmails(data: EmailData, config: ConfigType) {
 }
 
 async function triggerEmailSQS(data: EmailData) {
+    console.log("putting message in queue - email")
     const sqsClient = new SQSClient({});
     const command = new SendMessageCommand({
         QueueUrl: process.env.EMAIL_QUEUE_URL,
