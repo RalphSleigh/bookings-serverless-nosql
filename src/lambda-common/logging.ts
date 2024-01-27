@@ -15,9 +15,9 @@ const client = new CloudWatchLogsClient({ region: "eu-west-2" });
 
 export function log(message) {
     try {
-        console. log(message)
+        console.log(message)
         if (!am_in_lambda()) return
-
+        console.log("PUTTING TO CLOUDWATCH")
         tasks.push(client.send(new PutLogEventsCommand({
             logEvents: [{
                 message: message,
@@ -26,6 +26,7 @@ export function log(message) {
             logGroupName: log_group,
             logStreamName: log_stream
         })))
+        console.log("DONE PUTTING TO CLOUDWATCH")
     } catch (e) {
         console.log("Error logging to cloudwatch")
         console.log(serializeError(e))

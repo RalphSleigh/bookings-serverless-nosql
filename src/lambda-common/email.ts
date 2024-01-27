@@ -49,12 +49,14 @@ export async function queueManagerEmails(data: EmailData, config: ConfigType) {
 
 async function triggerEmailSQS(data: EmailData) {
     const sqsClient = new SQSClient({});
+    console.log("PUTTING TO EAMIL SQS")
     const command = new SendMessageCommand({
         QueueUrl: process.env.EMAIL_QUEUE_URL,
         MessageBody: JSON.stringify(data)
     });
 
     await sqsClient.send(command);
+    console.log("DONE PUTTING TO EAMIL SQS")
 }
 
 let jwtPromise: Promise<any>
