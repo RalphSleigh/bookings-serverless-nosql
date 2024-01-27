@@ -1,13 +1,18 @@
 import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
 import am_in_lambda from "./am_in_lambda.js"
 import { log } from "./logging.js"
-import { BookingType, EventType, UserType } from "./onetable.js"
+import { BookingType, EventType, RoleType, UserType, table } from "./onetable.js"
 import { emails, getEmailTemplate } from "./emails/emails.js";
 import MailComposer from 'nodemailer/lib/mail-composer/index.js'
 import { auth, gmail } from '@googleapis/gmail'
 import { ConfigType } from "./config.js";
 import { backOff } from 'exponential-backoff';
 import { render } from '@react-email/render';
+import { getUsersWithRolesForEvent } from "./util.js";
+import { ConfigurationServicePlaceholders } from "aws-sdk/lib/config_service_placeholders.js";
+
+const RoleModel = table.getModel<RoleType>('Role')
+const UserModel = table.getModel<UserType>('User')
 
 export type EmailData = {
     template: keyof emails
@@ -17,24 +22,32 @@ export type EmailData = {
     bookingOwner: UserType
 }
 
-export async function queueEmail(data: EmailData, config: any) {
-    console.log("queueing emails")
-    console.log(data)
+export async function queueEmail(data: EmailData, config: ConfigType) {
+    log("queueing emails")
+    log(data)
 
     if (!config.EMAIL_ENABLED) {
         log(`Not sending email ${data.template} to ${data.recipient.email} as email is disabled`)
         return true
     }
     else if (am_in_lambda()) {
-        log(`Sending email ${data.template} to ${data.recipient.email} via lambda`)
-        await triggerEmailSQS(data, config)
+        log(`Queuing email ${data.template} to ${data.recipient.email} via lambda`)
+        await triggerEmailSQS(data)
     } else {
-        log(`Sending email ${data.template} to ${data.recipient.email}`)
+        log(`Queuing email ${data.template} to ${data.recipient.email}`)
         sendEmail(data, config)
     }
 }
 
-async function triggerEmailSQS(data: EmailData, config: any) {
+export async function queueManagerEmails(data: EmailData, config: ConfigType) {
+    const users = await getUsersWithRolesForEvent(data.event, ["Owner", "Manage"])
+    for (const user of users) {
+        await queueEmail({ ...data, recipient: user }, config)
+    }
+    console.log(users)
+}
+
+async function triggerEmailSQS(data: EmailData) {
     const sqsClient = new SQSClient({});
     const command = new SendMessageCommand({
         QueueUrl: process.env.EMAIL_QUEUE_URL,

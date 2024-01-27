@@ -22,10 +22,6 @@ export function UserPage(props) {
         e.preventDefault()
     }
 
-    if (editUser.isSuccess) {
-        return <Navigate to='/' />
-    }
-
     return <Grid container spacing={0}>
         <Grid xs item></Grid>
         <Grid p={2} item>

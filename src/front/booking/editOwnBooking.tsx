@@ -1,18 +1,12 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import { useDeleteBooking, useEditBooking } from "../queries.js";
-import { Navigate, useParams } from "react-router-dom";
+import { eventTimelineQuery, useDeleteBooking, useEditBooking } from "../queries.js";
 import { BookingForm } from "./form/form.js";
-import { EnsureHasPermission } from "../permissions.js";
-import { CanBookIntoEvent } from "../../shared/permissions.js";
 import { BookingType, JsonBookingType } from "../../lambda-common/onetable.js";
-import { SnackBarContext, SnackbarDataType } from "../app/toasts.js";
-import { set } from "date-fns";
 
 export function EditOwnBookingPage({ event, booking, user }) {
-    const editBooking = useEditBooking()
+    const editBooking = useEditBooking(user, event)
     const deleteBooking = useDeleteBooking()
     const [bookingData, setBookingData] = useState<Partial<JsonBookingType>>(booking)
-    const setSnackbar = useContext(SnackBarContext)
 
     const submit = useCallback(() => {
         setBookingData(data => {
@@ -25,18 +19,6 @@ export function EditOwnBookingPage({ event, booking, user }) {
     const deleteBookingFn = useCallback(() => {
         deleteBooking.mutate({ eventId: bookingData.eventId!, userId: bookingData.userId! })
     }, [])
-
-    const setSnackBarFn = useCallback((data: SnackbarDataType) => { setSnackbar(data) }, [])
-
-    if (deleteBooking.isSuccess) {
-        setSnackBarFn({ message: `Booking Cancelled`, severity: 'success' })
-        return <Navigate to={`/`} />
-    }
-
-    if (editBooking.isSuccess) {
-        setSnackBarFn({ message: `Booking Edited`, severity: 'success' })
-        return <Navigate to={`/event/${event.id}/thanks`} />
-    }
 
     return <BookingForm
         data={bookingData}

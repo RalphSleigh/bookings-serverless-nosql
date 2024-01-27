@@ -4,6 +4,7 @@ import { unmarshall } from '@aws-sdk/util-dynamodb'
 export type ConfigType = {
   BASE_URL: string,
   DISCORD_ENABLED: boolean,
+  DRIVE_SYNC_ENABLED: boolean,
   EMAIL_ENABLED: boolean,
   EMAIL_FROM: string,
   EMAIL_CLIENT_EMAIL: string,

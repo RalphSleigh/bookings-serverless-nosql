@@ -6,7 +6,7 @@ import { JsonBookingType } from "../../lambda-common/onetable.js";
 import { SnackBarContext, SnackbarDataType } from "../app/toasts.js";
 
 export function EditBookingPage({ event, booking, user }) {
-    const editBooking = useEditBooking()
+    const editBooking = useEditBooking(user, event)
     const deleteBooking = useDeleteBooking()
     const [bookingData, setBookingData] = useState<Partial<JsonBookingType>>(booking)
     const setSnackbar = useContext(SnackBarContext)

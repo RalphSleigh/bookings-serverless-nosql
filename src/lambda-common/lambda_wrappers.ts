@@ -40,7 +40,7 @@ export function lambda_wrapper_json(
             */   
             const response = await handler(lambda_event, config, user)
 
-            if(response.statusCode) return response //we want a raw response
+            if(response && response.statusCode) return response //we want a raw response
 
             return {
                 statusCode: 200,

@@ -55,6 +55,7 @@ const schema = {
             replyTo: { type: String, required: true },
             kpMode: { type: String, required: true, enum: ['basic', 'vcamp'] },
             bigCampMode: { type: Boolean, required: true, default: 'false' },
+            emailSubjectTag: { type: String, required: true },
             attendanceStructure: { type: String, required: true, enum: ['whole'] },
             attendanceData: {
                 type: Object, schema: {

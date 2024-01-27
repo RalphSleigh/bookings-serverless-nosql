@@ -3,8 +3,8 @@ import { CanBookIntoEvent } from '../../shared/permissions.js';
 import { lambda_wrapper_json } from '../../lambda-common/lambda_wrappers.js';
 import { Model } from 'dynamodb-onetable';
 import { updateParticipantsDates } from '../../lambda-common/util.js';
-import { syncEventToDrive } from '../../lambda-common/drive_sync.js';
-import { queueEmail } from '../../lambda-common/email.js';
+import { queueDriveSync } from '../../lambda-common/drive_sync.js';
+import { queueEmail, queueManagerEmails } from '../../lambda-common/email.js';
 
 /*
 export const lambdaHandlerfsdf = lambda_wrapper_json(
@@ -62,7 +62,15 @@ export const lambdaHandler = lambda_wrapper_json(
                 bookingOwner: current_user,
             }, config)
 
-            await syncEventToDrive(event.id, config)
+            await queueManagerEmails({
+                template: "managerConfirmation",
+                recipient: current_user,
+                event: event as EventType,
+                booking: newBooking as BookingType,
+                bookingOwner: current_user,
+            }, config)
+
+            await queueDriveSync(event.id, config)
 
             return {}
         } else {

@@ -3,8 +3,8 @@ import { lambda_wrapper_json } from '../../lambda-common/lambda_wrappers.js';
 import { BookingType, EventBookingTimelineType, EventType, OnetableBookingType, OnetableEventType, table } from '../../lambda-common/onetable.js';
 import { CanEditBooking, CanEditEvent, CanEditOwnBooking, PermissionError } from '../../shared/permissions.js';
 import { updateParticipantsDates } from '../../lambda-common/util.js';
-import { syncEventToDrive } from '../../lambda-common/drive_sync.js';
-import { queueEmail } from '../../lambda-common/email.js';
+import { queueDriveSync } from '../../lambda-common/drive_sync.js';
+import { queueEmail, queueManagerEmails } from '../../lambda-common/email.js';
 
 const BookingModel = table.getModel<OnetableBookingType>('Booking')
 const EventModel = table.getModel<OnetableEventType>('Event')
@@ -41,9 +41,16 @@ export const lambdaHandler = lambda_wrapper_json(
                         booking: newLatest as BookingType,
                         bookingOwner: current_user,
                     }, config)
+                    await queueManagerEmails({
+                        template: "managerBookingUpdated",
+                        recipient: current_user,
+                        event: event as EventType,
+                        booking: newLatest as BookingType,
+                        bookingOwner: current_user,
+                    }, config)
                 }
 
-                await syncEventToDrive(event.id, config)
+                await queueDriveSync(event.id, config)
                 return {};
             } else {
                 throw new PermissionError("User can't edit booking")

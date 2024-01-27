@@ -1,6 +1,9 @@
 import _ from 'lodash';
-import { ParticipantType } from './onetable.js';
+import { OnetableEventType, ParticipantType, RoleType, UserType, UserWithRoles, table } from './onetable.js';
 //import { db } from './orm'
+
+const RoleModel = table.getModel<RoleType>('Role')
+const UserModel = table.getModel<UserType>('User')
 
 export function updateParticipantsDates(existing: Array<ParticipantType>, incoming: Array<ParticipantType>) {
     let now = new Date()
@@ -17,11 +20,15 @@ export function updateParticipantsDates(existing: Array<ParticipantType>, incomi
 
 }
 
-export function updateAssociation(db, instance, key, Association, values) {}
-export async function getEventDetails(db, id: string | number) {}
-export function getUserScopes(db, user, event, participants = true) {}
-export async function getBookingAndCombineScopes(db, user, booking) {}
-export async function getBookingsAndCombineScopes(db, user, event) {}
+export async function getUsersWithRolesForEvent(event: OnetableEventType, rolesNames: Array<RoleType["role"]>): Promise<UserWithRoles[]> {
+    const roles = await RoleModel.find({ sk: { begins: event.id } })
+    const users = await UserModel.scan()
+    const usersWithRoles = users.filter(u => roles.find(r => r.userId === u.id && rolesNames.includes(r.role)))
+    return usersWithRoles.map(u => {
+        const userRoles = roles.filter(r => r.userId === u.id)
+        return { roles: userRoles, ...u }
+    })
+}
 
 /* export function updateAssociation(db, instance, key, Association, values) {
 

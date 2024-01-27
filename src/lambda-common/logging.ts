@@ -15,7 +15,7 @@ const client = new CloudWatchLogsClient({ region: "eu-west-2" });
 
 export function log(message) {
     try {
-        console.log(message)
+        console. log(message)
         if (!am_in_lambda()) return
 
         tasks.push(client.send(new PutLogEventsCommand({

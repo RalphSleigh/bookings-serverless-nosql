@@ -61,6 +61,7 @@ export function EventForm({ data: inputData, submit, mode }: { data: any, submit
                                 <FormGroup>
                                     <DateTimePicker sx={{ mt: 2 }} label="Booking Deadline" value={parseDate(data.bookingDeadline)} onChange={updateDate('bookingDeadline')} />
                                 </FormGroup>
+                                <TextField fullWidth sx={{ mt: 2 }} required type="email" id="outlined-required" label="Email subject tag" value={data.emailSubjectTag || ''} onChange={updateField('emailSubjectTag')} />
                                 <TextField fullWidth sx={{ mt: 2 }} required type="email" id="outlined-required" label="Reply-to" value={data.replyTo || ''} onChange={updateField('replyTo')} />
                                 <FormGroup>
                                     <FormControlLabel sx={{ mt: 2 }} control={<Switch checked={data.bigCampMode || false} onChange={updateSwitch('bigCampMode')} />} label="Big Camp Mode" />

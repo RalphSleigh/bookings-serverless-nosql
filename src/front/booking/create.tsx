@@ -8,7 +8,7 @@ import { BookingType, JsonBookingType } from "../../lambda-common/onetable.js";
 import { SnackBarContext, SnackbarDataType } from "../app/toasts.js";
 
 export function CreateBookingPage({ event, user }) {
-    const createBooking = useCreateBooking()
+    const createBooking = useCreateBooking(event)
     const [bookingData, setBookingData] = useState<Partial<JsonBookingType>>({ eventId: event.id })
     const setSnackbar = useContext(SnackBarContext)
 
@@ -19,13 +19,6 @@ export function CreateBookingPage({ event, user }) {
             return data
         })
     }, [])
-
-    const setSnackBarFn = useCallback((data: SnackbarDataType) => { setSnackbar(data) }, [])
-
-    if (createBooking.isSuccess) {
-        setSnackBarFn({ message: `Booking Created`, severity: 'success' })
-        return <Navigate to={`/event/${event.id}/thanks`} />
-    }
 
     return <BookingForm 
     data={bookingData} 

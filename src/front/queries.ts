@@ -4,6 +4,7 @@ import { BookingType, EventBookingTimelineType, EventType, JsonBookingType, Json
 import { SnackBarContext } from './app/toasts.js';
 import { useContext } from 'react';
 import { set } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 
 export function useEnv() {
     return useSuspenseQuery({
@@ -24,6 +25,7 @@ export function useUser() {
 export function useEditUser() {
     const queryClient = useQueryClient()
     const setSnackbar = useContext(SnackBarContext)
+    const navigate = useNavigate()
     return useMutation<{ booking: JsonUserType }, any, JsonUserType, any>(
         {
             mutationFn: async data => (await axios.post('/api/user/edit', { user: data })),
@@ -31,7 +33,10 @@ export function useEditUser() {
                 queryClient.invalidateQueries({
                     queryKey: ['user']
                 })
+                setSnackbar({ message: "User updated", severity: 'success' })
+                navigate("/")
             },
+
             onError: snackbarError(setSnackbar)
         });
 }
@@ -84,9 +89,10 @@ export function useEditEvent() {
         });
 }
 
-export function useCreateBooking() {
+export function useCreateBooking(event) {
     const queryClient = useQueryClient()
     const setSnackbar = useContext(SnackBarContext)
+    const navigate = useNavigate()
     return useMutation<{ booking: JsonBookingType }, any, JsonBookingType, any>(
         {
             mutationFn: async data => (await axios.post('/api/booking/create', { booking: data })).data,
@@ -97,24 +103,30 @@ export function useCreateBooking() {
                 queryClient.invalidateQueries({
                     queryKey: ['manage']
                 })
+                setSnackbar({ message: "Booking Created", severity: 'success' })
+                navigate(`/event/${event.id}/thanks`)
             },
             onError: snackbarError(setSnackbar)
         });
 }
 
-export function useEditBooking() {
+export function useEditBooking(user, event) {
     const queryClient = useQueryClient()
     const setSnackbar = useContext(SnackBarContext)
-    return useMutation<{ booking: JsonBookingType }, any, JsonBookingType, any>(
+    const navigate = useNavigate()
+    return useMutation<{}, any, JsonBookingType, any>(
         {
             mutationFn: async data => (await axios.post('/api/booking/edit', { booking: data })).data,
-            onSuccess: () => {
+            onSuccess: (data, variables, context) => {
                 queryClient.invalidateQueries({
                     queryKey: ['user', 'bookings']
                 })
                 queryClient.invalidateQueries({
                     queryKey: ['manage']
                 })
+                setSnackbar({ message: "Booking Updated", severity: 'success' })
+                const target = user.id === variables.userId ? '/' : `/event/${event.id}/manage`
+                navigate(target)
             },
             onError: snackbarError(setSnackbar)
         }
@@ -124,6 +136,7 @@ export function useEditBooking() {
 export function useDeleteBooking() {
     const queryClient = useQueryClient()
     const setSnackbar = useContext(SnackBarContext)
+    const navigate = useNavigate()
     return useMutation<{}, any, { eventId: string, userId: string }, any>(
         {
             mutationFn: async data => (await axios.post('/api/booking/delete', { booking: { eventId: data.eventId, userId: data.userId } })).data,
@@ -134,6 +147,8 @@ export function useDeleteBooking() {
                 queryClient.invalidateQueries({
                     queryKey: ['manage']
                 })
+                setSnackbar({ message: "Booking Cancelled", severity: 'success' })
+                navigate(`/`)
             },
             onError: snackbarError(setSnackbar)
         }
@@ -254,11 +269,13 @@ export function useDisableDriveSync() {
 }
 
 const snackbarError = (setSnackbar) => (error, variables, context) => {
-    if(error.response.status == 401) {
-        setSnackbar({message: `Permission Denied: ${error.response.data.message}`, severity: 'warning'})
-    } else if (error.response.status >= 500) {
-        setSnackbar({message:  `Server Error (${error.response.status}): ${error.response.data.message}`, severity: 'error'})
+    if (error.response) {
+        if (error.response.status == 401) {
+            setSnackbar({ message: `Permission Denied: ${error.response.data.message}`, severity: 'warning' })
+        } else {
+            setSnackbar({ message: `Server Error (${error.response.status}): ${error.response.data.message}`, severity: 'error' })
+        }
     } else {
-        setSnackbar({message: `Unknown Error (${error.response.status}): ${error.response.data.message}`, severity: 'error'})
+        setSnackbar({ message: `Unknown Error`, severity: 'error' })
     }
 }
