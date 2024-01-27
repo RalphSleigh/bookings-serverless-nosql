@@ -15,8 +15,12 @@ const client = new CloudWatchLogsClient({ region: "eu-west-2" });
 
 export function log(message) {
     try {
-        console.log(message)
-        if (!am_in_lambda()) return
+        if(typeof message !== "string") message = JSON.stringify(message)
+        
+        if (!am_in_lambda()) {
+            console.log(`Not logging to cloudwatch: ${message}`)
+            return
+        }
         console.log(`Logging to cloudwatch: ${message}`)
         tasks.push(client.send(new PutLogEventsCommand({
             logEvents: [{

@@ -23,8 +23,8 @@ export type EmailData = {
 }
 
 export async function queueEmail(data: EmailData, config: ConfigType) {
-    log("queueing emails")
-    log(data)
+    console.log("queueing emails")
+    console.log(data)
 
     if (!config.EMAIL_ENABLED) {
         log(`Not sending email ${data.template} to ${data.recipient.email} as email is disabled`)
