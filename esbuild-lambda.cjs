@@ -20,8 +20,7 @@ var walk = function (dir) {
     return results;
 }
 
-const entrypoints = walk('src/lambdas')
-//.filter(p => p.includes('handler.ts'))
+const entrypoints = walk('src/lambdas').filter(p => !p.includes('handler.ts'))
 //.filter(p => p.includes('.ts'))
 const outDir = `dist-lambda`;
 const functionsDir = `src`;
