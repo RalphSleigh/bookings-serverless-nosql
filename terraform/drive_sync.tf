@@ -72,7 +72,7 @@ resource "aws_iam_role" "drive_sync_lambda_role" {
   assume_role_policy = data.aws_iam_policy_document.drive_sync_lambda_role_iam_policy.json
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_sqs_role_policy" {
+resource "aws_iam_role_policy_attachment" "drive_sync_lambda_sqs_role_policy" {
   role       = aws_iam_role.drive_sync_lambda_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
 }
