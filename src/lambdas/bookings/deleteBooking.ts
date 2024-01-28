@@ -7,7 +7,7 @@ import { queueDriveSync } from '../../lambda-common/drive_sync.js';
 import { queueManagerEmails } from '../../lambda-common/email.js';
 
 const BookingModel = table.getModel<OnetableBookingType>('Booking')
-const EventModel = table.getModel<OnetableEventType>('Event')
+const EventModel: Model<OnetableEventType> = table.getModel('Event')
 const EventBookingTimelineModel = table.getModel<EventBookingTimelineType>('EventBookingTimeline')
 
 export const lambdaHandler = lambda_wrapper_json(

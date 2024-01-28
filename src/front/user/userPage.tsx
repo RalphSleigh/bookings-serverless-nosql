@@ -29,12 +29,12 @@ export function UserPage(props) {
                 <Box p={2}>
                 <Avatar imgProps={{ referrerPolicy: "no-referrer" }} sx={{ width: 28, height: 28, ml: 1, boxShadow: 20, float: "right" }} alt={user?.userName ?? undefined} src={user.picture || "/nope.jpg"} />
                     <Typography variant="h6">Account details</Typography>
-                    <Typography variant="body1">You are logged in via {user?.source}</Typography>
+                    <Typography variant="body1">You are logged in via {user?.source}{user.isWoodcraft? ' with a Woodcraft Folk account' : ''}</Typography>
                     {user.isWoodcraft ? <Typography variant="body1">You can't edit these are they are set by the Woodcraft Folk directory</Typography> : <Typography variant="body1">You can update your details here:</Typography>}
                     <form>
                         <TextField fullWidth disabled={user.isWoodcraft} sx={{ mt: 2 }} id="outlined" label="Display Name" value={userDetails.userName} onChange={updateField("userName")} />
                         <TextField fullWidth disabled={user.isWoodcraft} sx={{ mt: 2 }} id="outlined" label="Email" value={userDetails.email} onChange={updateField("email")} />
-                        <Button sx={{ mt: 2 }} variant="contained" onClick={saveUser}>Save</Button>
+                        <Button disabled={user.isWoodcraft} sx={{ mt: 2 }} variant="contained" onClick={saveUser}>Save</Button>
                     </form>
                 </Box>
             </Paper>

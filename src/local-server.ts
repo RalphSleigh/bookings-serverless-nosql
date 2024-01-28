@@ -58,7 +58,7 @@ const handlerSetup = (url: string, lambda_path: string, method: string = "GET") 
 //handlerSetup('/api/init', 'init/handler')
 //handlerSetup('/api/test', 'test/handler')
 //handlerSetup('/api/migrate', 'migrate/handler')
-//handlerSetup('/api/seed', 'seed/handler')
+handlerSetup('/api/seed', 'seed/seed')
 
 handlerSetup('/api/env', 'env/getEnv')
 

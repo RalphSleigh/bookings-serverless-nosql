@@ -24,7 +24,7 @@ export const lambdaHandlerfsdf = lambda_wrapper_json(
 */
 
 const BookingModel: Model<OnetableBookingType> = table.getModel('Booking')
-const EventModel: Model<OnetableEventType> = table.getModel('Event')
+const EventModel: Model<OnetableEventType> = table.getModel<OnetableEventType>('Event')
 const EventBookingTimelineModel = table.getModel<EventBookingTimelineType>('EventBookingTimeline')
 
 export const lambdaHandler = lambda_wrapper_json(

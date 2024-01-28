@@ -26,6 +26,7 @@
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
     "@f/popcount": "^1.0.0",
+    "@faker-js/faker": "^8.4.0",
     "@fontsource/roboto": "^4.5.8",
     "@fortawesome/fontawesome-svg-core": "^6.2.0",
     "@fortawesome/free-brands-svg-icons": "^6.2.0",
@@ -89,7 +90,6 @@
     "uuid": "^3.3.0"
   },
   "devDependencies": {
-    "@faker-js/faker": "^7.6.0",
     "@types/aws-lambda": "^8.10.106",
     "@types/bcryptjs": "^2.4.2",
     "@types/cookie": "^0.5.1",

@@ -30,37 +30,36 @@ export function Component() {
     return <Grid xs={12} p={2} item>
         <Button variant="contained" onClick={() => saveCSV(event, user, bookings)}>Download CSV</Button>
         <BookingsModal selectedBooking={selectedBooking} booking={typeof selectedBooking == "number" ? bookings[selectedBooking] : undefined} handleClose={() => setSelectedBooking(undefined)} />
-        <DataGrid rowSelection={false} pageSizeOptions={[100]} rows={rows} columns={columns} onRowClick={onRowClick} getRowClassName={(params) => `participant-row-deleted-${params.row.booking.deleted}`}/>
+        <DataGrid rowSelection={false} pageSizeOptions={[100]} rows={rows} columns={columns} onRowClick={onRowClick} getRowClassName={(params) => `participant-row-deleted-${params.row.booking.deleted}`} />
     </Grid>
 
 }
 
 const BookingsModal = ({ selectedBooking, booking, handleClose }: { selectedBooking: number | undefined, booking: JsonBookingWithExtraType | undefined, handleClose: () => void }) => {
-    const style = {
-        position: 'absolute' as 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        p: 2,
-        outline: 'none'
-    }
-
     if (!booking) return null
 
     const noWrap = { whiteSpace: 'nowrap' as 'nowrap', mt: 1 }
     const participants = booking.participants.map((p, i) => <li key={i}>{p.basic.name}</li>)
 
+    const chunks: JSX.Element[][] = []
+    const chunkSize = 20;
+    for (let i = 0; i < participants.length; i += chunkSize) {
+        chunks.push(participants.slice(i, i + chunkSize))
+
+    }
+
     return (<Modal
         open={selectedBooking !== undefined}
         onClose={handleClose}
         aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description">
-        <Paper elevation={6} sx={style}>
-            <Typography id="modal-modal-title" variant="h6">
-                {booking.basic.contactName}
-            </Typography>
+        aria-describedby="modal-modal-description"
+        sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <Paper elevation={6} sx={{ p: 2, outline: 'none' }}>
             <Grid container spacing={2}>
                 <Grid item xs={12} sm>
+                    <Typography id="modal-modal-title" variant="h6">
+                        {booking.basic.contactName}
+                    </Typography>
                     <Typography variant="body1" sx={noWrap}>
                         <b>Booked By:</b><br /> {booking.basic.contactName}<br />
                         <a href={`mailto:${booking.basic.contactEmail}`}>{booking.basic.contactEmail}</a><br />
@@ -71,12 +70,12 @@ const BookingsModal = ({ selectedBooking, booking, handleClose }: { selectedBook
                         <a href={`tel:${booking.emergency?.phone}`}>{booking.emergency?.phone}</a>
                     </Typography>
                 </Grid>
-                <Grid item xs={12} sm>
-                <Typography variant="body1" sx={noWrap}><b>Attendees:</b></Typography>
+                {chunks.map((c, i) => <Grid item xs={12} sm>
+                    {i == 0 ? <Typography key={i} variant="body1" sx={noWrap}><b>Attendees:</b></Typography> : null}
                     <ul>
-                        {participants}
+                        {c}
                     </ul>
-                </Grid>
+                </Grid>)}
             </Grid>
         </Paper>
     </Modal>)
@@ -88,6 +87,6 @@ function saveCSV(event: JsonEventType, user: JsonUserResponseType, bookings: Jso
     const values = bookings.map(b => fields.getCSVValues(b, user))
 
     const csvData = stringify([headers, ...values])
-    const filename  = `${event.name}-Bookings-${format(new Date(), 'yyyy-MM-dd')}.csv`
+    const filename = `${event.name}-Bookings-${format(new Date(), 'yyyy-MM-dd')}.csv`
     save(new TextEncoder().encode(csvData), filename)
 }

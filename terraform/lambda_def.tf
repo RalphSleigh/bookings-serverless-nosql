@@ -14,13 +14,13 @@ variable "lambda_definitions" {
       code             = "init"
       path                 = "init"
       dont_create_endpoint = true
-    },
+    },*/
     seed = {
       name                 = "seed"
-      code             = "seed"
+      code             = "seed/seed"
       path                 = "seed"
       dont_create_endpoint = true
-    },*/
+    },
     env = {
       name   = "env"
       code   = "env/getEnv"
@@ -40,7 +40,7 @@ variable "lambda_definitions" {
       method = "post"
     },
     userDisableDriveSync = {
-      name   = "userDisableDriveSync"
+      name   = "user_disable_drive_sync"
       code   = "user/disableDriveSync"
       path   = "user/disableDriveSync"
       method = "post"

@@ -95,6 +95,7 @@ class AddtionalDiet extends Field {
 
 class Photo extends Field {
     fieldName = "Photo"
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View"]
     value (participant: JsonParticipantWithExtraType) {
         return participant.consent?.photo
     }

@@ -85,6 +85,9 @@ class NumberOfParticipants extends Field {
     value(booking: JsonBookingType) {
         return booking.participants.length
     }
+    sortComparator(a: BookingType | JsonBookingType, b: BookingType | JsonBookingType) {
+        return a.participants.length - b.participants.length
+    }
 }
 
 class EmergencyContactName extends Field {
