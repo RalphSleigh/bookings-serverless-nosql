@@ -3,6 +3,7 @@ import { unmarshall } from '@aws-sdk/util-dynamodb'
 
 export type ConfigType = {
   BASE_URL: string,
+  COOKIE_EXPIRY: number,
   DISCORD_ENABLED: boolean,
   DRIVE_SYNC_ENABLED: boolean,
   EMAIL_ENABLED: boolean,

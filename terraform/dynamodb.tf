@@ -29,8 +29,8 @@ resource "aws_dynamodb_table" "bookings_table" {
 }
 
 resource "aws_appautoscaling_target" "bookings_table_read_target" {
-  max_capacity       = 10
-  min_capacity       = 1
+  max_capacity       = 20
+  min_capacity       = 5
   resource_id        = "table/${aws_dynamodb_table.bookings_table.name}"
   scalable_dimension = "dynamodb:table:ReadCapacityUnits"
   service_namespace  = "dynamodb"
