@@ -7,7 +7,11 @@ const client = new Dynamo({
     client: new DynamoDBClient({
         region: 'eu-west-2',
         maxAttempts: 10
-    })
+    }),
+    /*
+    marshall: {
+        convertClassInstanceToMap: true
+    }*/
 })
 
 const schema = {
@@ -23,8 +27,8 @@ const schema = {
             sk: { type: String, value: 'user' },
             id: { type: String, generate: 'uid', required: true },
             remoteId: { type: String, required: true },
-            source: { type: String, required: true, enum: ['google', 'facebook', 'microsoft', 'yahoo']},
-            isWoodcraft: {type: Boolean, required: true, default: 'false'},
+            source: { type: String, required: true, enum: ['google', 'facebook', 'microsoft', 'yahoo'] },
+            isWoodcraft: { type: Boolean, required: true, default: 'false' },
             admin: { type: Boolean, required: true, default: 'false' },
             userName: { type: String },
             email: { type: String },
@@ -40,7 +44,7 @@ const schema = {
             id: { type: String, generate: 'uid', required: true },
             userId: { type: String, required: true },
             eventId: { type: String, required: true },
-            role: { type: String, required: true, enum: ['Owner','Manage','View','Money','KP','Book'] },
+            role: { type: String, required: true, enum: ['Owner', 'Manage', 'View', 'Money', 'KP', 'Book'] },
             created: { type: Date },
             updated: { type: Date },
         },
@@ -154,6 +158,21 @@ const schema = {
             customQuestions: {
                 type: Array
             },
+            fees: {
+                type: Array,
+                required: true,
+                default: [],
+                items: {
+                    type: Object,
+                    schema: {
+                        type: { type: String, required: true, enum: ['payment', 'adjustment'] },
+                        value: { type: Number, required: true },
+                        userId: {type: String, required: true},
+                        description: { type: String, required: true },
+                        date: { type: Date, required: true },
+                    }
+                }
+            },
             created: { type: Date, required: true },
             updated: { type: Date, required: true },
         },
@@ -245,7 +264,7 @@ export type ParticipantType = ParticipantFields & ParticipantBasicType & Partial
 
 export type JsonParticipantType = Jsonify<ParticipantFields> & Jsonify<ParticipantBasicType> & Partial<ParticipantKpType> & Partial<ParticipantConsentType> & Partial<ParticipantMedicalType>
 
-export type JsonParticipantWithBasicType = Partial<Omit<JsonParticipantType, 'basic'>> & Jsonify<ParticipantBasicType> 
+export type JsonParticipantWithBasicType = Partial<Omit<JsonParticipantType, 'basic'>> & Jsonify<ParticipantBasicType>
 
 
 export type UserType = Entity<typeof schema.models.User>

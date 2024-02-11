@@ -112,6 +112,36 @@ export class Ealing extends FeeStructure {
         const feeData = event.feeData as EalingFeeEventType["feeData"]
         const valueHeaders = this.getValueLabels().map((l, i) => <TableCell component="th" key={i}><b>{l}</b></TableCell>)
 
+        const totals: number[] = []
+
+        const myfees = this.getFeeLines(event, booking).map((row, i) => {
+
+            row.values.forEach((v, i) => {
+                if (!totals[i]) totals[i] = 0
+                totals[i] += v
+            })
+
+            return (<TableRow
+                key={i}
+                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                <TableCell component="th" scope="row">{row.description}</TableCell>
+                {row.values.map((v, i) => <TableCell key={i}><b>{currency(v)}</b></TableCell>)}
+            </TableRow>)
+        })
+
+        const adjustments = booking.fees?.filter(f => f.type === "adjustment").map((f, i) => {
+
+            totals.forEach((v, i) => {
+                if (!totals[i]) totals[i] = 0
+                totals[i] += f.value
+            })
+
+            return (<TableRow key={`adjustment-${i}`}>
+                <TableCell>{f.description}</TableCell>
+                {this.getValueLabels().map((l, i) => <TableCell component="th" key={i}><b>{currency(f.value)}</b></TableCell>)}
+            </TableRow>)
+        })
+
         return (<>
             <Typography variant="body2" mt={2}>The discounted donation is offered to all
                 families/individuals where there is no wage earner and/or the family/individual is on a low wage. This
@@ -136,14 +166,15 @@ export class Ealing extends FeeStructure {
                             <TableCell>{currency(feeData.ealingAccompanied)}</TableCell>
                             <TableCell>{currency(feeData.ealingDiscountAccompanied)}</TableCell>
                         </TableRow>
-                        {this.getFeeLines(event, booking).map((row, i) => (
-                            <TableRow
-                                key={i}
-                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                                <TableCell component="th" scope="row"><b>My Booking: {row.description}</b></TableCell>
-                                {row.values.map((v, i) => <TableCell key={i}><b>{currency(v)}</b></TableCell>)}
-                            </TableRow>
-                        ))}
+                        <TableRow>
+                            <TableCell colSpan={this.getValueLabels().length + 1}><Typography variant="body2" textAlign="center"><b>My Booking</b></Typography></TableCell>
+                        </TableRow>
+                        {myfees}
+                        {adjustments}
+                        <TableRow>
+                            <TableCell><b>Total</b></TableCell>
+                            {totals.map((v, i) => <TableCell key={i}><b>{currency(v)}</b></TableCell>)}
+                        </TableRow>
                     </TableBody>
                 </Table>
             </TableContainer>

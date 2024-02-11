@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { CssBaseline, useMediaQuery } from '@mui/material';
+import { CssBaseline, useMediaQuery, Box } from '@mui/material';
 import { useMemo, useState } from 'react';
 import { ThemeContext } from './themeContext.js';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -31,6 +31,7 @@ import { ThanksLoader } from '../booking/thanksLoader.js';
 import { ReactErrorBoundary, RouterErrorBoundary } from './errors.js';
 import { SnackBarProvider } from './toasts.js';
 import { EditBookingLoader } from '../booking/editBookingLoader.js';
+import { Footer } from './footer.js';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -46,7 +47,13 @@ const queryClient = new QueryClient({
 })
 
 const router = createBrowserRouter([{
-    element: <><AppToolbar /><SuspenseWrapper><Outlet /></SuspenseWrapper></>,
+    element: <Box sx={{ display: "flex", minHeight: "100vh", flexDirection: "column" }}>
+        <AppToolbar />
+        <Box sx={{ flexGrow: 1 }}>
+            <SuspenseWrapper><Outlet /></SuspenseWrapper>
+        </Box>
+        <Footer />
+    </Box>,
     errorElement: <RouterErrorBoundary />,
     children: [
         {
@@ -95,8 +102,14 @@ const router = createBrowserRouter([{
                         path: "bookings",
                         lazy: () => import('../manage/bookings.js')
                     }, {
+                        path: "kp",
+                        lazy: () => import('../manage/kp.js')
+                    }                    , {
                         path: "roles",
                         lazy: () => import('../manage/roles.js')
+                    }, {
+                        path: "money",
+                        lazy: () => import('../manage/money.js')
                     }]
                 }]
             }

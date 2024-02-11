@@ -9,6 +9,7 @@ abstract class Field {
     fieldName: string = ""
     roles: string[] = ["Owner", "Manage", "View", "Money", "KP"]
     defaultValue: string = "N/A"
+    enabledCSV: boolean = true
 
     constructor(event: JsonEventType | OnetableEventType) {
         this.event = event
@@ -107,6 +108,7 @@ class EmergencyContactPhone extends Field {
 class EditLink extends Field {
     fieldName = "Edit"
     roles = ["Owner", "Manage"]
+    enabledCSV = false
     value(booking: JsonBookingType) {
         return booking.userId
     }
@@ -158,10 +160,10 @@ export class BookingFields {
     }
 
     getCSVHeaders(user) {
-        return this.fields.filter(f => f.enabled() && f.permission(user)).map(f => f.fieldName)
+        return this.fields.filter(f => f.enabledCSV && f.enabled() && f.permission(user)).map(f => f.fieldName)
     }
 
     getCSVValues(booking: JsonBookingType | BookingType, user) {
-        return this.fields.filter(f => f.enabled() && f.permission(user)).map(f => f.csvCellValue(booking))
+        return this.fields.filter(f => f.enabledCSV && f.enabled() && f.permission(user)).map(f => f.csvCellValue(booking))
     }
 }

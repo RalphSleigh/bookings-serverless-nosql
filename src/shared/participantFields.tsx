@@ -59,6 +59,13 @@ class Name extends Field {
     }
 }
 
+class BookedBy extends Field {
+    fieldName = "Booked By"
+    value (participant: JsonParticipantWithExtraType) {
+        return this.event.bigCampMode ? participant.booking.basic.district : participant.booking.basic.contactName
+    }
+}
+
 class Age extends Field {
     fieldName = "Age"
     value (participant: JsonParticipantWithExtraType | ParticipantType) {
@@ -101,7 +108,8 @@ class Photo extends Field {
     }
 
     enabled(): boolean {
-        return this.event.bigCampMode
+        //return this.event.bigCampMode
+        return false
     }
 }
 
@@ -113,6 +121,21 @@ class Medical extends Field {
         return participant.medical?.details
     }
 }
+
+class Created extends Field {
+    fieldName = "Created"
+    value (participant: JsonParticipantWithExtraType) {
+        return new Date(participant.created)
+    }
+}
+
+class Updated extends Field {
+    fieldName = "Updated"
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.updated
+    }
+}
+
 
 export class CSVCurrent extends Field {
     fieldName = "Current"
@@ -131,10 +154,13 @@ export class ParticipantFields {
         this.fields = [
             new Name(event),
             new Age(event),
+            new BookedBy(event),
             new Diet(event),
             new AddtionalDiet(event),
             new Medical(event),
-            new Photo(event)
+            new Photo(event),
+            new Created(event),
+            new Updated(event),
         ]    
     }
     

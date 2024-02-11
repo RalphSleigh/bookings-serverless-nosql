@@ -39,10 +39,10 @@ variable "lambda_definitions" {
       path   = "user/edit"
       method = "post"
     },
-    userDisableDriveSync = {
+    user_disable_drive_dync = {
       name   = "user_disable_drive_sync"
-      code   = "user/disableDriveSync"
-      path   = "user/disableDriveSync"
+      code   = "user/disable_drive_sync"
+      path   = "user/disable_drive_sync"
       method = "post"
     },
     user_logout = {
@@ -110,8 +110,15 @@ variable "lambda_definitions" {
       code   = "events/manage/deleteRole"
       path   = "event/{id}/manage/roles/delete"
       method = "post"
-    }
+    },
+    event_booking_operation = {
+      name   = "event_booking_operation"
+      code   = "events/manage/bookingOperation"
+      path   = "event/{id}/manage/booking/{userId}/operation"
+      method = "post"
+    },
     /*handlerSetup('/api/event/:id/manage/timeline', 'events/manage/getTimeline')
+    handlerSetup('/api/event/:id/manage/booking/:userId/operation', 'events/manage/bookingOperation', "POST")
     events_delete = {
       name     = "events_delete"
       code = "events/delete"

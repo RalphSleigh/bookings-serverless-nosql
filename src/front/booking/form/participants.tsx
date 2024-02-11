@@ -25,7 +25,9 @@ export function ParticipantsForm({ participants, update, kp }: { participants: A
         <Grid xs={12} p={0} item>
             <Typography variant="h6">Campers</Typography>
             {participantsList}
-            <Button sx={{ mt: 2 }} variant="contained" onClick={addEmptyObjectToArray}>Add Participant</Button>
+            <Button sx={{ mt: 2 }} variant="contained" onClick={addEmptyObjectToArray}>
+                Add person
+            </Button>
         </Grid>
     </Grid>
 }

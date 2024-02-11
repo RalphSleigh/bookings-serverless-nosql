@@ -81,6 +81,12 @@ function getParticipantRecords(bookings: BookingType[]): CSVParticipant[] {
     const participants: Record<string, CSVParticipant> = {}
     for (const booking of bookings) {
         for (const participant of booking.participants) {
+            const key = participant.created.toISOString()
+            if (participants[key]) {
+                console.log(`Updating participant ${key}`)
+            } else {
+                console.log(`Creating participant ${key}`)
+            }
             participants[participant.created.toISOString()] = { ...participant, current: booking.version === "latest" && !booking.deleted }
         }
     }

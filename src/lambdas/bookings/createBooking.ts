@@ -40,6 +40,8 @@ export const lambdaHandler = lambda_wrapper_json(
             booking.userId = current_user.id
             booking.version = "latest"
             booking.deleted = false
+            //@ts-ignore
+            delete booking.fees
 
             updateParticipantsDates([], booking.participants)
 

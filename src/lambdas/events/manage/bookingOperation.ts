@@ -1,0 +1,57 @@
+import { Model } from 'dynamodb-onetable';
+import { lambda_wrapper_json } from '../../../lambda-common/lambda_wrappers.js';
+import { EventType, OnetableBookingType, RoleType, UserType, table } from '../../../lambda-common/onetable.js';
+import { CanCreateRole, CanWriteMoney } from '../../../shared/permissions.js';
+import { admin, auth } from '@googleapis/admin';
+import { BookingOperationType } from '../../../shared/computedDataTypes.js';
+import { Jsonify } from 'type-fest'
+
+const EventModel = table.getModel<EventType>('Event')
+const RoleModel = table.getModel<RoleType>('Role')
+const UserModel: Model<UserType> = table.getModel<UserType>('User')
+const BookingModel: Model<OnetableBookingType> = table.getModel<OnetableBookingType>('Booking')
+
+export const lambdaHandler = lambda_wrapper_json(
+    async (lambda_event, config, current_user) => {
+        const event = await EventModel.get({ id: lambda_event.pathParameters?.id })
+        if (event && current_user) {
+            const booking = await BookingModel.get({ eventId: lambda_event.pathParameters?.id, userId: lambda_event.pathParameters?.userId, version: "latest" })
+            if (booking) {
+                const operation: BookingOperationType = lambda_event.body.operation
+                switch (operation.type) {
+                    case "addPayment":
+                        CanWriteMoney.throw({ user: current_user, event: event })
+                        const fees = [{ type: "payment", value: operation.value, date: new Date().toISOString(), description: operation.description, userId: current_user.id }] as Jsonify<OnetableBookingType["fees"][0]>[]
+                        await BookingModel.update({ eventId: booking.eventId, userId: booking.userId, version: "latest" },
+                            {
+                                set: { fees: 'list_append(if_not_exists(fees, @{emptyList}), @{newFees})' },
+                                substitutions: { emptyList: [], newFees: fees }
+                            })
+                        return { message: "Payment added" }
+                    case "addAdjustment":
+                        CanWriteMoney.throw({ user: current_user, event: event })
+                        const adjustmentFees = [{ type: "adjustment", value: operation.value, date: new Date().toISOString(), description: operation.description, userId: current_user.id }] as Jsonify<OnetableBookingType["fees"][0]>[]
+                        await BookingModel.update({ eventId: booking.eventId, userId: booking.userId, version: "latest" },
+                            {
+                                set: { fees: 'list_append(if_not_exists(fees, @{emptyList}), @{newFees})' },
+                                substitutions: { emptyList: [], newFees: adjustmentFees }
+                            })
+                        return { message: "Adjustment added" }
+                    case "removeFeeItem":
+                        CanWriteMoney.throw({ user: current_user, event: event })
+                        const newFees = booking.fees.filter(fee => fee.date.toISOString() !== operation.date).map(f => {return {...f, date: f.date.toISOString()}})
+                        await BookingModel.update({ eventId: booking.eventId, userId: booking.userId, version: "latest" },
+                            {
+                                set: { fees: newFees }
+                            })
+                        return { message: "Fee removed" }
+                    default:
+                        throw new Error("Invalid operation")
+                }
+            } else {
+                throw new Error("Can't find booking")
+            }
+        } else {
+            throw new Error("Can't find event")
+        }
+    })

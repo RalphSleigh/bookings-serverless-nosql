@@ -48,8 +48,8 @@ export function RouterErrorBoundary() {
                     setSnackbar({ message: `Server Error (${error.response.status}): ${error.response.data.message}`, severity: 'error' })
                 }, [error])
             }
+            return <Navigate to='/' />
         }
-        return <Navigate to='/' />
     }
 
     return <div>Oops, something went wrong, maybe <a href="/">refreshing</a> the page will help.</div>

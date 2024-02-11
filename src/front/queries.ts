@@ -5,6 +5,7 @@ import { SnackBarContext } from './app/toasts.js';
 import { useContext } from 'react';
 import { set } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
+import { BookingOperationType } from '../shared/computedDataTypes.js';
 
 export function useEnv() {
     return useSuspenseQuery({
@@ -218,6 +219,8 @@ export const allUsersQuery = eventId => {
     }
 }
 
+export const useAllUsersQuery = eventId => useSuspenseQuery(allUsersQuery(eventId)) as QueryObserverSuccessResult<{ "users": [JsonUserType] }>
+
 export type allUsersQueryType = UseQueryOptions<{ "users": [JsonUserType] }, any>
 
 export function useCreateRole(eventId) {
@@ -262,6 +265,23 @@ export function useDisableDriveSync() {
                 queryClient.invalidateQueries({
                     queryKey: ['user']
                 })
+            },
+            onError: snackbarError(setSnackbar)
+        }
+    );
+}
+
+export function useBookingOperation() {
+    const queryClient = useQueryClient()
+    const setSnackbar = useContext(SnackBarContext)
+    return useMutation<{message: string}, any, { eventId: string, userId: string, operation: BookingOperationType }, any>(
+        {
+            mutationFn: async data => (await axios.post(`/api/event/${data.eventId}/manage/booking/${data.userId}/operation`, { operation: data.operation })).data,
+            onSuccess: (data) => {
+                queryClient.invalidateQueries({
+                    queryKey: ['manage']
+                })
+                setSnackbar({ message: data.message, severity: 'success' })
             },
             onError: snackbarError(setSnackbar)
         }

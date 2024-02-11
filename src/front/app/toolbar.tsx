@@ -22,7 +22,7 @@ export function AppToolbar(props) {
                     ml: -2.5,
                     mr: 1
                 }}
-                alt="Your logo."
+                alt="Logo"
                 src="/logoonly.png"
             />
             <Link underline="hover" variant="h6" color="inherit" sx={{ flexGrow: 1, }} href="/">
@@ -34,11 +34,12 @@ export function AppToolbar(props) {
                 {theme.palette.mode === 'dark' ? <Brightness7 /> : <Brightness4 />}
             </IconButton>
             {env === "dev" ? <><IconButton sx={{ ml: 1 }} onClick={() => { throw("BOOM (event handler)") }} color="inherit">
-                <BugReport />
+                <BugReport color="warning" />
             </IconButton>
             <IconButton sx={{ ml: 1 }} onClick={() => { setError(true) }} color="inherit">
-                <BugReport />
+                <BugReport color="warning"/>
             </IconButton>
+            <Typography variant="h6" sx={{ ml: 1, color: "warning.main" }}>TEST MODE</Typography>
             </> : null}
         </Toolbar>
     </AppBar>)

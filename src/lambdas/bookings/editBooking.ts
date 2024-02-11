@@ -23,7 +23,8 @@ export const lambdaHandler = lambda_wrapper_json(
             if (CanEditBooking.if(permissionData) || CanEditOwnBooking.if(permissionData)) {
 
                 updateParticipantsDates(existingLatestBooking.participants, newData.participants)
-
+                delete newData.fees
+                
                 const newLatest = await BookingModel.update({ ...existingLatestBooking, ...newData, deleted: false }, { partial: false })
                 const newVersion = await BookingModel.create({ ...newLatest, version: newLatest.updated.toISOString() })
 

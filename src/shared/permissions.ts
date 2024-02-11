@@ -118,6 +118,16 @@ export const CanDeleteBooking = new LoggedInPermission<"event" | "booking">(data
     return CanEditBooking.if(data)
 }, "User can't delete booking")
 
+export const CanSeeMoneyPage = new LoggedInPermission<"event">(data => {
+    if (IsGlobalAdmin.if(data)) return true
+    return hasRoleOnEvent(data.user, data.event, ["Owner", "Manage", "View", "Money"])
+}, "User can't see money page")
+
+export const CanWriteMoney = new LoggedInPermission<"event">(data => {
+    if (IsGlobalAdmin.if(data)) return true
+    return hasRoleOnEvent(data.user, data.event, ["Owner", "Manage", "Money"])
+}, "User can't manage fees")
+
 const hasRoleOnEvent = (user: NonNullable<UserResponseType | JsonUserResponseType>, event: OnetableEventType | JsonEventType, roles: Array<RoleType["role"]>): Boolean => {
     return !!roles.find(role => ((user.roles as Array<RoleType>).find(r => r.eventId === event.id && r.role === role)))
 }

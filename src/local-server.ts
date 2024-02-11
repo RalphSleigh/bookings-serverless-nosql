@@ -82,7 +82,7 @@ handlerSetup('/api/event/:id/manage/timeline', 'events/manage/getEventTimeline')
 handlerSetup('/api/event/:id/manage/roles', 'events/manage/getRoles')
 handlerSetup('/api/event/:id/manage/roles/create', 'events/manage/createRole', "POST")
 handlerSetup('/api/event/:id/manage/roles/delete', 'events/manage/deleteRole', "POST")
-
+handlerSetup('/api/event/:id/manage/booking/:userId/operation', 'events/manage/bookingOperation', "POST")
 handlerSetup('/api/booking/user', 'bookings/getUsersBookings')
 handlerSetup('/api/booking/create', 'bookings/createBooking', "POST")
 //handlerSetup('/api/booking/:id', 'bookings/get/handler')

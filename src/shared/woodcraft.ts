@@ -10,7 +10,7 @@ export abstract class AgeGroup {
     abstract filter: (age: number) => boolean
 
     public displayAgeGroup(age: number) {
-       return age > 21 ? this.singular : `${this.singular} (${age})`
+        return age > 21 ? this.singular : `${this.singular} (${age})`
     }
 }
 
@@ -62,10 +62,14 @@ class Adult extends AgeGroup {
     }
 }
 
-type ParticipantGroup = {group: AgeGroup, participants: JsonParticipantWithBasicType[]}
+type ParticipantGroup = { group: AgeGroup, participants: JsonParticipantWithBasicType[] }
+
+export function ageGroups(): AgeGroup[] {
+    return [new Woodchip(), new Elfin(), new Pioneer(), new Venturer(), new DF(), new Adult()]
+}
 
 export function getAgeGroup(age: number): AgeGroup {
-    const groups = [new Woodchip(), new Elfin(), new Pioneer(), new Venturer(), new DF(), new Adult()]
+    const groups = ageGroups()
     return groups.find(g => g.filter(age))!
 }
 
@@ -74,10 +78,12 @@ export function groupParticipants(participants: JsonParticipantWithBasicType[], 
     const groups = [new Woodchip(), new Elfin(), new Pioneer(), new Venturer(), new DF(), new Adult()]
     const grouped: ParticipantGroup[] = []
     for (const group of groups) {
-        grouped.push({group, participants: participants.filter(p => {
-            const age = differenceInYears(startDate, parseDate(p.basic.dob)!)
-            return group.filter(age)
-        })})
+        grouped.push({
+            group, participants: participants.filter(p => {
+                const age = differenceInYears(startDate, parseDate(p.basic.dob)!)
+                return group.filter(age)
+            })
+        })
     }
     return grouped
 }
