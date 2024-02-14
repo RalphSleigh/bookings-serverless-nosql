@@ -2,25 +2,33 @@ import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
 import am_in_lambda from "./am_in_lambda.js"
 import { log } from "./logging.js"
 import { BookingType, EventType, RoleType, UserType, table } from "./onetable.js"
-import { emails, getEmailTemplate } from "./emails/emails.js";
+import { getEmailTemplate } from "./emails/emails.js";
 import MailComposer from 'nodemailer/lib/mail-composer/index.js'
 import { auth, gmail } from '@googleapis/gmail'
 import { ConfigType } from "./config.js";
 import { backOff } from 'exponential-backoff';
 import { render } from '@react-email/render';
 import { getUsersWithRolesForEvent } from "./util.js";
-import { ConfigurationServicePlaceholders } from "aws-sdk/lib/config_service_placeholders.js";
+import { EmailsType } from "./emails/emails.js";
 
 const RoleModel = table.getModel<RoleType>('Role')
 const UserModel = table.getModel<UserType>('User')
 
-export type EmailData = {
-    template: keyof emails
+export type BasicEmailData = {
+    template: "managerDataAccess"
+    recipient: UserType
+    event: EventType
+}
+
+export type BookingEmailData = {
+    template: Exclude<keyof EmailsType, "managerDataAccess">
     recipient: UserType
     event: EventType
     booking: BookingType
     bookingOwner: UserType
 }
+
+export type EmailData = BasicEmailData | BookingEmailData
 
 export async function queueEmail(data: EmailData, config: ConfigType) {
     console.log("queueing emails")
@@ -87,7 +95,10 @@ export async function sendEmail(data: EmailData, config: any) {
         console.log(`Sending email ${data.template} to ${recipient.email}`)
 
         const template = getEmailTemplate(data.template)
+
+        //@ts-ignore
         const subject = template.subject(data)
+        //@ts-ignore
         const htmlEmail = template.HTLMBody(data, config)
         const htmlEmailText = render(htmlEmail)
         const textEmailText = render(htmlEmail, { plainText: true })

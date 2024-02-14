@@ -1,19 +1,15 @@
-import { BookingEmailData, EmailData } from "../email.js"
-import { EmailTemplate } from "./emailTemplate.js"
+import { EmailTemplate  } from "./emailTemplate.js"
 import * as React from 'react';
-import { Button } from '@react-email/button';
-import { Hr } from '@react-email/hr';
 import { Html, Text, Link } from '@react-email/components';
-import { getFee } from "../../shared/fee/fee.js";
 import { ConfigType } from "../config.js";
+import { BasicEmailData } from "../email.js";
 
-export class BookingEditedEmail extends EmailTemplate {
-    subject(data: BookingEmailData) {
-        return `Booking updated for ${data.event.name}`
+export class ManagerDataAccessEmail extends EmailTemplate {
+    subject(data: BasicEmailData) {
+        return `[${data.event.emailSubjectTag}] You have been granted access to data for ${ data.event.name }`
     }
 
-    HTLMBody(data: BookingEmailData, config: ConfigType) {
-
+    HTLMBody(data: BasicEmailData, config: ConfigType) {
         let loginReminder = ''
         switch (data.recipient.source) {
             case 'google':
@@ -30,21 +26,9 @@ export class BookingEditedEmail extends EmailTemplate {
                 break;
         }
 
-        const editLink = `${config.BASE_URL}/event/${data.event.id}/edit-my-booking`
-
-        const participantsList = data.booking.participants.map((p, i) => <li key={i} style={{ fontSize: "14px" }}>{p.basic.name}</li>);
-
-        const fees = getFee(data.event)
-
         return (<Html lang="en">
             <Text>Hi {data.recipient.userName}</Text>
-            <Text>You have updated your booking for {data.event.name}, You have
-                booked {data.booking.participants.length} {data.booking.participants.length === 1 ? 'person' : 'people'}:</Text>
-            <ul>{participantsList}</ul>
-            <Text>You can come back and edit your booking <Link href={editLink}>here</Link>.</Text>
-            <Text>
-                <fees.EmailElement event={data.event} booking={data.booking} />
-            </Text>
+            <Text>You have been granted access to bookings data for {data.event.name}, to view it please log in and choose the "manage" link in bottom corner of the event card.</Text>
             <Text>
                 <p>Blue Skies and Friendship,</p>
                 <p>Woodcraft Folk</p>

@@ -11,36 +11,36 @@ export function AppToolbar(props) {
     const env = useContext(EnvContext)
     const [error, setError] = React.useState(false);
 
-    if(error) throw("BOOM (render)")
+    if (error) throw ("BOOM (render)")
 
     return (<AppBar position="static">
         <Toolbar variant="dense">
-            <Box
-                component="img"
-                sx={{
-                    height: 40,
-                    ml: -2.5,
-                    mr: 1
-                }}
-                alt="Logo"
-                src="/logoonly.png"
-            />
-            <Link underline="hover" variant="h6" color="inherit" sx={{ flexGrow: 1, }} href="/">
-                {window.location.hostname}
-            </Link>
-
+                <Box
+                    component="img"
+                    sx={{
+                        height: 40,
+                        ml: -2.5,
+                        mr: 1
+                    }}
+                    alt="Logo"
+                    src="/logoonly.png"
+                />
+                <Link underline="hover" variant="h6" color="inherit" href="/">
+                    {window.location.hostname}
+                </Link>
+            <Box sx={{ flexGrow: 1 }} />
             <UserStatus />
             <IconButton sx={{ ml: 1 }} onClick={colourMode.toggleColorMode} color="inherit">
                 {theme.palette.mode === 'dark' ? <Brightness7 /> : <Brightness4 />}
             </IconButton>
-            {env === "dev" ? <><IconButton sx={{ ml: 1 }} onClick={() => { throw("BOOM (event handler)") }} color="inherit">
+            {env === "dev" ? <><IconButton sx={{ ml: 1 }} onClick={() => { throw ("BOOM (event handler)") }} color="inherit">
                 <BugReport color="warning" />
             </IconButton>
-            <IconButton sx={{ ml: 1 }} onClick={() => { setError(true) }} color="inherit">
-                <BugReport color="warning"/>
-            </IconButton>
-            <Typography variant="h6" sx={{ ml: 1, color: "warning.main" }}>TEST MODE</Typography>
+                <IconButton sx={{ ml: 1 }} onClick={() => { setError(true) }} color="inherit">
+                    <BugReport color="warning" />
+                </IconButton>
+                <Typography variant="h6" sx={{ ml: 1, color: "warning.main" }}>TEST MODE</Typography>
             </> : null}
         </Toolbar>
-    </AppBar>)
+    </AppBar >)
 }

@@ -1,15 +1,15 @@
-import { EmailData } from "../email.js"
+import { BookingEmailData, EmailData } from "../email.js"
 import { EmailTemplate } from "./emailTemplate.js"
 import * as React from 'react';
 import { Html, Text, Link } from '@react-email/components';
 import { ConfigType } from "../config.js";
 
 export class ManagerBookingDeletedEmail extends EmailTemplate {
-    subject(data: EmailData) {
+    subject(data: BookingEmailData) {
         return `[${data.event.emailSubjectTag}] Booking Cancelled`
     }
 
-    HTLMBody(data: EmailData, config: ConfigType) {
+    HTLMBody(data: BookingEmailData, config: ConfigType) {
         const participantsList = data.booking.participants.map((p, i) => <li key={i} style={{ fontSize: "14px" }}>{p.basic.name}</li>);
 
         return (<Html lang="en">

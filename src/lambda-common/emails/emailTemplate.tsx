@@ -1,5 +1,5 @@
 import { ConfigType } from "../config.js";
-import { EmailData } from "../email.js";
+import { BasicEmailData, EmailData } from "../email.js";
 import { EventType } from "../onetable.js";
 
 export abstract class EmailTemplate {

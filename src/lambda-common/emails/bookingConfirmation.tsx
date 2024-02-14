@@ -1,4 +1,4 @@
-import { EmailData } from "../email.js"
+import { BookingEmailData, EmailData } from "../email.js"
 import { EmailTemplate } from "./emailTemplate.js"
 import * as React from 'react';
 import { Button } from '@react-email/button';
@@ -8,11 +8,11 @@ import { getFee } from "../../shared/fee/fee.js";
 import { ConfigType } from "../config.js";
 
 export class BookingConfirmationEmail extends EmailTemplate {
-    subject(data: EmailData) {
+    subject(data: BookingEmailData) {
         return `Booking confirmation for ${data.event.name}`
     }
 
-    HTLMBody(data: EmailData, config: ConfigType) {
+    HTLMBody(data: BookingEmailData, config: ConfigType) {
 
         let loginReminder = ''
         switch (data.recipient.source) {

@@ -3,6 +3,7 @@ import { BookingEditedEmail } from "./bookingEdited.js";
 import { ManagerConfirmationEmail } from "./managerBookingCreated.js";
 import { ManagerBookingDeletedEmail } from "./managerBookingDeleted.js";
 import { ManagerBookingUpdatedEmail } from "./managerBookingUpdated.js";
+import { ManagerDataAccessEmail } from "./managerDataAccess.js";
 
 const emails = {
     confirmation: new BookingConfirmationEmail(),
@@ -11,10 +12,11 @@ const emails = {
     managerConfirmation: new ManagerConfirmationEmail(),
     managerBookingUpdated: new ManagerBookingUpdatedEmail(),
     managerBookingCancelled: new ManagerBookingDeletedEmail(),
+    managerDataAccess: new ManagerDataAccessEmail()
 }
 
-export type emails = typeof emails
+export type EmailsType = typeof emails
 
-export function getEmailTemplate(name: keyof emails) {
+export function getEmailTemplate<T extends keyof EmailsType>(name: T): EmailsType[T] {
     return emails[name]
 }

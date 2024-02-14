@@ -3,15 +3,16 @@ import { lambda_wrapper_json } from '../../../lambda-common/lambda_wrappers.js';
 import { EventType, RoleType, UserType, table } from '../../../lambda-common/onetable.js';
 import { CanCreateRole } from '../../../shared/permissions.js';
 import { admin, auth } from '@googleapis/admin';
+import { queueEmail } from '../../../lambda-common/email.js';
 
 const EventModel = table.getModel<EventType>('Event')
-const RoleModel = table.getModel<RoleType>('Role')
+const RoleModel: Model<RoleType> = table.getModel<RoleType>('Role')
 const UserModel: Model<UserType> = table.getModel<UserType>('User')
 
 export const lambdaHandler = lambda_wrapper_json(
     async (lambda_event, config, current_user) => {
         const event = await EventModel.get({ id: lambda_event.pathParameters?.id })
-        if (event) {
+        if (current_user && event) {
             CanCreateRole.throw({ user: current_user, event: event, role: lambda_event.body.role })
 
             if (event.bigCampMode) {
@@ -40,6 +41,15 @@ export const lambdaHandler = lambda_wrapper_json(
             }
 
             const role = await RoleModel.create(lambda_event.body.role)
+
+            if(role.role !== "Book") {
+                await queueEmail({
+                    template: "managerDataAccess",
+                    recipient: current_user,
+                    event: event as EventType,
+                }, config)
+            }
+
             return {}
         } else {
             throw new Error("Can't find event")
