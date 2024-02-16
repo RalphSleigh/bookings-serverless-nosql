@@ -86,8 +86,8 @@ function bookingGroupContactFields({ data, update }: { data: Partial<JsonBooking
     return <>
         <Typography variant="h6" mt={2}>{`Your details`}</Typography>
         <TextField fullWidth sx={{ mt: 2 }} required id="outlined-required" label="Your Name" value={data?.contactName || ''} onChange={updateField('contactName')} />
-        <TextField fullWidth sx={{ mt: 2 }} required id="outlined-required" label="Your email" value={data?.contactEmail || ''} onChange={updateField('contactEmail')} />
-        <TextField fullWidth sx={{ mt: 2 }} required id="outlined-required" label="Phone Number" value={data?.contactPhone || ''} onChange={updateField('contactPhone')} />
+        <TextField fullWidth sx={{ mt: 2 }} required id="outlined-required" type="email" label="Your email" value={data?.contactEmail || ''} onChange={updateField('contactEmail')} />
+        <TextField fullWidth sx={{ mt: 2 }} required id="outlined-required" type="tel" label="Phone Number" value={data?.contactPhone || ''} onChange={updateField('contactPhone')} />
         <TextField fullWidth sx={{ mt: 2 }} required id="outlined-required" label="District" value={data?.district || ''} onChange={updateField('district')} />
     </>
 }
