@@ -4,7 +4,7 @@ import React from "react";
 import { GridColDef } from "@mui/x-data-grid";
 import { JsonParticipantWithExtraType } from "./computedDataTypes.js";
 import { parseDate } from "./util.js";
-import { differenceInYears } from "date-fns";
+import { differenceInYears, formatDistanceToNow } from "date-fns";
 import { getAgeGroup } from "./woodcraft.js";
 
 abstract class Field {
@@ -127,12 +127,22 @@ class Created extends Field {
     value (participant: JsonParticipantWithExtraType) {
         return new Date(participant.created)
     }
+
+    dataGridCellRenderer(params: any): ReactNode {
+        const value = this.value(params.value)
+        return <>{formatDistanceToNow(value)} ago</>
+    }
 }
 
 class Updated extends Field {
     fieldName = "Updated"
     value (participant: JsonParticipantWithExtraType) {
-        return participant.updated
+        return new Date(participant.updated)
+    }
+
+    dataGridCellRenderer(params: any): ReactNode {
+        const value = this.value(params.value)
+        return <>{formatDistanceToNow(value)} ago</>
     }
 }
 

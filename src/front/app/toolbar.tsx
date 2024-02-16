@@ -28,7 +28,7 @@ export function AppToolbar(props) {
                 <Link underline="hover" variant="h6" color="inherit" href="/">
                     {window.location.hostname}
                 </Link>
-            <Box sx={{ flexGrow: 1 }} />
+            <Box sx={{ flexGrow: 1, flexShrink: 1 }} />
             <UserStatus />
             <IconButton sx={{ ml: 1 }} onClick={colourMode.toggleColorMode} color="inherit">
                 {theme.palette.mode === 'dark' ? <Brightness7 /> : <Brightness4 />}
