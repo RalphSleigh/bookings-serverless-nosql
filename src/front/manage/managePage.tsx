@@ -39,7 +39,7 @@ export function Component() {
 
     return <Grid container spacing={0}>
         <Grid xs={12} item>
-            <Tabs value={!location.pathname.endsWith("manage") ? location.pathname : participantPath.pathname}>
+            <Tabs value={!location.pathname.endsWith("manage") ? location.pathname : participantPath.pathname} variant="scrollable" scrollButtons="auto" allowScrollButtonsMobile>
                 <Tab label="Participants" value={participantPath.pathname} href={participantPath.pathname} component={Link} />
                 <Tab label="Bookings" value={bookingsPath.pathname} href={bookingsPath.pathname} component={Link} />
                 <Tab label="KP" value={kpPath.pathname} href={kpPath.pathname} component={Link} />
