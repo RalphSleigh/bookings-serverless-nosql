@@ -10,7 +10,7 @@ export function UserStatus(props) {
     if (user) {
         return <>
             <Link underline="hover" href="/user" color="inherit">
-                <Typography variant="body1">{user.userName ?? ''}</Typography>
+                <Typography variant="body1">{user.userName?.replaceAll(" ", '\xa0') ?? ''}</Typography>
             </Link>
             <RouterLink to="/user" style={{textDecoration:"none"}}>
                 <Avatar imgProps={{ referrerPolicy: "no-referrer" }} sx={{ width: 28, height: 28, ml: 1, boxShadow: 20 }} alt={user?.userName ?? undefined} src={user.picture || "/nope.jpg"} />
