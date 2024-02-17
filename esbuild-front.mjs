@@ -19,5 +19,8 @@ await esbuild.build({
     '.svg': 'dataurl',
     '.gif': 'dataurl',
   },
-  watch: false
+  watch: false,
+  define: {
+    'BUILDATE': `"${format(new Date(),'LLL do kk:mm')}"`
+  },
 })

@@ -1,4 +1,5 @@
 import * as esbuild from 'esbuild'
+import { format } from 'date-fns'
 
 await esbuild.build({
   entryPoints: ['src/front/index.tsx'],
@@ -19,5 +20,8 @@ await esbuild.build({
     '.svg': 'dataurl',
     '.gif': 'dataurl',
   },
-  watch: true
+  watch: true,
+  define: {
+    'BUILDATE': `"${format(new Date(),'LLL do kk:mm')}"`
+  },
 })
