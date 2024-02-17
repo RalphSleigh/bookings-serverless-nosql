@@ -57,7 +57,7 @@ export function BookingForm({ data, event, user, update, submit, mode, deleteBoo
                         >
                             <span>Submit</span>
                         </LoadingButton>
-                        {mode === "edit" ? <><Button variant="contained" color="error" disabled={deleteLock || deleteLoading} onClick={deleteBooking} startIcon={<Delete />}>Cancel Booking</Button>
+                        {mode === "edit" ? <><LoadingButton loading={deleteLoading} variant="contained" color="error" disabled={deleteLock} onClick={deleteBooking} startIcon={<Delete />}>Cancel Booking</LoadingButton>
                             <IconButton color="warning" onClick={() => setDeleteLock(!deleteLock)}>{deleteLock ? <Lock /> : <LockOpen />}</IconButton></> : null}
                     </Stack>
                 </form>

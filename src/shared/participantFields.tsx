@@ -1,17 +1,21 @@
 import { ReactNode } from "react";
 import { EventType, JsonEventType, JsonParticipantType, JsonUserResponseType, JsonUserType, OnetableEventType, ParticipantType, RoleType, UserResponseType, UserWithRoles } from "../lambda-common/onetable.js";
 import React from "react";
-import { GridColDef } from "@mui/x-data-grid";
+import { GridColDef, GridColumnVisibilityModel } from "@mui/x-data-grid";
 import { JsonParticipantWithExtraType } from "./computedDataTypes.js";
 import { parseDate } from "./util.js";
 import { differenceInYears, formatDistanceToNow } from "date-fns";
 import { getAgeGroup } from "./woodcraft.js";
+import { useMediaQuery, useTheme } from "@mui/material";
 
 abstract class Field {
     event: any;
     abstract fieldName: string
     roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "Money", "KP"]
     defaultValue: string = "N/A"
+
+    visbileMobile: boolean = true
+    visibleDesktop: boolean = true
 
     constructor(event: JsonEventType | OnetableEventType) {
         this.event = event
@@ -94,6 +98,7 @@ class Diet extends Field {
 
 class AddtionalDiet extends Field {
     fieldName = "Additional Diet"
+    visbileMobile = false
     defaultValue = ""
     value (participant: JsonParticipantWithExtraType | ParticipantType) {
         return participant.kp?.details
@@ -102,6 +107,7 @@ class AddtionalDiet extends Field {
 
 class Photo extends Field {
     fieldName = "Photo"
+    visbileMobile = false
     roles: Array<RoleType["role"]> = ["Owner", "Manage", "View"]
     value (participant: JsonParticipantWithExtraType) {
         return participant.consent?.photo
@@ -115,6 +121,7 @@ class Photo extends Field {
 
 class Medical extends Field {
     fieldName = "Medical"
+    visbileMobile = false
     roles: Array<RoleType["role"]> = ["Owner", "Manage"]
     defaultValue = ""
     value (participant: JsonParticipantWithExtraType) {
@@ -124,6 +131,7 @@ class Medical extends Field {
 
 class Created extends Field {
     fieldName = "Created"
+    visbileMobile = false
     value (participant: JsonParticipantWithExtraType) {
         return new Date(participant.created)
     }
@@ -136,6 +144,7 @@ class Created extends Field {
 
 class Updated extends Field {
     fieldName = "Updated"
+    visbileMobile = false
     value (participant: JsonParticipantWithExtraType) {
         return new Date(participant.updated)
     }
@@ -184,5 +193,14 @@ export class ParticipantFields {
 
     getCSVValues(participant: JsonParticipantWithExtraType | ParticipantType, user) {
         return this.fields.filter(f => f.enabled() && f.permission(user)).map(f => f.csvCellValue(participant))
+    }
+
+    getDefaultColumnVisibility(user: JsonUserType | UserResponseType): GridColumnVisibilityModel {
+        const theme = useTheme()
+        const wide = useMediaQuery(theme.breakpoints.up('xs'))
+        return this.fields.reduce((acc, f) => {
+            acc[f.fieldName] = wide ? f.visibleDesktop : f.visbileMobile
+            return acc
+        }, {})
     }
 }

@@ -1,4 +1,4 @@
-import { CircularProgress } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 import React from "react";
 
 export function SuspenseWrapper(props) {
@@ -8,5 +8,5 @@ export function SuspenseWrapper(props) {
 }
 
 function Loader() {
-    return <CircularProgress />
+    return <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}><CircularProgress /></Box>
 }

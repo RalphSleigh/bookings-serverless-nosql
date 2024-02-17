@@ -4,7 +4,7 @@ import { JsonEventType, JsonParticipantType, JsonUserResponseType } from "../../
 import { managePageContext } from "./managePage.js";
 import { Box, Button, Grid, Modal, Paper, Typography } from "@mui/material";
 import { ParticipantFields } from "../../shared/participantFields.js";
-import { DataGrid, GridCallbackDetails, GridRowParams, MuiEvent } from "@mui/x-data-grid";
+import { DataGrid, GridCallbackDetails, GridColumnVisibilityModel, GridRowParams, MuiEvent } from "@mui/x-data-grid";
 import { JsonParticipantWithExtraType } from "../../shared/computedDataTypes.js";
 import { UserContext } from "../user/userContext.js";
 import { format } from "date-fns";
@@ -22,7 +22,12 @@ export function Component() {
         return [...a, ...c.participants]
     }, [])
 
-    const columns = new ParticipantFields(event).getColumnDefs(user)
+    const fields = new ParticipantFields(event)
+
+    const columns = fields.getColumnDefs(user)
+
+    const [columnVisibilityModel, setColumnVisibilityModel] =
+        React.useState<GridColumnVisibilityModel>(fields.getDefaultColumnVisibility(user));
 
     const rows = useMemo(() => participants.map((p, i) => {
         return { participant: p, id: i }
@@ -35,7 +40,16 @@ export function Component() {
     return <Grid xs={12} p={2} item>
         <Button variant="contained" onClick={() => saveCSV(event, user, participants)}>Download CSV</Button>
         <ParticipantModal selectedParticipant={selectedParticipant} participant={typeof selectedParticipant == "number" ? participants[selectedParticipant] : undefined} handleClose={() => setSelectedParticipant(undefined)} />
-        <DataGrid rowSelection={false} pageSizeOptions={[100]} rows={rows} columns={columns} onRowClick={onRowClick} getRowClassName={(params) => `participant-row-deleted-${params.row.participant.booking.deleted}`}/>
+        <DataGrid 
+        rowSelection={false} 
+        pageSizeOptions={[100]} 
+        rows={rows} 
+        columns={columns} 
+        onRowClick={onRowClick}
+        columnVisibilityModel={columnVisibilityModel}
+        onColumnVisibilityModelChange={(newModel) =>
+            setColumnVisibilityModel(newModel)}
+        getRowClassName={(params) => `participant-row-deleted-${params.row.participant.booking.deleted}`} />
     </Grid>
 }
 
@@ -51,7 +65,7 @@ const ParticipantModal = ({ selectedParticipant, participant, handleClose }: { s
 
     if (!participant) return null
 
-    const noWrap = { whiteSpace: 'nowrap' as 'nowrap', mt:1 }
+    const noWrap = { whiteSpace: 'nowrap' as 'nowrap', mt: 1 }
     const capitalizeWord = (word: string) => {
         return word.charAt(0).toUpperCase() + word.slice(1);
     };
@@ -80,8 +94,8 @@ const ParticipantModal = ({ selectedParticipant, participant, handleClose }: { s
                 </Grid>
                 <Grid item xs={12} sm>
                     <Typography variant="body1" sx={noWrap}><b>Diet: </b>{capitalizeWord(participant.kp?.diet!)}</Typography>
-                    <Typography variant="body1" sx={{mt: 2}}><b>Additional&nbsp;Dietary&nbsp;Requirements:</b><br />{participant.kp?.details}</Typography>
-                    <Typography variant="body1" sx={{mt: 2}}><b>Medical:</b><br />{participant.medical?.details}</Typography>
+                    <Typography variant="body1" sx={{ mt: 2 }}><b>Additional&nbsp;Dietary&nbsp;Requirements:</b><br />{participant.kp?.details}</Typography>
+                    <Typography variant="body1" sx={{ mt: 2 }}><b>Medical:</b><br />{participant.medical?.details}</Typography>
                 </Grid>
             </Grid>
         </Paper>
@@ -94,6 +108,6 @@ function saveCSV(event: JsonEventType, user: JsonUserResponseType, participants:
     const values = participants.map(p => fields.getCSVValues(p, user))
 
     const csvData = stringify([headers, ...values])
-    const filename  = `${event.name}-Participants-${format(new Date(), 'yyyy-MM-dd')}.csv`
+    const filename = `${event.name}-Participants-${format(new Date(), 'yyyy-MM-dd')}.csv`
     save(new TextEncoder().encode(csvData), filename)
 }

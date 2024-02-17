@@ -100,7 +100,7 @@ export function useCreateBooking(event) {
         {
             mutationFn: async data => (await axios.post('/api/booking/create', { booking: data })).data,
             onSuccess: () => {
-                queryClient.invalidateQueries({
+                queryClient.resetQueries({
                     queryKey: ['user', 'bookings']
                 })
                 queryClient.invalidateQueries({
