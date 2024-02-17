@@ -197,7 +197,7 @@ export class ParticipantFields {
 
     getDefaultColumnVisibility(user: JsonUserType | UserResponseType): GridColumnVisibilityModel {
         const theme = useTheme()
-        const wide = !useMediaQuery(theme.breakpoints.up('sm'))
+        const wide = useMediaQuery(theme.breakpoints.up('sm'))
         return this.fields.reduce((acc, f) => {
             acc[f.fieldName] = wide ? f.visibleDesktop : f.visbileMobile
             return acc
