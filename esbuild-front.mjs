@@ -1,4 +1,5 @@
 import * as esbuild from 'esbuild'
+import { format } from 'date-fns'
 
 await esbuild.build({
   entryPoints: ['src/front/index.tsx'],
