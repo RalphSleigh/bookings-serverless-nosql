@@ -5,7 +5,6 @@ resource "aws_backup_vault" "bookings_backup_vault" {
 
 resource "aws_backup_vault_lock_configuration" "test" {
   backup_vault_name   = aws_backup_vault.bookings_backup_vault.name
-  changeable_for_days = 3
   max_retention_days  = 1200
   min_retention_days  = 29
 }
