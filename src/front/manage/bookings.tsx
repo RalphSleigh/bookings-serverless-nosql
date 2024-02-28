@@ -2,9 +2,9 @@ import React, { useCallback, useContext, useMemo } from "react";
 import { useOutletContext } from "react-router-dom";
 import { JsonEventType, JsonParticipantType, JsonUserResponseType } from "../../lambda-common/onetable.js";
 import { managePageContext } from "./managePage.js";
-import { Button, Grid, Modal, Paper, Typography } from "@mui/material";
+import { Button, Grid, MenuItem, Modal, Paper, Typography } from "@mui/material";
 import { ParticipantFields } from "../../shared/participantFields.js";
-import { DataGrid, GridCallbackDetails, GridRowParams, MuiEvent } from "@mui/x-data-grid";
+import { DataGrid, GridCallbackDetails, GridExportMenuItemProps, GridPrintExportMenuItem, GridRowParams, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarDensitySelector, GridToolbarExportContainer, GridToolbarFilterButton, MuiEvent } from "@mui/x-data-grid";
 import { JsonBookingWithExtraType, JsonParticipantWithExtraType } from "../../shared/computedDataTypes.js";
 import { UserContext } from "../user/userContext.js";
 import { BookingFields } from "../../shared/bookingFields.js";
@@ -28,12 +28,46 @@ export function Component() {
     }, [bookings])
 
     return <Grid xs={12} p={2} item>
-        <Button variant="contained" onClick={() => saveCSV(event, user, bookings)}>Download CSV</Button>
         <BookingsModal selectedBooking={selectedBooking} booking={typeof selectedBooking == "number" ? bookings[selectedBooking] : undefined} handleClose={() => setSelectedBooking(undefined)} />
-        <DataGrid rowSelection={false} pageSizeOptions={[100]} rows={rows} columns={columns} onRowClick={onRowClick} getRowClassName={(params) => `participant-row-deleted-${params.row.booking.deleted}`} />
+        <DataGrid rowSelection={false}
+            pageSizeOptions={[100]}
+            rows={rows}
+            columns={columns}
+            onRowClick={onRowClick}
+            getRowClassName={(params) => `participant-row-deleted-${params.row.booking.deleted}`}
+            slots={{ toolbar: CustomToolbar(() => saveCSV(event, user, bookings)) }} />
     </Grid>
 
 }
+
+const CustomToolbar = (saveCSV) => () => {
+    return (
+        <GridToolbarContainer>
+            <GridToolbarColumnsButton />
+            <GridToolbarFilterButton />
+            <GridToolbarDensitySelector />
+            <GridToolbarExportContainer>
+                <GridPrintExportMenuItem />
+                <CSVExportMenuItem saveCSV={saveCSV} />
+            </GridToolbarExportContainer>
+        </GridToolbarContainer>
+    );
+}
+
+
+const CSVExportMenuItem: React.FC<GridExportMenuItemProps<{}> & { saveCSV: () => void }> = (props) => {
+    const { hideMenu, saveCSV } = props;
+    return (
+        <MenuItem
+            onClick={() => {
+                saveCSV();
+                hideMenu?.();
+            }}>
+            Export CSV
+        </MenuItem>
+    );
+}
+
 
 const BookingsModal = ({ selectedBooking, booking, handleClose }: { selectedBooking: number | undefined, booking: JsonBookingWithExtraType | undefined, handleClose: () => void }) => {
     if (!booking) return null

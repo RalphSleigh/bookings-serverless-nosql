@@ -2,9 +2,9 @@ import React, { useCallback, useContext, useMemo } from "react";
 import { useOutletContext } from "react-router-dom";
 import { JsonEventType, JsonParticipantType, JsonUserResponseType } from "../../lambda-common/onetable.js";
 import { managePageContext } from "./managePage.js";
-import { Box, Button, Grid, Modal, Paper, Typography } from "@mui/material";
+import { Box, Button, Grid, MenuItem, Modal, Paper, Typography } from "@mui/material";
 import { ParticipantFields } from "../../shared/participantFields.js";
-import { DataGrid, GridCallbackDetails, GridColumnVisibilityModel, GridRowParams, MuiEvent } from "@mui/x-data-grid";
+import { DataGrid, GridCallbackDetails, GridColumnVisibilityModel, GridRowParams, MuiEvent, GridToolbar, GridToolbarContainer, GridToolbarColumnsButton, GridToolbarFilterButton, GridToolbarDensitySelector, GridToolbarExport, GridToolbarExportContainer, GridPrintExportMenuItem, useGridApiContext, GridExportMenuItemProps } from "@mui/x-data-grid";
 import { JsonParticipantWithExtraType } from "../../shared/computedDataTypes.js";
 import { UserContext } from "../user/userContext.js";
 import { format } from "date-fns";
@@ -37,21 +37,51 @@ export function Component() {
         setSelectedParticipant(params.row.id)
     }, [participants])
 
-    return <Grid xs={12} p={2} item>
-        <Button variant="contained" onClick={() => saveCSV(event, user, participants)}>Download CSV</Button>
-        <ParticipantModal selectedParticipant={selectedParticipant} participant={typeof selectedParticipant == "number" ? participants[selectedParticipant] : undefined} handleClose={() => setSelectedParticipant(undefined)} />
-        <DataGrid 
-        rowSelection={false} 
-        pageSizeOptions={[100]} 
-        rows={rows} 
-        columns={columns} 
-        onRowClick={onRowClick}
-        columnVisibilityModel={columnVisibilityModel}
-        onColumnVisibilityModelChange={(newModel) =>
-            setColumnVisibilityModel(newModel)}
-        getRowClassName={(params) => `participant-row-deleted-${params.row.participant.booking.deleted}`} />
-    </Grid>
+    return <>
+        <Grid xs={12} p={2} item>
+            <ParticipantModal selectedParticipant={selectedParticipant} participant={typeof selectedParticipant == "number" ? participants[selectedParticipant] : undefined} handleClose={() => setSelectedParticipant(undefined)} />
+            <DataGrid
+                rowSelection={false}
+                pageSizeOptions={[100]}
+                rows={rows}
+                columns={columns}
+                onRowClick={onRowClick}
+                columnVisibilityModel={columnVisibilityModel}
+                onColumnVisibilityModelChange={(newModel) =>
+                    setColumnVisibilityModel(newModel)}
+                getRowClassName={(params) => `participant-row-deleted-${params.row.participant.booking.deleted}`}
+                slots={{ toolbar: CustomToolbar(() => saveCSV(event, user, participants)) }} />
+        </Grid></>
 }
+
+const CustomToolbar = (saveCSV) => () => {
+    return (
+        <GridToolbarContainer>
+            <GridToolbarColumnsButton />
+            <GridToolbarFilterButton />
+            <GridToolbarDensitySelector />
+            <GridToolbarExportContainer>
+                <GridPrintExportMenuItem />
+                <CSVExportMenuItem saveCSV={saveCSV} />
+            </GridToolbarExportContainer>
+        </GridToolbarContainer>
+    );
+}
+
+
+const CSVExportMenuItem: React.FC<GridExportMenuItemProps<{}> & { saveCSV: () => void }> = (props) => {
+    const { hideMenu, saveCSV } = props;
+    return (
+        <MenuItem
+            onClick={() => {
+                saveCSV();
+                hideMenu?.();
+            }}>
+            Export CSV
+        </MenuItem>
+    );
+}
+
 
 const ParticipantModal = ({ selectedParticipant, participant, handleClose }: { selectedParticipant: number | undefined, participant: JsonParticipantWithExtraType | undefined, handleClose: () => void }) => {
     const style = {
