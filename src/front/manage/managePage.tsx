@@ -23,6 +23,7 @@ export function Component() {
     const rolesPath = useResolvedPath('roles')
     const moneyPath = useResolvedPath('money')
 
+    const [displayAdvanced, setDisplayAdvanced] = React.useState<boolean>(false)
     const [displayDeleted, setDisplayDeleted] = React.useState<boolean>(false)
     const [participantSearch, debouncedParticipantSearch, setParticipantSearch] = useDebounceState<string>("", 500)
     const [bookingSearch, debouncedBookingSearch, setBookingSearch] = useDebounceState<string>("", 500)
@@ -37,7 +38,7 @@ export function Component() {
 
     const Loader = timeline.latest ? MemoLatestDataLoader : MemoTimeLineDataLoader
 
-    return <Grid container spacing={0}>
+    return <><Grid container spacing={0}>
         <Grid xs={12} item>
             <Tabs value={!location.pathname.endsWith("manage") ? location.pathname : participantPath.pathname} variant="scrollable" scrollButtons="auto">
                 <Tab label="Participants" value={participantPath.pathname} href={participantPath.pathname} component={Link} />
@@ -47,24 +48,28 @@ export function Component() {
                 <PermissionTab user={user} event={event} permission={CanSeeMoneyPage} label="Money" value={moneyPath.pathname} href={moneyPath.pathname} component={Link} />
             </Tabs>
         </Grid>
-        {shouldShowSearch(location) ? <Grid xs={12} p={2} item sx={{displayPrint:"none"}}>
-            <FormControlLabel sx={{ float: "right" }} control={<Switch checked={displayDeleted} onChange={() => setDisplayDeleted(!displayDeleted)} />} label="Show Cancelled" />
-            <SyncWidget user={user} />
+        </Grid>
+        <Grid container spacing={2} p={2}>
+        {shouldShowSearch(location) ? <><Grid xs={12} item sx={{ displayPrint: "none" }}>
+            <FormControlLabel sx={{ float: "right" }} control={<Switch checked={displayAdvanced} onChange={() => setDisplayAdvanced(!displayAdvanced)} />} label="Advanced" />
             <TextField sx={{ mr: 1, mt: 1 }} size="small" margin="dense" label="Participant search" value={participantSearch} onChange={updateParticipantSearch} />
             <TextField sx={{ mr: 1, mt: 1 }} size="small" margin="dense" label="Booking search" value={bookingSearch} onChange={updateBookingSearch} />
-            <ButtonGroup variant="outlined" sx={{ mr: 1, mt: 1 }} aria-label="outlined button group">
-                <Button disabled={timeline.backEnabled} onClick={timeline.backFn}>{'<'}</Button>
-                <Button>{timeline.position.time}</Button>
-                <Button disabled={timeline.forwardEnabled} onClick={timeline.forwardFn}>{'>'}</Button>
-                <Button disabled={timeline.forwardEnabled} onClick={timeline.toLatest}>{'>>'}</Button>
-            </ButtonGroup>
-
-        </Grid> : null}
+        </Grid>
+            {displayAdvanced ? <Grid xs={12} item sx={{ displayPrint: "none" }}>
+                <FormControlLabel sx={{ float: "right" }} control={<Switch checked={displayDeleted} onChange={() => setDisplayDeleted(!displayDeleted)} />} label="Show Cancelled" />
+                <SyncWidget user={user} />
+                <ButtonGroup variant="outlined" sx={{ mr: 1 }} aria-label="outlined button group">
+                    <Button disabled={timeline.backEnabled} onClick={timeline.backFn}>{'<'}</Button>
+                    <Button>{timeline.position.time}</Button>
+                    <Button disabled={timeline.forwardEnabled} onClick={timeline.forwardFn}>{'>'}</Button>
+                    <Button disabled={timeline.forwardEnabled} onClick={timeline.toLatest}>{'>>'}</Button>
+                </ButtonGroup>
+            </Grid> : null}</> : null}
 
         <SuspenseWrapper>
-                <Loader event={event} timeline={timeline} displayDeleted={displayDeleted} participantSearch={debouncedParticipantSearch} bookingSearch={debouncedBookingSearch} />
+            <Loader event={event} timeline={timeline} displayDeleted={displayDeleted} participantSearch={debouncedParticipantSearch} bookingSearch={debouncedBookingSearch} />
         </SuspenseWrapper>
-    </Grid >
+    </Grid ></>
 }
 
 function shouldShowSearch(location) {
