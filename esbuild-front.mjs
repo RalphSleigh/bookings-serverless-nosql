@@ -19,6 +19,7 @@ await esbuild.build({
     '.ttf': 'dataurl',
     '.svg': 'dataurl',
     '.gif': 'dataurl',
+    '.css': 'local-css',
   },
   watch: false,
   define: {
