@@ -5,7 +5,7 @@ import { EnsureHasPermission } from "../permissions.js";
 import { CanEditOwnBooking } from "../../shared/permissions.js";
 import { UserContext } from "../user/userContext.js";
 import { ThanksPage } from "./thanks.js";
-import { addComputedFieldsToBookingsQueryResult } from "../util.js";
+import { addComputedFieldsToBookingsQueryResult } from "../../shared/util.js";
 
 export function ThanksLoader({ }) {
     const user = useContext(UserContext)

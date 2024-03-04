@@ -6,12 +6,12 @@ import { useEvents, useUsersBookings } from "../queries.js";
 import { isSameMonth, format, parseISO, add } from "date-fns";
 import { CanEditEvent, CanEditOwnBooking, CanManageEvent, IsGlobalAdmin } from "../../shared/permissions.js";
 import { IfHasPermission } from "../permissions.js";
-import { addComputedFieldsToBookingsQueryResult, toLocalDate } from "../util.js";
+import { toLocalDate } from "../util.js";
 import { UserContext } from "../user/userContext.js";
 import { Link as RouterLink } from 'react-router-dom'
 import Markdown from 'react-markdown'
 import { getFee } from "../../shared/fee/fee.js";
-import { parseDate } from "../../shared/util.js";
+import { addComputedFieldsToBookingsQueryResult, parseDate } from "../../shared/util.js";
 
 
 export function EventList(props) {

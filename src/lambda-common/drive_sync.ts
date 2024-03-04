@@ -8,6 +8,7 @@ import { ConfigType } from "./config.js"
 import { log } from "./logging.js"
 import am_in_lambda from "./am_in_lambda.js"
 import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs"
+import { addComputedFieldsToBookingsQueryResult } from "../shared/util.js"
 
 const EventModel = table.getModel<OnetableEventType>('Event')
 const RoleModel = table.getModel<RoleType>('Role')
@@ -43,19 +44,19 @@ async function triggerDriveSyncSQS(eventId: string) {
     await sqsClient.send(command);
 }
 
-
 export async function syncEventToDrive(eventId, config) {
     const event = await EventModel.get({ id: eventId })
     const roles = await RoleModel.find({ sk: { begins: eventId } })
     const users = await UserModel.scan()
     const bookings = await BookingModel.find({ sk: { begins: `event:${eventId}:version` } }) as BookingType[]
+    const betterBookings = addComputedFieldsToBookingsQueryResult(bookings, event)
     if (event) {
         for (const user of users) {
             if (!user.tokens) continue
             const userRoles = roles.filter(r => r.userId === user.id)
             if (userRoles.length > 0) {
                 const fullUser: UserWithRoles = { roles: userRoles, ...user }
-                const filtered = filterDataByRoles(event, bookings, fullUser)
+                const filtered = filterDataByRoles(event, betterBookings, fullUser)
                 const participants = getParticipantRecords(filtered)
                 try {
                     await syncToDrive(event, fullUser, participants, config)

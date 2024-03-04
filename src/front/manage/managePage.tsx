@@ -7,9 +7,10 @@ import { JsonBookingType, JsonEventType, JsonUserResponseType } from "../../lamb
 import { SuspenseWrapper } from "../suspense.js";
 import { UserContext } from "../user/userContext.js";
 import { CanCreateAnyRole, CanSeeMoneyPage } from "../../shared/permissions.js";
-import { addComputedFieldsToBookingsQueryResult, bookingsBookingSearch, bookingsParticipantSearch, useDebounceState } from "../util.js";
+import { bookingsBookingSearch, bookingsParticipantSearch, useDebounceState } from "../util.js";
 import { JsonBookingWithExtraType } from "../../shared/computedDataTypes.js";
 import { ReactErrorBoundary } from "../app/errors.js";
+import { addComputedFieldsToBookingsQueryResult } from "../../shared/util.js";
 
 export function Component() {
     const { event, timeline } = useOutletContext<manageLoaderContext>()

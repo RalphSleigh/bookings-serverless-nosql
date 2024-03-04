@@ -1,11 +1,27 @@
-import { parseISO } from "date-fns"
+import { differenceInYears, parseISO } from "date-fns"
 import React from "react"
+import { getAgeGroup } from "./woodcraft.js"
+import { JsonBookingWithExtraType, JsonParticipantWithExtraType } from "./computedDataTypes.js"
+import { JsonBookingType, JsonEventType, JsonParticipantType } from "../lambda-common/onetable.js"
 
 export function parseDate(date: Date | string | undefined): Date | null {
     if(!date) return null
     if(date instanceof Date) return date
     return parseISO(date)
 }
+
+const addComputedFieldToParticipant = (booking, startDate) => (p: JsonParticipantType): JsonParticipantWithExtraType => {
+    const age = differenceInYears(startDate, parseDate(p.basic.dob)!)
+    return {...p, age, ageGroup: getAgeGroup(age), booking}
+}
+
+export function addComputedFieldsToBookingsQueryResult(bookings: [JsonBookingType], event: JsonEventType): JsonBookingWithExtraType[] {
+    const startDate = parseDate(event.startDate)!
+    return bookings.map(b => {
+        return {...b, participants: b.participants.map(addComputedFieldToParticipant(b, startDate))}
+    }) as [JsonBookingWithExtraType]
+}
+
 
 export function getMemoUpdateFunctions(update) {
     return React.useMemo(() => ({
