@@ -6,7 +6,7 @@ resource "aws_s3_bucket" "lambda_code" {
   }
 }
 
-resource "aws_s3_bucket_ownership_controls" "example" {
+resource "aws_s3_bucket_ownership_controls" "lambda_code_controls" {
   bucket = aws_s3_bucket.lambda_code.id
 
   rule {
@@ -27,7 +27,7 @@ resource "aws_s3_bucket" "public_static" {
   }
 }
 
-resource "aws_s3_bucket_ownership_controls" "example" {
+resource "aws_s3_bucket_ownership_controls" "public_static_controls" {
   bucket = aws_s3_bucket.public_static.id
 
   rule {
