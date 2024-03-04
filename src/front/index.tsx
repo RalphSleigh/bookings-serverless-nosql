@@ -3,6 +3,13 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
+import '@fontsource/quicksand'
+import "@fontsource/quicksand/300.css"
+import "@fontsource/quicksand/400.css"
+import "@fontsource/quicksand/500.css"
+import "@fontsource/quicksand/700.css"
+
+
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 

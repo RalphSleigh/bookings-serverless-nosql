@@ -23,7 +23,7 @@ export function AppToolbar(props) {
                         mr: 1
                     }}
                     alt="Logo"
-                    src="/logoonly.png"
+                    src="/100logo.png"
                 />
                 <Link sx={{ flexShrink: 1, minWidth: 0, overflow: 'hidden' }} noWrap={true} underline="hover" variant="h6" color="inherit" href="/">
                     {window.location.hostname}

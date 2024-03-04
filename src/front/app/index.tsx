@@ -133,7 +133,19 @@ const LinkBehavior = React.forwardRef<
 
 const themeDef = mode => ({
     palette: {
-        mode, ...(mode === "light" ? {} : {
+        mode, ...(mode === "light" ? {
+            type: 'light',
+            primary: {
+                main: '#e9e1ca',
+              },
+              secondary: {
+                main: '#ec722c',
+              },
+              background: {
+                default: '#0f7a5c',
+                paper: '#fff',
+              }}
+          : {
             primary: {
                 main: '#1976d2',
             },
@@ -148,7 +160,10 @@ const themeDef = mode => ({
                 primary: 'rgba(255,255,255,0.9)',
             },
         })
-    }
+    },
+    typography: {
+        fontFamily: 'Quicksand',
+      }, 
 })
 
 export function App() {
