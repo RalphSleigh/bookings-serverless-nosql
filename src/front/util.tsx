@@ -34,18 +34,6 @@ export function UtcDatePicker(props) {
     return <DatePicker value={toLocalDate(value)} onChange={convertOnChange}  {...rest} isRequired />
 }
 
-const addComputedFieldToParticipant = (booking, startDate) => (p: JsonParticipantType): JsonParticipantWithExtraType => {
-    const age = differenceInYears(startDate, parseDate(p.basic.dob)!)
-    return {...p, age, ageGroup: getAgeGroup(age), booking}
-}
-
-export function addComputedFieldsToBookingsQueryResult(bookings: [JsonBookingType], event: JsonEventType): JsonBookingWithExtraType[] {
-    const startDate = parseDate(event.startDate)!
-    return bookings.map(b => {
-        return {...b, participants: b.participants.map(addComputedFieldToParticipant(b, startDate))}
-    }) as [JsonBookingWithExtraType]
-}
-
 export function useDebounceState<T>(defaultValue: T, delay: number): [T, T, (T) => void] {
     const [value, setValue] = React.useState(defaultValue)
     const [debouncedValue, setDebouncedValue] = React.useState(defaultValue)
