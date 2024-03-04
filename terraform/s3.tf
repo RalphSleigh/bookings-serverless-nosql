@@ -6,6 +6,14 @@ resource "aws_s3_bucket" "lambda_code" {
   }
 }
 
+resource "aws_s3_bucket_ownership_controls" "example" {
+  bucket = aws_s3_bucket.lambda_code.id
+
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+
 resource "aws_s3_bucket_acl" "private_acl_lambda_code" {
   bucket = aws_s3_bucket.lambda_code.id
   acl    = "private"
@@ -16,6 +24,14 @@ resource "aws_s3_bucket" "public_static" {
 
   tags = {
     Name        = "Public Static Bucket"
+  }
+}
+
+resource "aws_s3_bucket_ownership_controls" "example" {
+  bucket = aws_s3_bucket.public_static.id
+
+  rule {
+    object_ownership = "BucketOwnerPreferred"
   }
 }
 
