@@ -1,5 +1,4 @@
 User-agent: *
-Disallow: /
-
 Allow: /privacy.html
 Allow: /deletion.html
+Disallow: /
