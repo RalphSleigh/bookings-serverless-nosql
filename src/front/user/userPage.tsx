@@ -28,7 +28,7 @@ export function UserPage(props) {
                     <Avatar imgProps={{ referrerPolicy: "no-referrer" }} sx={{ width: 28, height: 28, ml: 1, boxShadow: 20, float: "right" }} alt={user?.userName ?? undefined} src={user.picture || "/nope.jpg"} />
                     <Typography variant="h6">Account details</Typography>
                     <Typography variant="body1">You are logged in via {user?.source}{user.isWoodcraft ? ' with a Woodcraft Folk account' : ''}</Typography>
-                    {user.isWoodcraft ? <Typography variant="body1">You can't edit these are they are set by the Woodcraft Folk directory, so probably want to go <Link to="/">Home</Link></Typography> : <Typography variant="body1">You can update your details here:</Typography>}
+                    {user.isWoodcraft ? <Typography variant="body1">You can't edit these as they are set by the Woodcraft Folk directory, so you probably want to go <Link to="/">Home</Link></Typography> : <Typography variant="body1">You can update your details here:</Typography>}
                     <form>
                         <TextField fullWidth disabled={user.isWoodcraft} sx={{ mt: 2 }} id="outlined" label="Display Name" value={userDetails.userName} onChange={updateField("userName")} />
                         <TextField fullWidth disabled={user.isWoodcraft} sx={{ mt: 2 }} id="outlined" label="Email" value={userDetails.email} onChange={updateField("email")} />
