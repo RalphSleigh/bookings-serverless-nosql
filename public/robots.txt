@@ -2,3 +2,8 @@ user-agent: *
 allow: /privacy.html
 allow: /deletion.html
 disallow: /
+
+user-agent: facebookexternalhit 
+allow: /privacy.html
+allow: /deletion.html
+disallow: /
