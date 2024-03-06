@@ -40,7 +40,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
         const profile = await profile_response.json() as any
 
         try {
-            const user_instance = await get_user_from_login(profile.sub, "yahoo", config, profile.name)
+            const user_instance = await get_user_from_login(profile.sub, "yahoo", config, profile.name, undefined, profile.email)
 
             if (!user_instance) {
                 return {
