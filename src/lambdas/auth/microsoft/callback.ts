@@ -56,7 +56,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
                 return undefined
             })(profile)
 
-            const user_instance = await get_user_from_login(profile.sub, "microsoft", config, name)
+            const user_instance = await get_user_from_login(profile.sub, "microsoft", config, name, undefined, profile.email)
 
             if (!user_instance) {
                 return {

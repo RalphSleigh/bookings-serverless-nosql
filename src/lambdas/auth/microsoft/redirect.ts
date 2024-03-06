@@ -15,7 +15,7 @@ import { auth } from '@googleapis/plus'
 export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => { //@ts-ignore
     return lambda_wrapper_raw(async (config) => {
 
-        const url = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=${config.MICROSOFT_CLIENT_ID}&response_type=code&redirect_uri=${config.BASE_URL}api/auth/microsoft/callback&response_mode=query&scope=openid profile&state=12345`
+        const url = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=${config.MICROSOFT_CLIENT_ID}&response_type=code&redirect_uri=${config.BASE_URL}api/auth/microsoft/callback&response_mode=query&scope=openid profile email&state=12345`
 
         return {
             statusCode: 301,
