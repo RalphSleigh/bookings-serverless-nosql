@@ -19,6 +19,7 @@ import appleSignin from 'apple-signin-auth';
 
 export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => { //@ts-ignore
     return lambda_wrapper_raw(async (config) => {
+        console.log(event.body)
         const data = JSON.parse(event.body!)
 
         const clientSecret = appleSignin.getClientSecret({
