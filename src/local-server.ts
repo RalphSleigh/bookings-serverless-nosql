@@ -13,7 +13,7 @@ const __dirname = urllib.fileURLToPath(new URL('.', import.meta.url));
 const app = express()
 app.use(express.text())
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.text({ type: 'application/x-www-form-urlencoded' }));
 
 const handlerSetup = (url: string, lambda_path: string, method: string = "GET") => {
 
@@ -35,7 +35,7 @@ const handlerSetup = (url: string, lambda_path: string, method: string = "GET") 
         timeoutMs: 60000,
         event: {
           headers: req.headers, // Pass on request headers
-          body: JSON.stringify(req.body), // Pass on request body
+          body: typeof req.body == "string" ? req.body : JSON.stringify(req.body), // Pass on request body
           queryStringParameters: req.query,
           pathParameters: bits
         },
