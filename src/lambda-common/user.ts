@@ -36,7 +36,7 @@ export async function get_user_from_event(event: APIGatewayProxyEvent, config): 
     }
 }
 
-export async function get_user_from_login(id: string, source: UserType["source"], config, displayName: string | undefined, picture: string | undefined = undefined) {
+export async function get_user_from_login(id: string, source: UserType["source"], config, displayName: string | undefined, picture: string | undefined = undefined, email: string | undefined = undefined): Promise<UserType & { new: boolean }> {
     if (typeof id !== 'string') throw new Error("No ID from provider");
     const combinedId = source + id;
     const UserModel = table.getModel<UserType>('User')
@@ -49,7 +49,6 @@ export async function get_user_from_login(id: string, source: UserType["source"]
     }
 
     let isWoodcraft = false
-    let email: string | undefined = undefined
     if (source === "google") {
         const auth_client = new auth.JWT(
             config.EMAIL_CLIENT_EMAIL,

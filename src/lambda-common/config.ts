@@ -2,6 +2,10 @@ import { DynamoDBClient, GetItemCommand, ScanCommand } from '@aws-sdk/client-dyn
 import { unmarshall } from '@aws-sdk/util-dynamodb'
 
 export type ConfigType = {
+  APPLE_CLIENT_ID: string,
+  APPLE_CLIENT_SECRET: string,
+  APPLE_KEY_ID: string,
+  APPLE_TEAM_ID: string,
   BASE_URL: string,
   COOKIE_EXPIRY: number,
   DISCORD_ENABLED: boolean,
