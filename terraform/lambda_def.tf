@@ -298,7 +298,7 @@ variable "lambda_definitions" {
       code   = "auth/facebook/callback"
       path   = "auth/facebook/callback"
       method = "get"
-    }, /*
+    },
     auth_yahoo_redirect = {
       name     = "auth_yahoo_redirect"
       code = "auth/yahoo/redirect"
@@ -322,7 +322,19 @@ variable "lambda_definitions" {
       code = "auth/microsoft/callback"
       path     = "auth/microsoft/callback"
       method   = "get"
-    },*/
+    },
+      auth_apple_redirect = {
+      name     = "auth_apple_redirect"
+      code = "auth/apple/redirect"
+      path     = "auth/apple/redirect"
+      method   = "get"
+    },
+    auth_apple_callback = {
+      name     = "auth_apple_callback"
+      code = "auth/apple/callback"
+      path     = "auth/apple/callback"
+      method   = "post"
+    },
     client_error = {
       name   = "client_error"
       code   = "error/reportError"

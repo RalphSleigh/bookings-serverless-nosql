@@ -121,6 +121,9 @@ handlerSetup('/api/auth/google_drive/callback', 'auth/google_drive/callback')
 handlerSetup('/api/auth/facebook/redirect', 'auth/facebook/redirect')
 handlerSetup('/api/auth/facebook/callback', 'auth/facebook/callback')
 
+handlerSetup('/api/auth/apple/redirect', 'auth/apple/redirect')
+handlerSetup('/api/auth/apple/callback', 'auth/apple/callback', 'POST')
+
 handlerSetup('/api/auth/yahoo/redirect', 'auth/yahoo/redirect')
 handlerSetup('/api/auth/yahoo/callback', 'auth/yahoo/callback')
 
