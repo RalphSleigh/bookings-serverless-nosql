@@ -1,6 +1,6 @@
 import { FormGroup, Grid, Paper, TextField, Typography, Box, Button, FormControlLabel, Switch, MenuItem, Select, FormControl, InputLabel, ButtonGroup, Stack, IconButton } from "@mui/material"
 import React, { useCallback, useContext, useState } from "react";
-import { JsonBookingType, JsonEventType, UserType } from "../../../lambda-common/onetable.js";
+import { JsonBookingType, JsonEventType, UserResponseType, UserType } from "../../../lambda-common/onetable.js";
 import { ParticipantsForm } from "./participants.js";
 import { kp } from "../../../shared/kp/kp.js"
 import { QuickList } from "./quickList.js";
@@ -13,10 +13,11 @@ import { BookingValidationResults, validate } from "./validation.js";
 import { Lock, LockOpen, Delete, Send } from '@mui/icons-material';
 import { getMemoUpdateFunctions } from "../../../shared/util.js";
 import { LoadingButton } from '@mui/lab'
+import { PartialDeep } from "type-fest";
 
 const MemoParticipantsForm = React.memo(ParticipantsForm)
 
-export function BookingForm({ data, event, user, update, submit, mode, deleteBooking, submitLoading, deleteLoading }: { data: Partial<JsonBookingType>, event: JsonEventType, user: UserType, update: React.Dispatch<React.SetStateAction<Partial<JsonBookingType>>>, submit: () => void, mode: "create" | "edit" | "rebook", deleteBooking: any, submitLoading: boolean, deleteLoading: boolean }) {
+export function BookingForm({ data, event, user, update, submit, mode, deleteBooking, submitLoading, deleteLoading }: { data: PartialDeep<JsonBookingType>, event: JsonEventType, user: UserResponseType, update: React.Dispatch<React.SetStateAction<PartialDeep<JsonBookingType>>>, submit: () => void, mode: "create" | "edit" | "rebook", deleteBooking: any, submitLoading: boolean, deleteLoading: boolean }) {
 
     const [permission, updatePermission] = useState({ permission: false })
     const [deleteLock, setDeleteLock] = useState(true)
@@ -34,8 +35,8 @@ export function BookingForm({ data, event, user, update, submit, mode, deleteBoo
     const kpConfig = React.useMemo(() => kp[event.kpMode] || kp.basic, [event]);
 
     const validationResults = validate(event, kpConfig, data, permission.permission)
-    return <Grid container spacing={2} p={2}>
-        <Grid sm={9} xs={12} item>
+    return <Grid container spacing={2} p={2} justifyContent="center">
+        <Grid  xl={6} lg={7} md={8} sm={9} xs={12} item>
             <Box p={2}>
                 <form>
                     <Typography variant="h4">{`Booking for ${event.name}`}</Typography>
@@ -67,7 +68,7 @@ export function BookingForm({ data, event, user, update, submit, mode, deleteBoo
     </Grid>
 }
 
-function bookingIndvidualContactFields({ data, update }: { data: Partial<JsonBookingType>["basic"], update: any }) {
+function bookingIndvidualContactFields({ data, update }: { data: PartialDeep<JsonBookingType>["basic"], update: any }) {
 
     const { updateField } = getMemoUpdateFunctions(update('basic'))
 
@@ -79,7 +80,7 @@ function bookingIndvidualContactFields({ data, update }: { data: Partial<JsonBoo
     </>
 }
 
-function bookingGroupContactFields({ data, update }: { data: Partial<JsonBookingType>["basic"], update: any }) {
+function bookingGroupContactFields({ data, update }: { data: PartialDeep<JsonBookingType>["basic"], update: any }) {
 
     const { updateField } = getMemoUpdateFunctions(update('basic'))
 

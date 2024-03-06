@@ -8,6 +8,7 @@ import { BookingType, EalingFeeEventType, EventType, JsonBookingType, JsonEventT
 import { differenceInYears } from "date-fns";
 import { Markdown as EmailMarkdown } from "@react-email/markdown";
 import { getMemoUpdateFunctions, parseDate } from "../util.js";
+import { PartialDeep } from "type-fest";
 
 const paymentInstructions = `Please make bank transfers to:  
 
@@ -93,7 +94,7 @@ export class Ealing extends FeeStructure {
         </>
     }
 
-    public getFeeLines = (event: JsonEventType | EventType, booking: Partial<JsonBookingType> | BookingType): FeeLine[] => {
+    public getFeeLines = (event: JsonEventType | EventType, booking: PartialDeep<JsonBookingType> | BookingType): FeeLine[] => {
         const feeData = event.feeData as EalingFeeEventType["feeData"]//@ts-ignore
         const validParticipants = booking.participants?.filter(p => (p.basic && p.basic.name && p.basic.dob))
         if (!validParticipants || validParticipants.length == 0) return []
@@ -107,7 +108,7 @@ export class Ealing extends FeeStructure {
         }
     }
 
-    public DescriptionElement = ({ event, booking }: { event: JsonEventType, booking: Partial<JsonBookingType> }) => {
+    public DescriptionElement = ({ event, booking }: { event: JsonEventType, booking: PartialDeep<JsonBookingType> }) => {
 
         const feeData = event.feeData as EalingFeeEventType["feeData"]
         const valueHeaders = this.getValueLabels().map((l, i) => <TableCell component="th" key={i}><b>{l}</b></TableCell>)

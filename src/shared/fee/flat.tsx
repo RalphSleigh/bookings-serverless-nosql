@@ -4,6 +4,7 @@ import React from "react";
 import { AttendanceStructure } from "../attendance/attendanceStructure.js";
 import { Whole } from "../attendance/whole.js";
 import { JsonBookingType, JsonEventType } from "../../lambda-common/onetable.js";
+import { PartialDeep } from "type-fest";
 
 export class Flat extends FeeStructure {
     public feeName = "Flat"
@@ -30,7 +31,7 @@ export class Flat extends FeeStructure {
         </>
     }
 
-    public DescriptionElement = ({ event, booking }: { event: JsonEventType, booking: Partial<JsonBookingType> }) => {
+    public DescriptionElement = ({ event, booking }: { event: JsonEventType, booking: PartialDeep<JsonBookingType> }) => {
         return (<>
             <Typography variant="body2" mt={2}>Ok</Typography>
         </>)

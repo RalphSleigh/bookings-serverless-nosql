@@ -6,14 +6,11 @@ import { EnsureHasPermission } from "../permissions.js";
 import { CanBookIntoEvent } from "../../shared/permissions.js";
 import { BookingType, JsonBookingType, JsonEventType, UserResponseType } from "../../lambda-common/onetable.js";
 import { SnackBarContext, SnackbarDataType } from "../app/toasts.js";
-
-type DeepPartial<T> = T extends object ? {
-    [P in keyof T]?: DeepPartial<T[P]>;
-} : T;
+import { PartialDeep } from "type-fest";
 
 export function CreateBookingPage({ event, user }: { event: JsonEventType, user: UserResponseType }) {
     const createBooking = useCreateBooking(event)
-    const [bookingData, setBookingData] = useState<DeepPartial<JsonBookingType>>({ eventId: event.id, basic: { contactName: user!.userName, contactEmail: user?.email} })
+    const [bookingData, setBookingData] = useState<PartialDeep<JsonBookingType>>({ eventId: event.id, basic: { contactName: user!.userName, contactEmail: user?.email} })
     const setSnackbar = useContext(SnackBarContext)
 
     const submit = useCallback(() => {
