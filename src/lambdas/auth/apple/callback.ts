@@ -7,6 +7,7 @@ import jwt from 'jsonwebtoken'
 import cookie from 'cookie'
 import fetch, { Headers } from 'node-fetch'
 import appleSignin from 'apple-signin-auth';
+import { URLSearchParams } from 'node:url'
 /**
  *
  * Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
@@ -20,7 +21,7 @@ import appleSignin from 'apple-signin-auth';
 export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => { //@ts-ignore
     return lambda_wrapper_raw(async (config) => {
         console.log(event.body)
-        const data = JSON.parse(event.body!)
+        const data = Object.fromEntries(new URLSearchParams(event.body!))
 
         const clientSecret = appleSignin.getClientSecret({
             clientID: config.APPLE_CLIENT_ID,
