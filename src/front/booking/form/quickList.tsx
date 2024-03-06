@@ -2,8 +2,9 @@ import React from "react";
 import { JsonEventType, JsonParticipantType, JsonParticipantWithBasicType } from "../../../lambda-common/onetable.js";
 import { Box, Grid, List, ListItem, Paper, Typography } from "@mui/material";
 import { groupParticipants } from "../../../shared/woodcraft.js";
+import { PartialDeep } from "type-fest";
 
-function QuickListElement({ participants, event }: { participants: Partial<JsonParticipantType>[], event: JsonEventType }) {
+function QuickListElement({ participants, event }: { participants: PartialDeep<JsonParticipantType>[], event: JsonEventType }) {
 
     const wholeParticipants = participants.filter(p => p.basic?.name && p.basic?.dob) as JsonParticipantWithBasicType[]
     const groups = groupParticipants(wholeParticipants, event) 

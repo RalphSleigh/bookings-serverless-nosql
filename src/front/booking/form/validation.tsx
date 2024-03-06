@@ -2,10 +2,11 @@ import React from "react"
 import { JsonBookingType, JsonEventType } from "../../../lambda-common/onetable.js"
 import { Alert, AlertTitle } from "@mui/material"
 import { KpStructure } from "../../../shared/kp/kp_class.js"
+import { PartialDeep } from "type-fest"
 
 type validationResults = string[]
 
-export function validate(event: JsonEventType, kpConfig: KpStructure, data: Partial<JsonBookingType>, permission: Boolean): validationResults {
+export function validate(event: JsonEventType, kpConfig: KpStructure, data: PartialDeep<JsonBookingType>, permission: Boolean): validationResults {
     const results: validationResults = []
     const bigCamp = event.bigCampMode
 

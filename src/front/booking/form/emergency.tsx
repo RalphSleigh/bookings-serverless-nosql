@@ -2,8 +2,9 @@ import { TextField, Typography } from "@mui/material"
 import { JsonBookingType } from "../../../lambda-common/onetable.js"
 import React from "react"
 import { getMemoUpdateFunctions } from "../../../shared/util.js"
+import { PartialDeep } from "type-fest"
 
-function bookingIndvidualEmergencyFields({ data, update }: { data: Partial<JsonBookingType>["emergency"], update: any }) {
+function bookingIndvidualEmergencyFields({ data, update }: { data: PartialDeep<JsonBookingType>["emergency"], update: any }) {
 
     const { updateField } = getMemoUpdateFunctions(update('emergency'))
 
@@ -15,7 +16,7 @@ function bookingIndvidualEmergencyFields({ data, update }: { data: Partial<JsonB
     </>
 }
 
-function bookingGroupEmergencyFields({ data, update }: { data: Partial<JsonBookingType>["emergency"], update: any }) {
+function bookingGroupEmergencyFields({ data, update }: { data: PartialDeep<JsonBookingType>["emergency"], update: any }) {
 
     const { updateField } = getMemoUpdateFunctions(update('emergency'))
 

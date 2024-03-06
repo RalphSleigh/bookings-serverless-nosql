@@ -2,11 +2,12 @@ import React, { useCallback, useContext, useEffect, useState } from "react";
 import { eventTimelineQuery, useDeleteBooking, useEditBooking } from "../queries.js";
 import { BookingForm } from "./form/form.js";
 import { BookingType, JsonBookingType } from "../../lambda-common/onetable.js";
+import { PartialDeep } from "type-fest";
 
 export function EditOwnBookingPage({ event, booking, user }) {
     const editBooking = useEditBooking(user, event)
     const deleteBooking = useDeleteBooking()
-    const [bookingData, setBookingData] = useState<Partial<JsonBookingType>>(booking)
+    const [bookingData, setBookingData] = useState<PartialDeep<JsonBookingType>>(booking)
 
     const submit = useCallback(() => {
         setBookingData(data => {

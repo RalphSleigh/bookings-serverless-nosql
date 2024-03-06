@@ -27,6 +27,8 @@ export function EventList(props) {
     };
 
     return <>
+        <Grid container justifyContent="center">
+        <Grid item xs={12} lg={10} xl={8}>
         <Grid container spacing={2} p={2}>
             {cards}
         </Grid>
@@ -35,6 +37,8 @@ export function EventList(props) {
                 <Add />
             </Fab>
         </IfHasPermission>
+        </Grid>
+        </Grid>
     </>
 }
 
