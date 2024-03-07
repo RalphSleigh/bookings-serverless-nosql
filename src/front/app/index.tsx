@@ -153,7 +153,7 @@ const themeDef = mode => ({
 
 export function App() {
     const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-    const [mode, setMode] = useState<'light' | 'dark'>(prefersDarkMode ? 'dark' : 'light');
+    const [mode, setMode] = useStickyState<'light' | 'dark'>(prefersDarkMode ? 'dark' : 'light', "color-mode");
     const colorMode = useMemo(
         () => ({
             mode: mode,
@@ -223,3 +223,16 @@ export function App() {
         </QueryClientProvider>
     </ReactErrorBoundary >
 }
+
+function useStickyState<T>(defaultValue: T, key: string): [T, React.Dispatch<React.SetStateAction<T>>] {
+    const [value, setValue] = React.useState<T>(() => {
+      const stickyValue = window.localStorage && window.localStorage.getItem(key);
+      return stickyValue !== null
+        ? JSON.parse(stickyValue)
+        : defaultValue;
+    });
+    React.useEffect(() => {
+        if(window.localStorage) window.localStorage.setItem(key, JSON.stringify(value));
+    }, [key, value]);
+    return [value, setValue];
+  }
