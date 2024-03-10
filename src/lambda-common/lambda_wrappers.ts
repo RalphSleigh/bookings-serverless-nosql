@@ -3,10 +3,11 @@ import { ConfigType, get_config } from './config.js';
 import { flush_logs, log } from './logging.js';
 import { serializeError } from 'serialize-error';
 import { get_user_from_event } from './user.js';
-import { UserResponseType} from './onetable.js';
+import { UserResponseType } from './onetable.js';
 import { PermissionError } from '../shared/permissions.js';
+import { PublishCommand, SNSClient } from '@aws-sdk/client-sns';
 
-export type LambdaJSONHandlerEvent = Pick<APIGatewayProxyEvent, Exclude<keyof APIGatewayProxyEvent, 'body'>> & { 
+export type LambdaJSONHandlerEvent = Pick<APIGatewayProxyEvent, Exclude<keyof APIGatewayProxyEvent, 'body'>> & {
     body: any
 }
 
@@ -21,7 +22,7 @@ export function lambda_wrapper_json(
             const user = await get_user_from_event(lambda_event, config)
 
             //log(`User ${user.userName} calling ${lambda_event.httpMethod} ${lambda_event.path}`)
-            
+
             if (lambda_event.body) lambda_event.body = JSON.parse(lambda_event.body)
             /*
             try {
@@ -37,27 +38,27 @@ export function lambda_wrapper_json(
                 };
             }
             since("done permissions") 
-            */   
+            */
             const response = await handler(lambda_event, config, user)
 
-            if(response && response.statusCode) return response //we want a raw response
+            if (response && response.statusCode) return response //we want a raw response
 
             return {
                 statusCode: 200,
-                headers: {"Content-Type":"application/json"},
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(response),
             }
         }
         catch (e: any) {
-            if(e instanceof PermissionError) {
+            if (e instanceof PermissionError) {
                 console.log("Permissions Error:")
                 console.log(e.stack)
                 console.log(serializeError(e))
-                log(`Permissions Error in ${context.functionName }`)
+                log(`Permissions Error in ${context.functionName}`)
                 log(e)
                 return {
                     statusCode: 401,
-                    headers: {"Content-Type":"application/json"},
+                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         message: e instanceof Error ? e.message : 'Permission Error',
                     }),
@@ -67,8 +68,17 @@ export function lambda_wrapper_json(
             console.log("General failure:")
             console.log(e.stack)
             console.log(serializeError(e))
-            log(`General failure in ${context.functionName }`)
+            log(`General failure in ${context.functionName}`)
             log(e)
+
+            const client = new SNSClient({});
+            const input = { // PublishInput
+                TopicArn: process.env.SNS_QUEUE_ARN,
+                Message: JSON.stringify(e), // required  
+            }
+            const command = new PublishCommand(input);
+            const response = await client.send(command);
+
             return {
                 statusCode: 500,
                 body: JSON.stringify({
@@ -89,6 +99,15 @@ export async function lambda_wrapper_raw(handler: (config: ConfigType) => Promis
     }
     catch (e) {
         console.log(e)
+
+        const client = new SNSClient({});
+        const input = { // PublishInput
+            TopicArn: process.env.SNS_QUEUE_ARN,
+            Message: JSON.stringify(e), // required  
+        }
+        const command = new PublishCommand(input);
+        const response = await client.send(command);
+
         return {
             statusCode: 500,
             body: JSON.stringify({
