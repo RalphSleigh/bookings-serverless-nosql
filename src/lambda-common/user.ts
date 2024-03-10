@@ -2,12 +2,13 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import { log } from './logging.js'
 import jwt from 'jsonwebtoken'
 import cookie from 'cookie'
-import { RoleType, table, UserResponseType, UserType, FoundUserResponseType } from './onetable.js'
+import { RoleType, table, UserResponseType, UserType, FoundUserResponseType, ApplicationType } from './onetable.js'
 import { useGridRowSelection } from '@mui/x-data-grid/internals'
 import { admin, auth } from '@googleapis/admin'
 
 const UserModel = table.getModel<UserType>('User')
 const RoleModel = table.getModel<RoleType>('Role')
+const ApplicationModel = table.getModel<ApplicationType>('Application')
 
 export async function get_user_from_event(event: APIGatewayProxyEvent, config): Promise<UserResponseType> {
     try {
@@ -24,8 +25,10 @@ export async function get_user_from_event(event: APIGatewayProxyEvent, config): 
 
         const user = await UserModel.get({ remoteId: token.remoteId }) as UserType | undefined
         if (user) {
-            const userResponse: FoundUserResponseType = { ...user, tokens: !!user.tokens, roles: [] }
-            userResponse.roles = await RoleModel.find({ userIdVersion: { begins: user?.id } }, { index: 'ls1' })
+            const userResponse: FoundUserResponseType = { ...user, tokens: !!user.tokens, roles: [], applications: [] }
+            const [roles, applications] = await Promise.all([RoleModel.find({ userIdVersion: { begins: user?.id } }, { index: 'ls1' }), ApplicationModel.find({ userIdVersion: { begins: user?.id } }, { index: 'ls1' })])
+            userResponse.roles = roles
+            userResponse.applications = applications
             return userResponse
         } else {
             throw "no user found for ID???"

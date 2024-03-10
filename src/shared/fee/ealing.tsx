@@ -3,12 +3,12 @@ import Markdown from 'react-markdown'
 import { Grid, InputAdornment, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import { FeeLine, FeeStructure } from "./feeStructure.js";
 import { AttendanceStructure } from "../attendance/attendanceStructure.js";
-import { Whole } from "../attendance/whole.js";
 import { BookingType, EalingFeeEventType, EventType, JsonBookingType, JsonEventType } from "../../lambda-common/onetable.js";
 import { differenceInYears } from "date-fns";
 import { Markdown as EmailMarkdown } from "@react-email/markdown";
 import { getMemoUpdateFunctions, parseDate } from "../util.js";
 import { PartialDeep } from "type-fest";
+import { WholeAttendance } from "../attendance/whole.js";
 
 const paymentInstructions = `Please make bank transfers to:  
 
@@ -21,7 +21,7 @@ Please include a sensible reference and drop [NAME](mailto:email) an email to le
 
 export class Ealing extends FeeStructure {
     public feeName = "Ealing"
-    public supportedAttendanceStructures = [Whole]
+    public supportedAttendanceStructures = [WholeAttendance]
 
     public ConfigurationElement = ({ data, update }: { data: Partial<JsonEventType["feeData"]>, update: any }) => {
 

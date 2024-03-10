@@ -6,7 +6,7 @@ import { useDisableDriveSync, useEventBookings, useHistoricalEventBookings } fro
 import { JsonBookingType, JsonEventType, JsonUserResponseType } from "../../lambda-common/onetable.js";
 import { SuspenseWrapper } from "../suspense.js";
 import { UserContext } from "../user/userContext.js";
-import { CanCreateAnyRole, CanSeeMoneyPage } from "../../shared/permissions.js";
+import { CanCreateAnyRole, CanManageApplications, CanSeeMoneyPage } from "../../shared/permissions.js";
 import { bookingsBookingSearch, bookingsParticipantSearch, useDebounceState } from "../util.js";
 import { JsonBookingWithExtraType } from "../../shared/computedDataTypes.js";
 import { ReactErrorBoundary } from "../app/errors.js";
@@ -20,6 +20,7 @@ export function Component() {
 
     const participantPath = useResolvedPath('participants')
     const bookingsPath = useResolvedPath('bookings')
+    const applicationsPath = useResolvedPath('applications')
     const kpPath = useResolvedPath('kp')
     const rolesPath = useResolvedPath('roles')
     const moneyPath = useResolvedPath('money')
@@ -44,8 +45,9 @@ export function Component() {
             <Tabs value={!location.pathname.endsWith("manage") ? location.pathname : participantPath.pathname} variant="scrollable" scrollButtons="auto">
                 <Tab label="Participants" value={participantPath.pathname} href={participantPath.pathname} component={Link} />
                 <Tab label="Bookings" value={bookingsPath.pathname} href={bookingsPath.pathname} component={Link} />
+                <PermissionTab user={user} event={event} permission={CanManageApplications} label="Applications" value={applicationsPath.pathname} href={applicationsPath.pathname} component={Link} />
                 <Tab label="KP" value={kpPath.pathname} href={kpPath.pathname} component={Link} />
-                <PermissionTab user={user} event={event} permission={CanCreateAnyRole} label="Roles" value={rolesPath.pathname} href={rolesPath.pathname} component={Link} />
+                { event.applicationsRequired ? <PermissionTab user={user} event={event} permission={CanCreateAnyRole} label="Roles" value={rolesPath.pathname} href={rolesPath.pathname} component={Link} /> : null }
                 <PermissionTab user={user} event={event} permission={CanSeeMoneyPage} label="Money" value={moneyPath.pathname} href={moneyPath.pathname} component={Link} />
             </Tabs>
         </Grid>

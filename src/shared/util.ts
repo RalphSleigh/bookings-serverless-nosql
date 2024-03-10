@@ -52,6 +52,16 @@ export function getMemoUpdateFunctions(update) {
                 e.preventDefault()
             }
         },
+        setArrayItemFilter: i => {
+            return e => {
+                update((data: any[] = []) => {
+                    const newData = [...data]
+                    newData[i] = e.target.value
+                    return newData.filter(x => x)
+                })
+                e.preventDefault()
+            }
+        },
         setArrayRadio: i => {
             return value => {
                 update((data: any[] = []) => {

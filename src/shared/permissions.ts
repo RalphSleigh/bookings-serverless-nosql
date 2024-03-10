@@ -94,9 +94,19 @@ export const CanDeleteRole = new LoggedInPermission<"event" | "role">(data => {
     return CanCreateRole.if(data)
 }, "User can't delete role")
 
+export const CanApplyToEvent = new LoggedInPermission<"event">(data => {
+    if (IsGlobalAdmin.if(data)) return true
+    if (!data.event.applicationsRequired) return false
+    if (hasRoleOnEvent(data.user, data.event, ["Book"])) return false
+    return true
+}, "User can't apply to event")
+
 export const CanBookIntoEvent = new LoggedInPermission<"event">(data => {
     if (IsGlobalAdmin.if(data)) return true
     if (isPast(parseDate(data.event.bookingDeadline)!)) return false
+    if (data.event.applicationsRequired) {
+        return hasRoleOnEvent(data.user, data.event, ["Book"])
+    }
     return true
 }, "User can't book into event")
 
@@ -127,6 +137,11 @@ export const CanWriteMoney = new LoggedInPermission<"event">(data => {
     if (IsGlobalAdmin.if(data)) return true
     return hasRoleOnEvent(data.user, data.event, ["Owner", "Manage", "Money"])
 }, "User can't manage fees")
+
+export const CanManageApplications = new LoggedInPermission<"event">(data => {
+    if (IsGlobalAdmin.if(data)) return true
+    return hasRoleOnEvent(data.user, data.event, ["Owner", "Manage"])
+}, "User can't manage applications")
 
 const hasRoleOnEvent = (user: NonNullable<UserResponseType | JsonUserResponseType>, event: OnetableEventType | JsonEventType, roles: Array<RoleType["role"]>): Boolean => {
     return !!roles.find(role => ((user.roles as Array<RoleType>).find(r => r.eventId === event.id && r.role === role)))

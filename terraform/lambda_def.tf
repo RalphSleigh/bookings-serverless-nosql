@@ -99,6 +99,12 @@ variable "lambda_definitions" {
       path   = "event/{id}/manage/roles"
       method = "get"
     },
+    event_applications = {
+      name   = "event_applications"
+      code   = "events/manage/getApplications"
+      path   = "event/{id}/manage/applications"
+      method = "get"
+    },
     event_roles_create = {
       name   = "event_roles_create"
       code   = "events/manage/createRole"
@@ -109,6 +115,12 @@ variable "lambda_definitions" {
       name   = "event_roles_delete"
       code   = "events/manage/deleteRole"
       path   = "event/{id}/manage/roles/delete"
+      method = "post"
+    },
+    event_application_operation = {
+      name   = "event_application_operation"
+      code   = "events/manage/applicationOperation"
+      path   = "event/{id}/manage/application/{userId}/operation"
       method = "post"
     },
     event_booking_operation = {
@@ -130,13 +142,13 @@ variable "lambda_definitions" {
       code = "events/details"
       path     = "event/{id}/details"
       method   = "get"
-    },
+    },*/
     apply = {
       name     = "apply"
-      code = "events/apply"
-      path     = "event/{id}/apply"
+      code     = "application/apply"
+      path     = "booking/apply"
       method   = "post"
-    },*/
+    },
     bookings_user = {
       name   = "bookings_user"
       code   = "bookings/getUsersBookings"

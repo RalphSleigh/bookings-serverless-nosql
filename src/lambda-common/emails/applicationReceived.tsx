@@ -1,54 +1,34 @@
-import {
-    Email,
-    Box,
-    Item,
-    Span,
-    A,
-    renderEmail
-}                    from 'react-html-email'
-import React         from 'react'
-import ReactMarkdown from 'react-markdown'
-import feeFactory    from '../../shared/fee/feeFactory'
+import { BookingEmailData, EmailData } from "../email.js"
+import { EmailTemplate } from "./emailTemplate.js"
+import * as React from 'react';
+import { Button } from '@react-email/button';
+import { Hr } from '@react-email/hr';
+import { Html, Text, Link } from '@react-email/components';
+import { getFee } from "../../shared/fee/fee.js";
+import { ConfigType } from "../config.js";
+import { getLoginReminderText } from "./emailsUtils.js";
 
-export const name = "application recieved"
-
-export function html(values) {
-
-    let button = '';
-
-    switch(values.user.remoteId.substr(0,4)) {
-        case 'goog':
-            button = 'Google';
-            break;
-        case 'face':
-            button = 'Facebook';
-            break;
-        case 'micr':
-            button = 'Microsoft';
-            break;
-        case 'yaho':
-            button = 'Yahoo';
-            break;
+export class ApplicationReceivedEmail extends EmailTemplate {
+    subject(data: BookingEmailData) {
+        return `Application received for ${data.event.name}`
     }
 
-    return renderEmail(
-        <Email title={`Application Received for ${values.name}`}>
-            <Item>
-                <p> Hi {values.user.userName},</p>
-                <p>Thanks for applying to book for {values.name}. One of our team will check your application as soon as
-                    possible and you will recieve another e-mail as soon as you are approved to book in.</p>
-            </Item>
-            <Item>
-                <p>Blue Skies</p>
-                <p>Woodcraft Folk</p>
-            </Item>
-            <Item>
-                <small>When logging in again make sure to log in as {values.user.email} using the {button} button</small>
-            </Item>
-        </Email>
-    )
-}
+    HTLMBody(data: BookingEmailData, config: ConfigType) {
 
-export function subject(values) {
-    return `Application Received for ${values.name}`
+        const  loginReminder = getLoginReminderText(data)
+
+        return (<Html lang="en">
+            <Text>Hi {data.recipient.userName}</Text>
+            <Text>Thanks for applying to book for {data.event.name}. One of our team will check your application as soon as
+                    possible and you will recieve another e-mail as soon as you are approved to book in.
+            </Text>
+            <Text>
+                <p>Blue Skies and Friendship,</p>
+                <p>Woodcraft Folk</p>
+            </Text>
+            <Text>
+                <small>{loginReminder}</small>
+            </Text>
+        </Html>)
+    }
 }

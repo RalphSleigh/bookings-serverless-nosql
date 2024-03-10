@@ -21,12 +21,16 @@ EOF
 data "aws_caller_identity" "current" {}
 
 data "aws_iam_policy_document" "lambda_exec_role_policy" {
-
   statement {
     actions = [
       "sqs:SendMessage"
     ]
     resources = [aws_sqs_queue.email_queue.arn, aws_sqs_queue.drive_sync_queue.arn]
+  }
+
+  statement {
+    actions = ["sns:Publish"]
+    resources = [aws_sns_topic.lambda-errors.arn]
   }
 
   statement {

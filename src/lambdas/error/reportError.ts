@@ -1,8 +1,18 @@
 import { lambda_wrapper_json } from "../../lambda-common/lambda_wrappers.js"
 import { log } from "../../lambda-common/logging.js"
+import { SNSClient, PublishCommand } from "@aws-sdk/client-sns";
+import am_in_lambda from "./am_in_lambda.js"
 
 export const lambdaHandler = lambda_wrapper_json(
     async (lambda_event, config, current_user) => {
         log(`CLIENT ERROR from ${current_user?.userName}: ${JSON.stringify(lambda_event.body)}`)
+
+        const client = new SNSClient({});
+        const input = { // PublishInput
+            TopicArn: process.env.SNS_QUEUE_ARN,
+            Message: JSON.stringify(lambda_event.body), // required  
+        }
+        const command = new PublishCommand(input);
+        const response = await client.send(command);
         return {}
     })

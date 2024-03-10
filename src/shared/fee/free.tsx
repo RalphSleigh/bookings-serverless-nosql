@@ -1,11 +1,11 @@
 import { InputAdornment, TextField, Typography } from "@mui/material";
 import { FeeStructure } from "./feeStructure.js";
 import React from "react";
-import { Whole } from "../attendance/whole.js";
+import { WholeAttendance } from "../attendance/whole.js";
 
 export class Free extends FeeStructure {
     public feeName = "Free"
-    public supportedAttendanceStructures = [Whole]
+    public supportedAttendanceStructures = [WholeAttendance]
 
     public ConfigurationElement = (props) => {
         return <>

@@ -2,13 +2,13 @@ import { InputAdornment, TextField, Typography } from "@mui/material";
 import { FeeStructure } from "./feeStructure.js";
 import React from "react";
 import { AttendanceStructure } from "../attendance/attendanceStructure.js";
-import { Whole } from "../attendance/whole.js";
+import { WholeAttendance } from "../attendance/whole.js";
 import { JsonBookingType, JsonEventType } from "../../lambda-common/onetable.js";
 import { PartialDeep } from "type-fest";
 
 export class Flat extends FeeStructure {
     public feeName = "Flat"
-    public supportedAttendanceStructures = [Whole]
+    public supportedAttendanceStructures = [WholeAttendance]
 
     public ConfigurationElement = ({data, update}) => {
 

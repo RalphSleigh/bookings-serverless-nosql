@@ -6,6 +6,7 @@ import { Hr } from '@react-email/hr';
 import { Html, Text, Link } from '@react-email/components';
 import { getFee } from "../../shared/fee/fee.js";
 import { ConfigType } from "../config.js";
+import { getLoginReminderText } from "./emailsUtils.js";
 
 export class BookingConfirmationEmail extends EmailTemplate {
     subject(data: BookingEmailData) {
@@ -14,21 +15,7 @@ export class BookingConfirmationEmail extends EmailTemplate {
 
     HTLMBody(data: BookingEmailData, config: ConfigType) {
 
-        let loginReminder = ''
-        switch (data.recipient.source) {
-            case 'google':
-                loginReminder = 'When logging in again make sure to log in with the same account using the Google button'
-                break;
-            case 'facebook':
-                loginReminder = 'When logging in again make sure to log in with the same account using the Facebook button'
-                break;
-            case 'microsoft':
-                loginReminder = 'When logging in again make sure to log in with the same account using the Microsoft button'
-                break;
-            case 'yahoo':
-                loginReminder = 'When logging in again make sure to log in with the same account using the Yahoo button'
-                break;
-        }
+        const  loginReminder = getLoginReminderText(data)
 
         const editLink = `${config.BASE_URL}/event/${data.event.id}/edit-my-booking`
 

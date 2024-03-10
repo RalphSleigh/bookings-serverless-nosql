@@ -1,0 +1,240 @@
+import React from "react";
+import Markdown from 'react-markdown'
+import { Grid, InputAdornment, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import { FeeLine, FeeStructure } from "./feeStructure.js";
+import { AttendanceStructure } from "../attendance/attendanceStructure.js";
+import { BookingType, EalingFeeEventType, EventType, JsonBookingType, JsonEventType, JsonParticipantType, LargeFeeEventType, ParticipantType } from "../../lambda-common/onetable.js";
+import { differenceInYears, format } from "date-fns";
+import { Markdown as EmailMarkdown } from "@react-email/markdown";
+import { getMemoUpdateFunctions, parseDate } from "../util.js";
+import { PartialDeep } from "type-fest";
+import { WholeAttendance } from "../attendance/whole.js";
+import { OptionsAttendance } from "../attendance/options.js";
+import { DateTimePicker } from '@mui/x-date-pickers'
+import { NumberType } from "aws-sdk/clients/pinpointsmsvoicev2.js";
+import { JsonBookingWithExtraType } from "../computedDataTypes.js";
+
+const paymentInstructions = `Please make bank transfers to:  
+
+WOODCRAFT FOLK EALING DISTRICT RC1148195  
+50491232  
+08-90-80  
+  
+Please include a sensible reference and drop [NAME](mailto:email) an email to let me you have paid.`
+
+export class Large extends FeeStructure {
+    public feeName = "Large Camp Style"
+    public supportedAttendanceStructures = [OptionsAttendance]
+
+    public ConfigurationElement = ({ attendanceData, data, update }: { attendanceData: JsonEventType["attendanceData"], data: Partial<JsonEventType["feeData"]>, update: any }) => {
+
+        const { updateSubField } = getMemoUpdateFunctions(update)
+        const { updateArrayItem } = getMemoUpdateFunctions(updateSubField('largeCampBands'))
+
+
+        const bands = [...(data.largeCampBands || []), {}].map((band, i) => {
+            return <FeeBandConfig key={i} attendanceData={attendanceData} data={band} update={updateArrayItem(i)} />
+        })
+
+        return <>
+            <Typography sx={{ mt: 2 }} variant="h5">Large Camp Fee Options</Typography>
+            <Typography variant="body2" mt={2}>Under 5s are free, everyone else will be charged the band that's before date is in the future and closest to the time they book, please ensure there is a band that covers the event period in to cover people added during the event. The before datetime should be supplied in UTC.</Typography>
+            <Grid container spacing={2}>
+                <Grid item xs={12}>
+                    {bands}
+                </Grid>
+            </Grid>
+        </>
+    }
+
+
+    public getFeeLines = (event: JsonEventType | EventType, booking: PartialDeep<JsonBookingType> | BookingType | JsonBookingWithExtraType): FeeLine[] => {
+        const feeData = event.feeData as LargeFeeEventType["feeData"]//@ts-ignore
+        const startDate = parseDate(event.startDate)
+        if (Array.isArray(booking.participants)) {
+
+            const filterParticipants: (any) => any = p => p.basic && p.basic.name && p.basic.dob && p.attendance && typeof p.attendance.option == "number"
+            const validateParticipant: (any) => ParticipantType = p => {
+                p.created = p.created ? parseDate(p.created) : new Date()
+                p.basic.dob = parseDate(p.basic!.dob)
+                return p
+            }
+
+            const computedBands = feeData.largeCampBands.map(band => {
+                return { ...band, beforeDate: parseDate(band.before), beforeString: parseDate(band.before)!.toISOString() }
+            })
+
+            let free = 0
+            let totals: Record<string, Record<number, { count: number, band: typeof computedBands[0] }>> = {}
+
+            const validParticipants = (booking.participants as JsonParticipantType[]).filter(filterParticipants).map(validateParticipant)
+
+            for (const participant of validParticipants) {
+                if (differenceInYears(startDate!, participant.basic.dob) < 5) {
+                    free++
+                } else {
+                    for (const band of computedBands) {
+                        if (band.beforeDate! > participant.created) {
+                            if (!totals[band.beforeString]) totals[band.beforeString] = {}
+                            if (!totals[band.beforeString][participant.attendance!.option!]) totals[band.beforeString][participant.attendance!.option!] = { count: 0, band: band }
+                            totals[band.beforeString][participant.attendance!.option!].count++
+                            break
+                        }
+                    }
+                }
+            }
+
+            const results: FeeLine[] = []
+            if (free > 0) results.push({ description: `${free} Under 5s for free`, values: [0] })
+            for (const [band, item] of Object.entries(totals)) {
+                for (const [index, option] of Object.entries(item)) {
+                    results.push({ description: `${option.count} ${option.count == 1 ? 'person' : 'people'} for ${event.attendanceData!.options![index]} before ${format(option.band.beforeDate!, 'PPP')}`, values: [option.count * option.band.fees[index]] })
+                }
+            }
+            return results
+        } else {
+            return []
+        }
+    }
+
+    public DescriptionElement = ({ event, booking }: { event: JsonEventType, booking: PartialDeep<JsonBookingType> }) => {
+
+        const feeData = event.feeData as EalingFeeEventType["feeData"]
+        const valueHeaders = this.getValueLabels().map((l, i) => <TableCell component="th" key={i}><b>{l}</b></TableCell>)
+
+        const totals: number[] = []
+
+        let paymentTotal = 0
+
+        const payments = booking.fees?.filter(f => f.type === "payment").map((f, i) => {
+            paymentTotal += f.value
+            return (<TableRow key={`payment-${i}`}>
+                <TableCell>{f.description}</TableCell>
+                {this.getValueLabels().map((l, i) => <TableCell component="th" key={i}></TableCell>)}
+                <TableCell component="th" key={i}>{currency(f.value)}</TableCell>
+            </TableRow>)
+        })
+
+        const myfees = this.getFeeLines(event, booking).map((row, i) => {
+
+            row.values.forEach((v, i) => {
+                if (!totals[i]) totals[i] = 0
+                totals[i] += v
+            })
+
+            return (<TableRow
+                key={i}
+                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                <TableCell component="th" scope="row">{row.description}</TableCell>
+                {row.values.map((v, i) => <TableCell key={i}>{currency(v)}</TableCell>)}
+                {payments && payments.length > 0 ? <TableCell></TableCell> : null}
+            </TableRow>)
+        })
+
+
+
+        const adjustments = booking.fees?.filter(f => f.type === "adjustment").map((f, i) => {
+
+            totals.forEach((v, i) => {
+                if (!totals[i]) totals[i] = 0
+                totals[i] += f.value
+            })
+
+            return (<TableRow key={`adjustment-${i}`}>
+                <TableCell>{f.description}</TableCell>
+                {this.getValueLabels().map((l, i) => <TableCell component="th" key={i}>{currency(f.value)}</TableCell>)}
+                {payments && payments.length > 0 ? <TableCell></TableCell> : null}
+            </TableRow>)
+        })
+
+        return (<>
+            <Typography variant="body2" mt={2}>The discounted donation is offered to all
+                families/individuals where there is no wage earner and/or the family/individual is on a low wage. This
+                would include DFs and students as well as adults and families. Cost should never be a reason for people
+                being unable to attend camp so please contact us if you need further discount.</Typography>
+            <TableContainer component={Paper} sx={{ mt: 2, p: 1 }}>
+                <Table size="small">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell></TableCell>
+                            {valueHeaders}
+                            {payments && payments.length > 0 ? <TableCell><b>Payments</b></TableCell> : null}
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {myfees}
+                        {adjustments}
+                        {payments}
+                        <TableRow>
+                            <TableCell><b>Total</b></TableCell>
+                            {totals.map((v, i) => <TableCell key={i}><b>{currency(v)}</b></TableCell>)}
+                            {payments && payments.length > 0 ? <TableCell><b>{currency(paymentTotal)}</b></TableCell> : null}
+                        </TableRow>
+                    </TableBody>
+                </Table>
+            </TableContainer>
+            <this.PaymentElement event={event} />
+        </>)
+    }
+
+    public PaymentElement = ({ event }: { event: JsonEventType }) => {
+        const feeData = event.feeData as EalingFeeEventType["feeData"]
+        return <Markdown>{feeData.paymentInstructions}</Markdown>
+    }
+
+    public EmailElement = ({ event, booking }: { event: EventType, booking: BookingType }) => {
+        const feeData = event.feeData as EalingFeeEventType["feeData"]
+        const valueHeaders = this.getValueLabels().map((l, i) => <th key={i}>{l}</th>)
+        return (<>
+            {feeData.paymentInstructions ?
+                <EmailMarkdown children={feeData.paymentInstructions}
+                    markdownCustomStyles={{
+                        p: { fontSize: "14px" },
+                    }}
+                /> : null}
+            <table>
+                <thead>
+                    <tr>
+                        <th></th>
+                        {valueHeaders}
+                    </tr>
+                </thead>
+                <tbody>
+                    {this.getFeeLines(event, booking).map((row, i) => (
+                        <tr key={i}>
+                            <td>My Booking: {row.description}</td>
+                            {row.values.map((v, i) => <td key={i}>{currency(v)}</td>)}
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </>)
+    }
+
+    public getValueLabels = () => (["Fee"])
+}
+
+const currency = c => c.toLocaleString(undefined, { style: "currency", currency: "GBP" })
+
+const FeeBandConfig = ({ attendanceData, data, update }: { attendanceData: JsonEventType["attendanceData"], data: any, update: any }) => {
+
+    const { updateDate, updateNumber, updateSubField } = getMemoUpdateFunctions(update)
+    const { setArrayItem } = getMemoUpdateFunctions(updateSubField('fees'))
+
+    const feeFields = (attendanceData?.options || []).map((option, i) => {
+        return <TextField
+            InputProps={{ startAdornment: <InputAdornment position="start">£</InputAdornment> }}
+            key={i}
+            sx={{ ml: 2, width: 200 }}
+            id="outlined-required"
+            label={option}
+            type="number"
+            value={data?.fees?.[i]}
+            onChange={setArrayItem(i)} />
+    })
+
+    return <Paper sx={{ p: 2, mt: 2 }}>
+        <DateTimePicker label="Before" value={parseDate(data.before)} onChange={updateDate('before')} timezone="UTC" />
+        {feeFields}
+    </Paper>
+}
