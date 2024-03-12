@@ -49,7 +49,7 @@ resource "aws_lambda_function" "discord_lambda" {
   runtime = "nodejs18.x"
 }
 
-resource "aws_lambda_event_source_mapping" "event_source_mapping" {
+resource "aws_lambda_event_source_mapping" "event_source_mapping_discord" {
   event_source_arn = aws_sqs_queue.discord_queue.arn
   enabled          = true
   function_name    = aws_lambda_function.discord_lambda.arn
@@ -71,7 +71,7 @@ resource "aws_iam_role" "discord_lambda_role" {
   assume_role_policy = data.aws_iam_policy_document.discord_lambda_role_iam_policy.json
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_sqs_role_policy" {
+resource "aws_iam_role_policy_attachment" "lambda_sqs_role_policy_discord" {
   role       = aws_iam_role.discord_lambda_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
 }
