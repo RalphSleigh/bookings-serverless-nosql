@@ -41,6 +41,7 @@ resource "aws_lambda_function" "lambda" {
       EMAIL_QUEUE_URL = aws_sqs_queue.email_queue.id
       DRIVE_SYNC_QUEUE_URL = aws_sqs_queue.drive_sync_queue.id
       SNS_QUEUE_ARN = aws_sns_topic.lambda-errors.arn
+      DISCORD_QUEUE_URL = aws_sqs_queue.discord_queue.id
     }
   }
 

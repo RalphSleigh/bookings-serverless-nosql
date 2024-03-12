@@ -5,6 +5,7 @@ import { CanEditBooking, CanEditEvent, CanEditOwnBooking, PermissionError } from
 import { updateParticipantsDates } from '../../lambda-common/util.js';
 import { queueDriveSync } from '../../lambda-common/drive_sync.js';
 import { queueEmail, queueManagerEmails } from '../../lambda-common/email.js';
+import { postToDiscord } from '../../lambda-common/discord.js';
 
 const BookingModel = table.getModel<OnetableBookingType>('Booking')
 const EventModel = table.getModel<OnetableEventType>('Event')
@@ -49,6 +50,8 @@ export const lambdaHandler = lambda_wrapper_json(
                         booking: newLatest as BookingType,
                         bookingOwner: current_user,
                     }, config)
+
+                    await postToDiscord(config, "Boop")
                 }
 
                 await queueDriveSync(event.id, config)

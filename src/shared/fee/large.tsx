@@ -1,6 +1,6 @@
 import React from "react";
 import Markdown from 'react-markdown'
-import { Grid, InputAdornment, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import { Grid, InputAdornment, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from "@mui/material";
 import { FeeLine, FeeStructure } from "./feeStructure.js";
 import { AttendanceStructure } from "../attendance/attendanceStructure.js";
 import { BookingType, EalingFeeEventType, EventType, JsonBookingType, JsonEventType, JsonParticipantType, LargeFeeEventType, ParticipantType } from "../../lambda-common/onetable.js";
@@ -88,7 +88,9 @@ export class Large extends FeeStructure {
             if (free > 0) results.push({ description: `${free} Under 5s for free`, values: [0] })
             for (const [band, item] of Object.entries(totals)) {
                 for (const [index, option] of Object.entries(item)) {
-                    results.push({ description: `${option.count} ${option.count == 1 ? 'person' : 'people'} for ${event.attendanceData!.options![index]} before ${format(option.band.beforeDate!, 'PPP')}`, values: [option.count * option.band.fees[index]] })
+                    results.push({ description: `${option.count} ${option.count == 1 ? 'Person' : 'People'} for the ${event.attendanceData!.options![index]} before ${option.band.description}`, 
+                    tooltip:`${format(option.band.beforeDate!, 'PPPp')}`,
+                    values: [option.count * option.band.fees[index]] })
                 }
             }
             return results
@@ -125,13 +127,11 @@ export class Large extends FeeStructure {
             return (<TableRow
                 key={i}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                <TableCell component="th" scope="row">{row.description}</TableCell>
+                <TableCell component="th" scope="row"><Tooltip followCursor={true} title={row.tooltip}><span>{row.description}</span></Tooltip></TableCell>
                 {row.values.map((v, i) => <TableCell key={i}>{currency(v)}</TableCell>)}
                 {payments && payments.length > 0 ? <TableCell></TableCell> : null}
             </TableRow>)
         })
-
-
 
         const adjustments = booking.fees?.filter(f => f.type === "adjustment").map((f, i) => {
 
@@ -148,10 +148,7 @@ export class Large extends FeeStructure {
         })
 
         return (<>
-            <Typography variant="body2" mt={2}>The discounted donation is offered to all
-                families/individuals where there is no wage earner and/or the family/individual is on a low wage. This
-                would include DFs and students as well as adults and families. Cost should never be a reason for people
-                being unable to attend camp so please contact us if you need further discount.</Typography>
+            <Typography variant="body2" mt={2}>PLACEHOLDER: SOME TEXT ABOUT THE FEES SHOULD GO HERE? IDK</Typography>
             <TableContainer component={Paper} sx={{ mt: 2, p: 1 }}>
                 <Table size="small">
                     <TableHead>
@@ -216,9 +213,9 @@ export class Large extends FeeStructure {
 
 const currency = c => c.toLocaleString(undefined, { style: "currency", currency: "GBP" })
 
-const FeeBandConfig = ({ attendanceData, data, update }: { attendanceData: JsonEventType["attendanceData"], data: any, update: any }) => {
+const FeeBandConfig = ({ attendanceData, data, update }: { attendanceData: JsonEventType["attendanceData"], data: PartialDeep<Required<JsonEventType["feeData"]>["largeCampBands"][0]>, update: any }) => {
 
-    const { updateDate, updateNumber, updateSubField } = getMemoUpdateFunctions(update)
+    const { updateDate, updateNumber, updateSubField, updateField } = getMemoUpdateFunctions(update)
     const { setArrayItem } = getMemoUpdateFunctions(updateSubField('fees'))
 
     const feeFields = (attendanceData?.options || []).map((option, i) => {
@@ -235,6 +232,12 @@ const FeeBandConfig = ({ attendanceData, data, update }: { attendanceData: JsonE
 
     return <Paper sx={{ p: 2, mt: 2 }}>
         <DateTimePicker label="Before" value={parseDate(data.before)} onChange={updateDate('before')} timezone="UTC" />
+        <TextField
+            sx={{ ml: 2, width: 200 }}
+            id="outlined-required"
+            label={"description"}
+            value={data?.description}
+            onChange={updateField('description')} />
         {feeFields}
     </Paper>
 }
