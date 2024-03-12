@@ -32,7 +32,7 @@ export const lambdaHandler = async (event: SQSEvent): Promise<any> => {
         }
         await client.send(
             new DeleteMessageCommand({
-                QueueUrl: process.env.EMAIL_QUEUE_URL,
+                QueueUrl: process.env.DISCORD_QUEUE_URL,
                 ReceiptHandle: record.receiptHandle,
             }))
     }
