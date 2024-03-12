@@ -18,7 +18,7 @@ export class BookingEditedEmail extends EmailTemplate {
         const  loginReminder = getLoginReminderText(data)
 
 
-        const editLink = `${config.BASE_URL}/event/${data.event.id}/edit-my-booking`
+        const editLink = `${config.BASE_URL}event/${data.event.id}/edit-my-booking`
 
         const participantsList = data.booking.participants.map((p, i) => <li key={i} style={{ fontSize: "14px" }}>{p.basic.name}</li>);
 
