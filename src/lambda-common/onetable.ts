@@ -100,7 +100,7 @@ const schema = {
                 items: {
                     type: Object,
                     schema: {
-                        questionType: { type: String, required: true, enum: ['yesnochoice', 'text'] },
+                        questionType: { type: String, required: true, enum: ['yesnochoice', 'text', 'longtext'] },
                         questionLabel: { type: String, required: true }
                     }
                 },

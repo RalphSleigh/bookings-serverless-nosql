@@ -38,7 +38,7 @@ import { ApplyThanksLoader } from '../booking/applyThanksLoader.js';
 const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
-            refetchOnWindowFocus: true,
+            refetchOnWindowFocus: false,
             staleTime: 1000 * 60 * 5,
             retry: (failureCount, error) => {//@ts-ignore
                 if (error.response && error.response.status === 401) return false

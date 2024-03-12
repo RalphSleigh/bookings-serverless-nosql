@@ -138,6 +138,7 @@ const QuestionItem = ({ i, question, updateArrayItem, deleteQuestion }: { i: num
                         <MenuItem value="default">Please select</MenuItem>
                         <MenuItem value="yesnochoice">Yes/No</MenuItem>
                         <MenuItem value="text">Text</MenuItem>
+                        <MenuItem value="longtext">Long Text</MenuItem>
                     </Select>
                 </FormControl>
                 <IconButton color="error" onClick={deleteQuestion(i)}><Close /></IconButton>

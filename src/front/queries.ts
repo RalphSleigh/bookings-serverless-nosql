@@ -17,8 +17,9 @@ export function useEnv() {
 export const userQuery = {
     queryKey: ['user'],
     queryFn: async () => (await axios.get("/api/user")).data,
-    staleTime: 60*1000,
-    cacheTime: 60*1000
+    staleTime: 60 * 1000,
+    cacheTime: 60 * 1000,
+    refetchOnWindowFocus: true
 }
 
 export function useUser() {
@@ -310,7 +311,7 @@ export function useDisableDriveSync() {
 export function useBookingOperation() {
     const queryClient = useQueryClient()
     const setSnackbar = useContext(SnackBarContext)
-    return useMutation<{message: string}, any, { eventId: string, userId: string, operation: BookingOperationType }, any>(
+    return useMutation<{ message: string }, any, { eventId: string, userId: string, operation: BookingOperationType }, any>(
         {
             mutationFn: async data => (await axios.post(`/api/event/${data.eventId}/manage/booking/${data.userId}/operation`, { operation: data.operation })).data,
             onSuccess: (data) => {
@@ -339,7 +340,7 @@ const snackbarError = (setSnackbar) => (error, variables, context) => {
 export function useApplicationOperation(eventId) {
     const queryClient = useQueryClient()
     const setSnackbar = useContext(SnackBarContext)
-    return useMutation<{message: string}, any, { userId: String, operation: ApplicationOperationType }, any>(
+    return useMutation<{ message: string }, any, { userId: String, operation: ApplicationOperationType }, any>(
         {
             mutationFn: async data => (await axios.post(`/api/event/${eventId}/manage/application/${data.userId}/operation`, { operation: data.operation })).data,
             onSuccess: (data) => {

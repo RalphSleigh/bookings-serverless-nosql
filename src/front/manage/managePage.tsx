@@ -45,9 +45,9 @@ export function Component() {
             <Tabs value={!location.pathname.endsWith("manage") ? location.pathname : participantPath.pathname} variant="scrollable" scrollButtons="auto">
                 <Tab label="Participants" value={participantPath.pathname} href={participantPath.pathname} component={Link} />
                 <Tab label="Bookings" value={bookingsPath.pathname} href={bookingsPath.pathname} component={Link} />
-                <PermissionTab user={user} event={event} permission={CanManageApplications} label="Applications" value={applicationsPath.pathname} href={applicationsPath.pathname} component={Link} />
+                { event.applicationsRequired ? <PermissionTab user={user} event={event} permission={CanManageApplications} label="Applications" value={applicationsPath.pathname} href={applicationsPath.pathname} component={Link} /> : null }
                 <Tab label="KP" value={kpPath.pathname} href={kpPath.pathname} component={Link} />
-                { event.applicationsRequired ? <PermissionTab user={user} event={event} permission={CanCreateAnyRole} label="Roles" value={rolesPath.pathname} href={rolesPath.pathname} component={Link} /> : null }
+                <PermissionTab user={user} event={event} permission={CanCreateAnyRole} label="Roles" value={rolesPath.pathname} href={rolesPath.pathname} component={Link} />
                 <PermissionTab user={user} event={event} permission={CanSeeMoneyPage} label="Money" value={moneyPath.pathname} href={moneyPath.pathname} component={Link} />
             </Tabs>
         </Grid>

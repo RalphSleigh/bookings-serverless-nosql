@@ -8,7 +8,7 @@ const EventModel = table.getModel<OnetableEventType>('Event')
 
 export const lambdaHandler = lambda_wrapper_json(
     async (lambda_event, config, current_user) => {
-        console.log(`Edited event ${lambda_event.body.id}`);
+        console.log(`Edited event ${lambda_event.body.event.id}`);
 
         console.log(lambda_event.body.event.id)
         const event = await EventModel.get({ id: lambda_event.body.event.id })

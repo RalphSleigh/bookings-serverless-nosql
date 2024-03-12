@@ -14,6 +14,8 @@ function customQuestionFields({ eventCustomQuestions, data = [], update }: { eve
         switch (e.questionType) {
             case "text":
                 return <CustomQestionText key={i} i={i} question={e} data={data ? data[i] ?? '' : ''} setArrayItem={setArrayItem} />
+            case "longtext":
+                return <CustomQestionLongText key={i} i={i} question={e} data={data ? data[i] ?? '' : ''} setArrayItem={setArrayItem} />
             case "yesnochoice":
                 return <CustomQuestionYesNo key={i} i={i} question={e} data={data ? data[i] ?? '' : ''} setArrayRadio={setArrayRadio} />
         }
@@ -31,6 +33,15 @@ function CustomQestionText({ i, question, data, setArrayItem }: { i: number, que
     return (<Grid container spacing={2} mt={1} mb={1}>
         <Grid item xs>
             <TextField fullWidth required id="outlined-required" label={question.questionLabel} value={data || ''} onChange={update} />
+        </Grid>
+    </Grid>)
+}
+
+function CustomQestionLongText({ i, question, data, setArrayItem }: { i: number, question: JsonEventType["customQuestions"][0], data: any, setArrayItem: any }) {
+    const update = setArrayItem(i)
+    return (<Grid container spacing={2} mt={1} mb={1}>
+        <Grid item xs>
+            <TextField multiline minRows={3} fullWidth required id="outlined-required" label={question.questionLabel} value={data || ''} onChange={update} />
         </Grid>
     </Grid>)
 }
