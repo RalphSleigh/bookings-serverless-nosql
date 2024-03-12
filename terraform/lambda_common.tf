@@ -25,7 +25,7 @@ data "aws_iam_policy_document" "lambda_exec_role_policy" {
     actions = [
       "sqs:SendMessage"
     ]
-    resources = [aws_sqs_queue.email_queue.arn, aws_sqs_queue.drive_sync_queue.arn, aws_sns_queue.discord_queue.arn]
+    resources = [aws_sqs_queue.email_queue.arn, aws_sqs_queue.drive_sync_queue.arn, aws_sqs_queue.discord_queue.arn]
   }
 
   statement {
