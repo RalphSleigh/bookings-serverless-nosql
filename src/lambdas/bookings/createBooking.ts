@@ -5,6 +5,7 @@ import { Model } from 'dynamodb-onetable';
 import { updateParticipantsDates } from '../../lambda-common/util.js';
 import { queueDriveSync } from '../../lambda-common/drive_sync.js';
 import { queueEmail, queueManagerEmails } from '../../lambda-common/email.js';
+import { postToDiscord } from '../../lambda-common/discord.js';
 
 const BookingModel: Model<OnetableBookingType> = table.getModel('Booking')
 const EventModel: Model<OnetableEventType> = table.getModel<OnetableEventType>('Event')
@@ -66,6 +67,8 @@ export const lambdaHandler = lambda_wrapper_json(
             }, config)
 
             await queueDriveSync(event.id, config)
+
+            await postToDiscord(config, `${newBooking.basic.contactName} (${newBooking.basic.district}) created a booking for event ${event.name}, they have booked ${booking.participants.length} people`)
 
             return {}
         } else {

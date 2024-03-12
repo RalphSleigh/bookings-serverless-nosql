@@ -5,6 +5,7 @@ import { CanCreateRole, CanWriteMoney } from '../../../shared/permissions.js';
 import { admin, auth } from '@googleapis/admin';
 import { BookingOperationType } from '../../../shared/computedDataTypes.js';
 import { Jsonify } from 'type-fest'
+import { postToDiscord } from '../../../lambda-common/discord.js';
 
 const EventModel = table.getModel<EventType>('Event')
 const RoleModel = table.getModel<RoleType>('Role')
@@ -27,6 +28,9 @@ export const lambdaHandler = lambda_wrapper_json(
                                 set: { fees: 'list_append(if_not_exists(fees, @{emptyList}), @{newFees})' },
                                 substitutions: { emptyList: [], newFees: fees }
                             })
+
+                        await postToDiscord(config, `${current_user.userName} added an adjustmemt to booking ${booking.basic.district} of ${currency(operation.value)} (${operation.description})`)
+
                         return { message: "Payment added" }
                     case "addAdjustment":
                         CanWriteMoney.throw({ user: current_user, event: event })
@@ -36,14 +40,20 @@ export const lambdaHandler = lambda_wrapper_json(
                                 set: { fees: 'list_append(if_not_exists(fees, @{emptyList}), @{newFees})' },
                                 substitutions: { emptyList: [], newFees: adjustmentFees }
                             })
+
+                        await postToDiscord(config, `${current_user.userName} added a payment to booking ${booking.basic.district} of ${currency(operation.value)} (${operation.description})`)
+
                         return { message: "Adjustment added" }
                     case "removeFeeItem":
                         CanWriteMoney.throw({ user: current_user, event: event })
-                        const newFees = booking.fees.filter(fee => fee.date.toISOString() !== operation.date).map(f => {return {...f, date: f.date.toISOString()}})
+                        const newFees = booking.fees.filter(fee => fee.date.toISOString() !== operation.date).map(f => { return { ...f, date: f.date.toISOString() } })
                         await BookingModel.update({ eventId: booking.eventId, userId: booking.userId, version: "latest" },
                             {
                                 set: { fees: newFees }
                             })
+
+                        await postToDiscord(config, `${current_user.userName} deleted a fee from booking ${booking.basic.district}`)
+
                         return { message: "Fee removed" }
                     default:
                         throw new Error("Invalid operation")
@@ -55,3 +65,6 @@ export const lambdaHandler = lambda_wrapper_json(
             throw new Error("Can't find event")
         }
     })
+
+
+const currency = c => c.toLocaleString(undefined, { style: "currency", currency: "GBP" })

@@ -7,7 +7,7 @@ import { queueDriveSync } from '../../lambda-common/drive_sync.js';
 import { queueEmail, queueManagerEmails } from '../../lambda-common/email.js';
 import { postToDiscord } from '../../lambda-common/discord.js';
 
-const BookingModel = table.getModel<OnetableBookingType>('Booking')
+const BookingModel: Model<OnetableBookingType> = table.getModel<OnetableBookingType>('Booking')
 const EventModel = table.getModel<OnetableEventType>('Event')
 const EventBookingTimelineModel = table.getModel<EventBookingTimelineType>('EventBookingTimeline')
 
@@ -51,7 +51,8 @@ export const lambdaHandler = lambda_wrapper_json(
                         bookingOwner: current_user,
                     }, config)
 
-                    await postToDiscord(config, "Boop")
+                    await postToDiscord(config, `${newVersion.basic.contactName} (${newVersion.basic.district}) edited their booking for event ${event.name}, they have booked ${newVersion.participants.length} people (previously ${existingLatestBooking})`)
+                    await postToDiscord(config, "TODO: The cool diff thing") 
                 }
 
                 await queueDriveSync(event.id, config)

@@ -6,6 +6,7 @@ import { updateParticipantsDates } from '../../lambda-common/util.js';
 import { queueDriveSync } from '../../lambda-common/drive_sync.js';
 import { queueEmail, queueManagerEmails } from '../../lambda-common/email.js';
 import { application } from 'express';
+import { postToDiscord } from '../../lambda-common/discord.js';
 
 const BookingModel: Model<OnetableBookingType> = table.getModel('Booking')
 const EventModel: Model<OnetableEventType> = table.getModel<OnetableEventType>('Event')
@@ -45,6 +46,9 @@ export const lambdaHandler = lambda_wrapper_json(
                 event: event as EventType,
                 bookingOwner: current_user,
             }, config)
+
+
+            await postToDiscord(config, `Application recieved from ${application.name} (${application.email})`)
 
             return {}
         } else {
