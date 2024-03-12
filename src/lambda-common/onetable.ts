@@ -142,7 +142,6 @@ const schema = {
                             //schema: {
                             //    name: { type: String, required: true }
                             //},
-                            required: true
                         },
                         kp: {
                             type: Object,
