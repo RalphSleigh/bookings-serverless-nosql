@@ -4,11 +4,11 @@ import { Navigate, useParams } from "react-router-dom";
 import { BookingForm } from "./form/form.js";
 import { EnsureHasPermission } from "../permissions.js";
 import { CanBookIntoEvent } from "../../shared/permissions.js";
-import { BookingType, JsonBookingType, JsonEventType, UserResponseType } from "../../lambda-common/onetable.js";
+import { BookingType, JsonBookingType, JsonEventType, JsonUserResponseType, UserResponseType } from "../../lambda-common/onetable.js";
 import { SnackBarContext, SnackbarDataType } from "../app/toasts.js";
 import { PartialDeep } from "type-fest";
 
-export function CreateBookingPage({ event, user }: { event: JsonEventType, user: UserResponseType }) {
+export function CreateBookingPage({ event, user }: { event: JsonEventType, user: JsonUserResponseType }) {
     const createBooking = useCreateBooking(event)
     const [bookingData, setBookingData] = useState<PartialDeep<JsonBookingType>>({ eventId: event.id, basic: { contactName: user!.userName, contactEmail: user?.email} })
     const setSnackbar = useContext(SnackBarContext)

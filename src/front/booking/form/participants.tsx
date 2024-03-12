@@ -1,14 +1,16 @@
 import { Grid, Paper, TextField, Typography, Box, Button, FormControlLabel, Switch, IconButton, CardMedia } from "@mui/material";
 import React, { useState } from "react";
 //import { validate } from "./validate.js";
-import { BookingType, JsonParticipantType, UserType } from "../../../lambda-common/onetable.js";
+import { BookingType, JsonEventType, JsonParticipantType, UserType } from "../../../lambda-common/onetable.js";
 import { Lock, LockOpen, Close } from '@mui/icons-material';
 import { KpStructure } from "../../../shared/kp/kp_class.js";
 import { PartialDeep } from "type-fest";
 import { UtcDatePicker } from "../../util.js";
 import { getMemoUpdateFunctions } from "../../../shared/util.js";
+import { getAttendance } from "../../../shared/attendance/attendance.js";
+import { AttendanceStructure } from "../../../shared/attendance/attendanceStructure.js";
 
-export function ParticipantsForm({ participants, update, kp }: { participants: Array<PartialDeep<JsonParticipantType>>, update: any, kp: KpStructure }) {
+export function ParticipantsForm({ event, attendanceConfig, participants, update, kp }: { event: JsonEventType, attendanceConfig: AttendanceStructure, participants: Array<PartialDeep<JsonParticipantType>>, update: any, kp: KpStructure }) {
 
     const { addEmptyObjectToArray, updateArrayItem, deleteArrayItem } = getMemoUpdateFunctions(update(('participants')))
 
@@ -19,7 +21,7 @@ export function ParticipantsForm({ participants, update, kp }: { participants: A
         e.preventDefault()
     }, [])
 
-    const participantsList = participants.map((p, i) => (<MemoParticipantForm key={i} index={i} participant={p} kp={kp} updateArrayItem={updateArrayItem} deleteParticipant={deleteParticipant} />))
+    const participantsList = participants.map((p, i) => (<MemoParticipantForm key={i} index={i} event={event} attendanceConfig={attendanceConfig} participant={p} kp={kp} updateArrayItem={updateArrayItem} deleteParticipant={deleteParticipant} />))
 
     return <Grid container spacing={0} sx={{ mt: 2 }}>
         <Grid xs={12} p={0} item>
@@ -32,7 +34,7 @@ export function ParticipantsForm({ participants, update, kp }: { participants: A
     </Grid>
 }
 
-function ParticipantForm({ index, participant, kp, updateArrayItem, deleteParticipant }: { index: number, participant: PartialDeep<JsonParticipantType>, kp: KpStructure, updateArrayItem: any, deleteParticipant: any }) {
+function ParticipantForm({ index, event, attendanceConfig, participant, kp, updateArrayItem, deleteParticipant }: { index: number, event: JsonEventType, attendanceConfig: AttendanceStructure, participant: PartialDeep<JsonParticipantType>, kp: KpStructure, updateArrayItem: any, deleteParticipant: any }) {
 
     const { updateSubField } = getMemoUpdateFunctions(updateArrayItem(index))
     const basicUpdates = getMemoUpdateFunctions(updateSubField('basic'))
@@ -60,6 +62,10 @@ function ParticipantForm({ index, participant, kp, updateArrayItem, deletePartic
                 <Grid xs={12} item>
                     <ParicipantMedicalForm data={participant.medical || {}} update={updateSubField('medical')} />
                 </Grid>
+                <Grid xs={12} item>
+                    <attendanceConfig.ParticipantElement configuration={event.attendanceData} data={participant.attendance} update={updateSubField('attendance')} />
+                </Grid>
+
                 {/*}Grid xs={12} item>
                     <FormControlLabel control={<Switch checked={participant.consent?.photo as boolean || false} onChange={getMemoUpdateFunctions(updateSubField('consent')).updateSwitch('photo')} />} label="Photo Consent" />
 </Grid>*/}

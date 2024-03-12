@@ -60,14 +60,20 @@ const schema = {
             replyTo: { type: String, required: true },
             kpMode: { type: String, required: true, enum: ['basic', 'vcamp'] },
             bigCampMode: { type: Boolean, required: true, default: false },
+            applicationsRequired: { type: Boolean, required: true, default: false },
             emailSubjectTag: { type: String, required: true },
-            attendanceStructure: { type: String, required: true, enum: ['whole'] },
+            attendanceStructure: { type: String, required: true, enum: ['whole', 'options'] },
             attendanceData: {
                 type: Object, schema: {
-                    mask: { type: Number }
-                }
+                    options: {
+                        type: Array,
+                        items: {
+                            type: String
+                        }
+                    }
+                },
             },
-            feeStructure: { type: String, required: true, enum: ['ealing', 'flat', 'free'] },
+            feeStructure: { type: String, required: true, enum: ['ealing', 'flat', 'free', 'large'] },
             feeData: {
                 type: Object, required: true, schema: {
                     fee: { type: Number },
@@ -76,6 +82,16 @@ const schema = {
                     ealingUnaccompanied: { type: Number },
                     ealingDiscountAccompanied: { type: Number },
                     ealingDiscountUnaccompanied: { type: Number },
+                    largeCampBands: {
+                        type: Array,
+                        items: {
+                            type: Object,
+                            schema: {
+                                before: { type: Date, required: true },
+                                fees: { type: Array, required: true, items: { type: Number, required: true } }
+                            }
+                        }
+                    }
                 }
             },
             customQuestions: {
@@ -84,7 +100,7 @@ const schema = {
                 items: {
                     type: Object,
                     schema: {
-                        questionType: { type: String, required: true, enum: ['yesnochoice', 'text'] },
+                        questionType: { type: String, required: true, enum: ['yesnochoice', 'text', 'longtext'] },
                         questionLabel: { type: String, required: true }
                     }
                 },
@@ -113,6 +129,14 @@ const schema = {
                     type: Object,
                     schema: {
                         basic: {
+                            type: Object,
+                            //Currently unsupported
+                            //schema: {
+                            //    name: { type: String, required: true }
+                            //},
+                            required: true
+                        },
+                        attendance: {
                             type: Object,
                             //Currently unsupported
                             //schema: {
@@ -167,7 +191,7 @@ const schema = {
                     schema: {
                         type: { type: String, required: true, enum: ['payment', 'adjustment'] },
                         value: { type: Number, required: true },
-                        userId: {type: String, required: true},
+                        userId: { type: String, required: true },
                         description: { type: String, required: true },
                         date: { type: Date, required: true },
                     }
@@ -192,6 +216,20 @@ const schema = {
             },
             created: { type: Date },
             updated: { type: Date },
+        },
+        Application: {
+            pk: { type: String, value: 'application' },
+            sk: { type: String, value: 'event:${eventId}:user:${userId}' },
+            userIdVersion: { type: String, value: '${userId}' },
+            eventId: { type: String, required: true },
+            userId: { type: String, required: true },
+            bookingType: { type: String, required: true, enum: ['individual', 'group'] },
+            name: { type: String, required: true },
+            email: { type: String, required: true },
+            district: { type: String },
+            predictedParticipants: { type: Number, required: true },
+            created: { type: Date },
+            updated: { type: Date },
         }
     } as const,
     params: {
@@ -200,9 +238,14 @@ const schema = {
     },
 }
 
+export interface ParticipantAttendanceType {
+    option?: string
+}
+
 interface ParticipantFields {
     created: Date,
     updated: Date
+    attendance: ParticipantAttendanceType
 }
 
 interface ParticipantBasicType {
@@ -244,6 +287,16 @@ export interface EalingFeeEventType {
     }
 }
 
+export interface LargeFeeEventType {
+    feeStructure: "large"
+    feeData: {
+        largeCampBands: Array<{
+            before: Date
+            fees: number[]
+        }>
+    }
+}
+
 export interface FlatFeeEventType {
     feeStructure: "flat"
     feeData: {
@@ -257,7 +310,7 @@ export interface FreeFeeEventType {
     }
 }
 
-export type EventType = (OnetableEventType & EalingFeeEventType) | (OnetableEventType & FlatFeeEventType) | (OnetableEventType & FreeFeeEventType)
+export type EventType = (OnetableEventType & EalingFeeEventType) | (OnetableEventType & FlatFeeEventType) | (OnetableEventType & FreeFeeEventType) | (OnetableEventType & LargeFeeEventType)
 export type JsonEventType = Jsonify<EventType>
 
 export type ParticipantType = ParticipantFields & ParticipantBasicType & Partial<ParticipantKpType> & Partial<ParticipantConsentType> & Partial<ParticipantMedicalType>
@@ -266,12 +319,11 @@ export type JsonParticipantType = Jsonify<ParticipantFields> & Jsonify<Participa
 
 export type JsonParticipantWithBasicType = Partial<Omit<JsonParticipantType, 'basic'>> & Jsonify<ParticipantBasicType>
 
-
 export type UserType = Entity<typeof schema.models.User>
 export type RoleType = Entity<typeof schema.models.Role>
 
 export type UserWithRoles = UserType & { roles: Array<RoleType> }
-export type FoundUserResponseType = (Omit<UserType, "tokens"> & { roles: Array<RoleType>, tokens: boolean })
+export type FoundUserResponseType = (Omit<UserType, "tokens"> & { roles: Array<RoleType>, applications: Array<ApplicationType>, tokens: boolean })
 export type UserResponseType = FoundUserResponseType | undefined
 
 export type OnetableBookingType = Entity<typeof schema.models.Booking>
@@ -285,6 +337,9 @@ export type JsonUserResponseType = Jsonify<UserResponseType>
 export type JsonBookingType = Omit<Jsonify<BookingType>, 'participants'> & { participants: Array<JsonParticipantType> }
 export type JsonEventBookingTimelineType = Jsonify<EventBookingTimelineType>
 export type JsonRoleType = SetOptional<Jsonify<RoleType>, 'id'>
+
+export type ApplicationType = Entity<typeof schema.models.Application>
+export type JsonApplicationType = Jsonify<ApplicationType>
 
 //@ts-ignore
 export const table = new Table({

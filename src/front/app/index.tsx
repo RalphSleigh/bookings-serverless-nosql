@@ -32,10 +32,13 @@ import { ReactErrorBoundary, RouterErrorBoundary } from './errors.js';
 import { SnackBarProvider } from './toasts.js';
 import { EditBookingLoader } from '../booking/editBookingLoader.js';
 import { Footer } from './footer.js';
+import { ApplyLoader } from '../booking/applyLoader.js';
+import { ApplyThanksLoader } from '../booking/applyThanksLoader.js';
 
 const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
+            refetchOnWindowFocus: false,
             staleTime: 1000 * 60 * 5,
             retry: (failureCount, error) => {//@ts-ignore
                 if (error.response && error.response.status === 401) return false
@@ -76,6 +79,12 @@ const router = createBrowserRouter([{
                 path: "event/:eventId/edit",
                 element: <EditEventLoader />,
             }, {
+                path: "event/:eventId/apply",
+                element: <ApplyLoader />,
+            }, {
+                path: "event/:eventId/applicationthanks",
+                element: <ApplyThanksLoader />,
+            }, {
                 path: "event/:eventId/book",
                 element: <CreateBookingLoader />,
             }, {
@@ -102,9 +111,12 @@ const router = createBrowserRouter([{
                         path: "bookings",
                         lazy: () => import('../manage/bookings.js')
                     }, {
+                        path: "applications",
+                        lazy: () => import('../manage/applications.js')
+                    }, {
                         path: "kp",
                         lazy: () => import('../manage/kp.js')
-                    }                    , {
+                    }, {
                         path: "roles",
                         lazy: () => import('../manage/roles.js')
                     }, {
@@ -226,13 +238,13 @@ export function App() {
 
 function useStickyState<T>(defaultValue: T, key: string): [T, React.Dispatch<React.SetStateAction<T>>] {
     const [value, setValue] = React.useState<T>(() => {
-      const stickyValue = window.localStorage && window.localStorage.getItem(key);
-      return stickyValue !== null
-        ? JSON.parse(stickyValue)
-        : defaultValue;
+        const stickyValue = window.localStorage && window.localStorage.getItem(key);
+        return stickyValue !== null
+            ? JSON.parse(stickyValue)
+            : defaultValue;
     });
     React.useEffect(() => {
-        if(window.localStorage) window.localStorage.setItem(key, JSON.stringify(value));
+        if (window.localStorage) window.localStorage.setItem(key, JSON.stringify(value));
     }, [key, value]);
     return [value, setValue];
-  }
+}

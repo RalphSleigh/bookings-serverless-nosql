@@ -1,18 +1,18 @@
-import { Whole } from "./whole.js";
+import { WholeAttendance } from "./whole.js";
 import { JsonEventType } from "../../lambda-common/onetable.js";
 import { AttendanceStructure } from "./attendanceStructure.js";
-import { TestBigAttendance } from "./testBigAttendance.js";
+import { OptionsAttendance } from "./options.js";
 
 export const attendances = {
-    whole: new Whole(),
-    testBigAttendance: new TestBigAttendance()
+    whole: new WholeAttendance(),
+    options: new OptionsAttendance()
 }
 
-export type AttendanceTypes = (typeof Whole | typeof TestBigAttendance)
+export type AttendanceTypes = (typeof WholeAttendance | typeof OptionsAttendance)
 
-type WholeInstance = InstanceType<typeof Whole>;
-type TestBigAttendanceInstance = InstanceType<typeof TestBigAttendance>
-type AttendanceInstance = WholeInstance | TestBigAttendanceInstance;
+type WholeInstance = InstanceType<typeof WholeAttendance>;
+type OptionsAttendanceInstance = InstanceType<typeof OptionsAttendance>
+type AttendanceInstance = WholeInstance | OptionsAttendanceInstance;
 
 export const maybeGetAttendance = (event: Partial<JsonEventType>): AttendanceInstance | null => {
     if (event.attendanceStructure && attendances[event.attendanceStructure]) return attendances[event.attendanceStructure]

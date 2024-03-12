@@ -4,7 +4,7 @@ import { Add, EventNoteTwoTone } from '@mui/icons-material';
 import { BookingType, EventType, JsonBookingType, JsonEventType } from "../../lambda-common/onetable.js";
 import { useEvents, useUsersBookings } from "../queries.js";
 import { isSameMonth, format, parseISO, add } from "date-fns";
-import { CanEditEvent, CanEditOwnBooking, CanManageEvent, IsGlobalAdmin } from "../../shared/permissions.js";
+import { CanBookIntoEvent, CanEditEvent, CanEditOwnBooking, CanManageEvent, IsGlobalAdmin } from "../../shared/permissions.js";
 import { IfHasPermission } from "../permissions.js";
 import { toLocalDate } from "../util.js";
 import { UserContext } from "../user/userContext.js";
@@ -80,8 +80,14 @@ function BookingButton({ event, booking }: { event: JsonEventType, booking?: Jso
     if (booking && CanEditOwnBooking.if({ user, event, booking })) return <Button variant="contained" sx={{ float: "right" }} component={RouterLink} to={`/event/${event.id}/edit-my-booking`}>Edit my booking
     </Button>
 
-    return <Button variant="contained" sx={{ float: "right" }} component={RouterLink} to={`/event/${event.id}/book`}>Book
+    if (CanBookIntoEvent.if({ user, event })) return <Button variant="contained" sx={{ float: "right" }} component={RouterLink} to={`/event/${event.id}/book`}>Book
     </Button>
+
+    if(event.applicationsRequired && user.applications.find(a => a.eventId === event.id)) return <Button variant="contained" sx={{ float: "right" }} disabled>Application Pending</Button>
+
+    if(event.applicationsRequired) return <Button variant="contained" sx={{ float: "right" }} component={RouterLink} to={`/event/${event.id}/apply`}>Apply to book</Button>
+
+    return <Button variant="contained" sx={{ float: "right" }}>Dunno</Button>
 }
 
 function YourBooking({ event, booking }: { event: JsonEventType, booking: JsonBookingType }) {

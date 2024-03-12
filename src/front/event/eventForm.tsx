@@ -3,7 +3,6 @@ import React, { useCallback, useContext, useState } from "react";
 import { UserContext } from "../user/userContext.js";
 import { validate } from "./validate.js";
 import { UtcDatePicker } from "../util.js";
-import { DateTimePicker } from "@mui/x-date-pickers";
 import { fees, getFee, maybeGetFee } from "../../shared/fee/fee.js";
 import { kp } from "../../shared/kp/kp.js"
 import { attendances, getAttendance, maybeGetAttendance } from "../../shared/attendance/attendance.js";
@@ -12,6 +11,7 @@ import { AttendanceStructure } from "../../shared/attendance/attendanceStructure
 import { FeeStructure } from "../../shared/fee/feeStructure.js";
 import { Close } from "@mui/icons-material";
 import { getMemoUpdateFunctions, parseDate } from "../../shared/util.js";
+import { DateTimePicker } from '@mui/x-date-pickers'
 
 export function EventForm({ data: inputData, submit, mode }: { data: any, submit: (data) => void, mode: "create" | "edit" }) {
     const user = useContext(UserContext)
@@ -59,12 +59,15 @@ export function EventForm({ data: inputData, submit, mode }: { data: any, submit
                                     <UtcDatePicker sx={{ mt: 2 }} label="End Date" value={data.endDate} onChange={updateDate('endDate')} />
                                 </FormGroup>
                                 <FormGroup>
-                                    <DateTimePicker sx={{ mt: 2 }} label="Booking Deadline" value={parseDate(data.bookingDeadline)} onChange={updateDate('bookingDeadline')} />
+                                    <DateTimePicker sx={{ mt: 2 }} label="Booking Deadline" timezone="UTC" value={parseDate(data.bookingDeadline)} onChange={updateDate('bookingDeadline')} />
                                 </FormGroup>
                                 <TextField fullWidth sx={{ mt: 2 }} required type="email" id="outlined-required" label="Email subject tag" value={data.emailSubjectTag || ''} onChange={updateField('emailSubjectTag')} />
                                 <TextField fullWidth sx={{ mt: 2 }} required type="email" id="outlined-required" label="Reply-to" value={data.replyTo || ''} onChange={updateField('replyTo')} />
                                 <FormGroup>
                                     <FormControlLabel sx={{ mt: 2 }} control={<Switch checked={data.bigCampMode || false} onChange={updateSwitch('bigCampMode')} />} label="Big Camp Mode" />
+                                </FormGroup>
+                                <FormGroup>
+                                    <FormControlLabel sx={{ mt: 2 }} control={<Switch checked={data.applicationsRequired || false} onChange={updateSwitch('applicationsRequired')} />} label="Applications required?" />
                                 </FormGroup>
                                 <FormControl fullWidth sx={{ mt: 2 }}>
                                     <InputLabel id="fee-select-label">KP Structure</InputLabel>
@@ -88,7 +91,7 @@ export function EventForm({ data: inputData, submit, mode }: { data: any, submit
                                         {feeOptions}
                                     </Select>
                                 </FormControl>
-                                <FeeConfig data={data.feeData ?? {}} update={updateSubField("feeData")} />
+                                <FeeConfig attendanceData={data.attendanceData} data={data.feeData ?? {}} update={updateSubField("feeData")} />
                                 <CustomQuestionsForm data={data.customQuestions!} update={updateSubField("customQuestions")} />
                             </Grid>
                             <Grid container spacing={0}>
@@ -135,6 +138,7 @@ const QuestionItem = ({ i, question, updateArrayItem, deleteQuestion }: { i: num
                         <MenuItem value="default">Please select</MenuItem>
                         <MenuItem value="yesnochoice">Yes/No</MenuItem>
                         <MenuItem value="text">Text</MenuItem>
+                        <MenuItem value="longtext">Long Text</MenuItem>
                     </Select>
                 </FormControl>
                 <IconButton color="error" onClick={deleteQuestion(i)}><Close /></IconButton>

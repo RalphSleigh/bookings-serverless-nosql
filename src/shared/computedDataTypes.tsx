@@ -30,3 +30,15 @@ type RemoveFeeItemType = {
 }
 
 export type BookingOperationType = AddPaymentType | AddAdjustmentType | RemoveFeeItemType
+
+type ApproveApplicationType = {
+    type: "approveApplication"
+    userId: string
+}
+
+type DeclineApplicationType = {
+    type: "declineApplication"
+    userId: string
+}
+
+export type ApplicationOperationType = ApproveApplicationType | DeclineApplicationType

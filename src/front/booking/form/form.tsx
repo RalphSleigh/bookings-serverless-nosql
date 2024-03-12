@@ -1,6 +1,6 @@
 import { FormGroup, Grid, Paper, TextField, Typography, Box, Button, FormControlLabel, Switch, MenuItem, Select, FormControl, InputLabel, ButtonGroup, Stack, IconButton } from "@mui/material"
 import React, { useCallback, useContext, useState } from "react";
-import { JsonBookingType, JsonEventType, UserResponseType, UserType } from "../../../lambda-common/onetable.js";
+import { JsonBookingType, JsonEventType, JsonUserResponseType, UserResponseType, UserType } from "../../../lambda-common/onetable.js";
 import { ParticipantsForm } from "./participants.js";
 import { kp } from "../../../shared/kp/kp.js"
 import { QuickList } from "./quickList.js";
@@ -14,10 +14,11 @@ import { Lock, LockOpen, Delete, Send } from '@mui/icons-material';
 import { getMemoUpdateFunctions } from "../../../shared/util.js";
 import { LoadingButton } from '@mui/lab'
 import { PartialDeep } from "type-fest";
+import { getAttendance } from "../../../shared/attendance/attendance.js";
 
 const MemoParticipantsForm = React.memo(ParticipantsForm)
 
-export function BookingForm({ data, event, user, update, submit, mode, deleteBooking, submitLoading, deleteLoading }: { data: PartialDeep<JsonBookingType>, event: JsonEventType, user: UserResponseType, update: React.Dispatch<React.SetStateAction<PartialDeep<JsonBookingType>>>, submit: () => void, mode: "create" | "edit" | "rebook", deleteBooking: any, submitLoading: boolean, deleteLoading: boolean }) {
+export function BookingForm({ data, event, user, update, submit, mode, deleteBooking, submitLoading, deleteLoading }: { data: PartialDeep<JsonBookingType>, event: JsonEventType, user: JsonUserResponseType, update: React.Dispatch<React.SetStateAction<PartialDeep<JsonBookingType>>>, submit: () => void, mode: "create" | "edit" | "rebook", deleteBooking: any, submitLoading: boolean, deleteLoading: boolean }) {
 
     const [permission, updatePermission] = useState({ permission: false })
     const [deleteLock, setDeleteLock] = useState(true)
@@ -33,15 +34,16 @@ export function BookingForm({ data, event, user, update, submit, mode, deleteBoo
     const BasicFields = event.bigCampMode ? MemoBookingGroupContactFields : MemoBookingIndvidualContactFields
     const EmergencyFields = event.bigCampMode ? MemoBookingGroupEmergenecyFields : MemoBookingIndvidualEmergencyFields
     const kpConfig = React.useMemo(() => kp[event.kpMode] || kp.basic, [event]);
+    const attendanceConfig = React.useMemo(() => getAttendance(event), [event]);
 
-    const validationResults = validate(event, kpConfig, data, permission.permission)
+    const validationResults = validate(event, kpConfig, attendanceConfig, data, permission.permission)
     return <Grid container spacing={2} p={2} justifyContent="center">
         <Grid  xl={6} lg={7} md={8} sm={9} xs={12} item>
             <Box p={2}>
                 <form>
                     <Typography variant="h4">{`Booking for ${event.name}`}</Typography>
                     <BasicFields data={data.basic} update={updateSubField} />
-                    <MemoParticipantsForm participants={data.participants || [{}]} update={updateSubField} kp={kpConfig} />
+                    <MemoParticipantsForm event={event} attendanceConfig={attendanceConfig} participants={data.participants || [{}]} update={updateSubField} kp={kpConfig} />
                     <EmergencyFields data={data.emergency} update={updateSubField} />
                     <MemoCustomQuestionFields eventCustomQuestions={event.customQuestions} data={data.customQuestions} update={updateSubField} />
                     <MemoBookingMoneySection fees={fee} event={event} data={data} />

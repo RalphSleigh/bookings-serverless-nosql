@@ -1,11 +1,11 @@
 import { QueryObserverSuccessResult, UseQueryOptions, useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import axios from 'axios'
-import { BookingType, EventBookingTimelineType, EventType, JsonBookingType, JsonEventBookingTimelineType, JsonEventType, JsonRoleType, JsonUserResponseType, JsonUserType } from '../lambda-common/onetable.js'
+import { BookingType, EventBookingTimelineType, EventType, JsonApplicationType, JsonBookingType, JsonEventBookingTimelineType, JsonEventType, JsonRoleType, JsonUserResponseType, JsonUserType } from '../lambda-common/onetable.js'
 import { SnackBarContext } from './app/toasts.js';
 import { useContext } from 'react';
 import { set } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
-import { BookingOperationType } from '../shared/computedDataTypes.js';
+import { ApplicationOperationType, BookingOperationType } from '../shared/computedDataTypes.js';
 
 export function useEnv() {
     return useSuspenseQuery({
@@ -17,8 +17,9 @@ export function useEnv() {
 export const userQuery = {
     queryKey: ['user'],
     queryFn: async () => (await axios.get("/api/user")).data,
-    staleTime: 1000 * 60 * 5,
-    cacheTime: 1000 * 60 * 10
+    staleTime: 60 * 1000,
+    cacheTime: 60 * 1000,
+    refetchOnWindowFocus: true
 }
 
 export function useUser() {
@@ -108,6 +109,27 @@ export function useCreateBooking(event) {
                 })
                 setSnackbar({ message: "Booking Created", severity: 'success' })
                 navigate(`/event/${event.id}/thanks`)
+            },
+            onError: snackbarError(setSnackbar)
+        });
+}
+
+export function useCreateApplication(event) {
+    const queryClient = useQueryClient()
+    const setSnackbar = useContext(SnackBarContext)
+    const navigate = useNavigate()
+    return useMutation<{ application: JsonApplicationType }, any, JsonApplicationType, any>(
+        {
+            mutationFn: async data => (await axios.post('/api/booking/apply', { application: data })).data,
+            onSuccess: () => {
+                queryClient.resetQueries({
+                    queryKey: ['user']
+                })
+                queryClient.invalidateQueries({
+                    queryKey: ['manage']
+                })
+                setSnackbar({ message: "Application Created", severity: 'success' })
+                navigate(`/event/${event.id}/applicationthanks`)
             },
             onError: snackbarError(setSnackbar)
         });
@@ -211,6 +233,19 @@ export function useEventRoles(eventId) {
     return useSuspenseQuery(eventRolesQuery(eventId)) as QueryObserverSuccessResult<{ "roles": [JsonRoleType] }>
 }
 
+export type eventApplicationsQueryType = UseQueryOptions<{ "applications": [JsonApplicationType] }, any>
+
+export const eventApplicationsQuery = eventId => {
+    return {
+        queryKey: ['manage', eventId, 'applications'],
+        queryFn: async () => (await axios.get(`/api/event/${eventId}/manage/applications`)).data
+    }
+}
+
+export function useEventApplications(eventId) {
+    return useSuspenseQuery(eventApplicationsQuery(eventId)) as QueryObserverSuccessResult<{ "applications": [JsonApplicationType] }>
+}
+
 export type eventRolesQueryType = UseQueryOptions<{ "roles": [JsonRoleType] }, any>
 
 //This does not depend on the eventId, but we use it to make checking permission simpler
@@ -276,7 +311,7 @@ export function useDisableDriveSync() {
 export function useBookingOperation() {
     const queryClient = useQueryClient()
     const setSnackbar = useContext(SnackBarContext)
-    return useMutation<{message: string}, any, { eventId: string, userId: string, operation: BookingOperationType }, any>(
+    return useMutation<{ message: string }, any, { eventId: string, userId: string, operation: BookingOperationType }, any>(
         {
             mutationFn: async data => (await axios.post(`/api/event/${data.eventId}/manage/booking/${data.userId}/operation`, { operation: data.operation })).data,
             onSuccess: (data) => {
@@ -301,3 +336,24 @@ const snackbarError = (setSnackbar) => (error, variables, context) => {
         setSnackbar({ message: `Unknown Error`, severity: 'error' })
     }
 }
+
+export function useApplicationOperation(eventId) {
+    const queryClient = useQueryClient()
+    const setSnackbar = useContext(SnackBarContext)
+    return useMutation<{ message: string }, any, { userId: String, operation: ApplicationOperationType }, any>(
+        {
+            mutationFn: async data => (await axios.post(`/api/event/${eventId}/manage/application/${data.userId}/operation`, { operation: data.operation })).data,
+            onSuccess: (data) => {
+                queryClient.invalidateQueries({
+                    queryKey: ['manage', eventId, 'applications']
+                })
+                queryClient.invalidateQueries({
+                    queryKey: ['manage', eventId, 'roles']
+                })
+                setSnackbar({ message: data.message, severity: 'success' })
+            },
+            onError: snackbarError(setSnackbar)
+        }
+    );
+}
+

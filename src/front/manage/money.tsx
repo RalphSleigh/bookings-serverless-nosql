@@ -46,7 +46,7 @@ const MoneyTable = ({ event, bookings, onRowClick }: { event: JsonEventType, boo
                 totals[i] += v
             })
             return a
-        }, [])
+        }, fees.getValueLabels().map(() => 0))
 
         b.fees.filter(f => f.type === "adjustment").forEach(f => {
             rows.forEach((v, i) => rows[i] += f.value)
@@ -123,7 +123,7 @@ const MoneyModal = ({ selectedBooking, booking, event, users, handleClose }: { s
             a[i] += v
         })
         return a
-    }, [])
+    }, fees.getValueLabels().map(() => 0))
 
     const adjustmentRows = booking.fees.filter(f => f.type === "adjustment").map((f, i) => {
         totals = totals.map((v, i) => totals[i] += f.value)

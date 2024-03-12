@@ -15,20 +15,27 @@ const RoleModel = table.getModel<RoleType>('Role')
 const UserModel = table.getModel<UserType>('User')
 
 export type BasicEmailData = {
-    template: "managerDataAccess"
+    template: "managerDataAccess" | "applicationReceived" | "applicationApproved"
     recipient: UserType
     event: EventType
 }
 
+export type ApplicationEmailData = {
+    template: "managerApplicationReceived",
+    recipient: UserType
+    event: EventType
+    bookingOwner: UserType
+}
+
 export type BookingEmailData = {
-    template: Exclude<keyof EmailsType, "managerDataAccess">
+    template: "confirmation" | "edited" | "managerConfirmation" | "managerBookingUpdated" | "managerBookingCancelled",
     recipient: UserType
     event: EventType
     booking: BookingType
     bookingOwner: UserType
 }
 
-export type EmailData = BasicEmailData | BookingEmailData
+export type EmailData = BasicEmailData | BookingEmailData | ApplicationEmailData
 
 export async function queueEmail(data: EmailData, config: ConfigType) {
     console.log("queueing emails")
