@@ -8,7 +8,7 @@ export async function postToDiscord(config, message) {
         console.log("putting message in queue - discord")
         const sqsClient = new SQSClient({});
         const command = new SendMessageCommand({
-            QueueUrl: process.env.EMAIL_QUEUE_URL,
+            QueueUrl: process.env.DISCORD_QUEUE_URL,
             MessageBody: JSON.stringify({ message: message })
         });
 
