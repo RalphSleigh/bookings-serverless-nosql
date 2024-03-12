@@ -51,7 +51,7 @@ export const lambdaHandler = lambda_wrapper_json(
                         bookingOwner: current_user,
                     }, config)
 
-                    await postToDiscord(config, `${newVersion.basic.contactName} (${newVersion.basic.district}) edited their booking for event ${event.name}, they have booked ${newVersion.participants.length} people (previously ${existingLatestBooking})`)
+                    await postToDiscord(config, `${newVersion.basic.contactName} (${newVersion.basic.district}) edited their booking for event ${event.name}, they have booked ${newVersion.participants.length} people (previously ${existingLatestBooking.participants.length})`)
                     await postToDiscord(config, "TODO: The cool diff thing") 
                 }
 
