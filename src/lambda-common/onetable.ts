@@ -88,6 +88,7 @@ const schema = {
                             type: Object,
                             schema: {
                                 before: { type: Date, required: true },
+                                description: { type: String, required: true },
                                 fees: { type: Array, required: true, items: { type: Number, required: true } }
                             }
                         }
@@ -291,6 +292,7 @@ export interface LargeFeeEventType {
     feeData: {
         largeCampBands: Array<{
             before: Date
+            description: string
             fees: number[]
         }>
     }

@@ -7,6 +7,7 @@ import { JsonBookingWithExtraType } from "../computedDataTypes.js";
 
 export interface FeeLine {
     description: string,
+    tooltip?: string,
     values: number[]
 }
 
