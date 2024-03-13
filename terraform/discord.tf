@@ -1,5 +1,5 @@
 resource "aws_sqs_queue" "discord_queue" {
-    name                       = "discord-queue"
+    name                       = "discord-queue.fifo"
     visibility_timeout_seconds = 300
     fifo_queue                 = true
     content_based_deduplication = true
