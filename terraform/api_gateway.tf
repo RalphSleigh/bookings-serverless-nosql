@@ -17,6 +17,21 @@ resource "aws_api_gateway_rest_api" "gateway" {
             httpMethod = "POST"
             type = "aws_proxy"
           }
+          parameters = [{
+            name = "X-Signature-Ed25519"
+            in   = "header"
+            schema = {
+              type = "string"
+              default = ""
+            }
+          },{
+            name = "X-Signature-Timestamp"
+            in   = "header"
+            schema = {
+              type = "string"
+              default = ""
+            }
+          }]
         }
       }
     }]...)
