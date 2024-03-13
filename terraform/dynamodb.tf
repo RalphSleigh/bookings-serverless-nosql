@@ -26,6 +26,13 @@ resource "aws_dynamodb_table" "bookings_table" {
     projection_type = "ALL"
     range_key       = "userIdVersion"
   }
+
+  lifecycle {
+    ignore_changes = [
+      read_capacity,
+      write_capacity,
+    ]
+  }
 }
 
 resource "aws_appautoscaling_target" "bookings_table_read_target" {
@@ -92,6 +99,13 @@ resource "aws_dynamodb_table" "config_table" {
   attribute {
     name = "key"
     type = "S"
+  }
+
+  lifecycle {
+    ignore_changes = [
+      read_capacity,
+      write_capacity,
+    ]
   }
 }
 
