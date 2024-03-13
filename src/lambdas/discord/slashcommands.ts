@@ -8,6 +8,7 @@ import { queueManagerEmails } from '../../lambda-common/email.js';
 
 import { verify } from "discord-verify/node";
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { formatDuration, intervalToDuration } from 'date-fns';
 
 
 export const lambdaHandler = async (lambda_event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => { //@ts-ignore
@@ -39,12 +40,14 @@ export const lambdaHandler = async (lambda_event: APIGatewayProxyEvent): Promise
 
         console.log(rawBody)
 
+        const result = formatDuration(intervalToDuration({ start: new Date(), end: new Date(2025, 7, 27, 12, 0 ,0)}), { delimiter: ', ' }).replace("minutes,", "minutes and")
+
         return {
             statusCode: 200, body: JSON.stringify({
                 "type": 4,
                 "data": {
                     "tts": false,
-                    "content": "If I knew when camp started, this might tell you!",
+                    "content": `🌞⛺⛺⛺ Camp begins in ${result}! ⛺⛺⛺🌞`,
                     "embeds": [],
                     "allowed_mentions": { "parse": [] }
                 }
