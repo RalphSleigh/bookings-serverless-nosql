@@ -6,7 +6,10 @@ import { updateParticipantsDates } from '../../lambda-common/util.js';
 import { queueDriveSync } from '../../lambda-common/drive_sync.js';
 import { queueManagerEmails } from '../../lambda-common/email.js';
 
+import { verify } from "discord-verify/node";
+
 export const lambdaHandler = lambda_wrapper_json(
     async (lambda_event, config, current_user) => {
+        console.log(JSON.stringify(lambda_event))
         if(lambda_event.body.type == 1)return { type: 1 }
     })

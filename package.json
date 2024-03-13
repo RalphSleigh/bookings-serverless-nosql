@@ -59,6 +59,7 @@
     "date-fns": "^2.29.3",
     "date-fns-tz": "^2.0.0",
     "debounce": "^1.1.0",
+    "discord-verify": "^1.2.0",
     "discord.js": "^14.7.1",
     "dynamodb-onetable": "^2.7.1",
     "eol": "^0.9.1",
