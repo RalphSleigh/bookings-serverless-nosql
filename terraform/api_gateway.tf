@@ -16,10 +16,6 @@ resource "aws_api_gateway_rest_api" "gateway" {
             uri         = aws_lambda_function.lambda[k].invoke_arn
             httpMethod = "POST"
             type = "aws_proxy"
-            passthroughBehavior = "when_no_match"
-            requestTemplates = {
-              "application/json" = "{\"headers\": $input.params().header}"
-            }
           }
         }
       }

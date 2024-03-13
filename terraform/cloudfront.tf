@@ -127,10 +127,7 @@ resource "aws_cloudfront_origin_request_policy" "api_policy" {
     cookie_behavior = "all"
   }
   headers_config {
-    header_behavior = "whitelist"
-    headers {
-      items = ["User-Agent"]
-    }
+    header_behavior = "all"
   }
 
   query_strings_config {
