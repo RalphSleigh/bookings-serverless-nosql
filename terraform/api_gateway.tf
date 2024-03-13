@@ -16,22 +16,12 @@ resource "aws_api_gateway_rest_api" "gateway" {
             uri         = aws_lambda_function.lambda[k].invoke_arn
             httpMethod = "POST"
             type = "aws_proxy"
+            passthroughBehavior = "when_no_match"
+            requestParameters = {
+              "integration.request.header.X-Signature-Ed25519" = "method.request.header.X-Signature-Ed25519",
+              "integration.request.header.X-Signature-Timestamp" = "method.request.header.X-Signature-Timestamp"
+              }
           }
-          parameters = [{
-            name = "X-Signature-Ed25519"
-            in   = "header"
-            schema = {
-              type = "string"
-              default = ""
-            }
-          },{
-            name = "X-Signature-Timestamp"
-            in   = "header"
-            schema = {
-              type = "string"
-              default = ""
-            }
-          }]
         }
       }
     }]...)
