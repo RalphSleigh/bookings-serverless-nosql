@@ -1,6 +1,8 @@
 resource "aws_sqs_queue" "discord_queue" {
-  name                       = "discord-queue"
-  visibility_timeout_seconds = 300
+    name                       = "discord-queue"
+    visibility_timeout_seconds = 300
+    fifo_queue                 = true
+    content_based_deduplication = true
 }
 
 data "archive_file" "discord_lambda_zip" {
