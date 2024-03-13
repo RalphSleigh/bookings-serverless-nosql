@@ -6,6 +6,7 @@ import { admin, auth } from '@googleapis/admin';
 import { ApplicationOperationType, BookingOperationType } from '../../../shared/computedDataTypes.js';
 import { Jsonify } from 'type-fest'
 import { queueEmail } from '../../../lambda-common/email.js';
+import { postToDiscord } from '../../../lambda-common/discord.js';
 
 const EventModel = table.getModel<EventType>('Event')
 const RoleModel: Model<RoleType> = table.getModel<RoleType>('Role')
@@ -32,10 +33,15 @@ export const lambdaHandler = lambda_wrapper_json(
                         event: event as EventType,
                     }, config)
 
+                    await postToDiscord(config, `${current_user.userName} approved application from ${appliction.name} (${appliction.district})`)
+
                     return { message: "Application Approved" }
                 case "declineApplication":
                     CanManageApplications.throw({ user: current_user, event: event })
                     await ApplicationModel.remove({ eventId: event.id, userId: operation.userId })
+
+                    await postToDiscord(config, `${current_user.userName} declined application from ${operation.userId} (TODO: get application name and district)`)
+
                     return { message: "Application Declined" }
                 default:
                     throw new Error("Invalid operation")
