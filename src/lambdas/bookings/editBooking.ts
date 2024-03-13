@@ -6,6 +6,8 @@ import { updateParticipantsDates } from '../../lambda-common/util.js';
 import { queueDriveSync } from '../../lambda-common/drive_sync.js';
 import { queueEmail, queueManagerEmails } from '../../lambda-common/email.js';
 import { postToDiscord } from '../../lambda-common/discord.js';
+import { diffString } from 'json-diff';
+import { log } from '../../lambda-common/logging.js';
 
 const BookingModel: Model<OnetableBookingType> = table.getModel<OnetableBookingType>('Booking')
 const EventModel = table.getModel<OnetableEventType>('Event')
@@ -51,8 +53,17 @@ export const lambdaHandler = lambda_wrapper_json(
                         bookingOwner: current_user,
                     }, config)
 
+                    const diffOutput = diffString(existingLatestBooking, newVersion, {outputKeys:['name'], color: false, maxElisions: 1, excludeKeys:['created', 'updated']})
+                    .split("\n")
+                    .slice(1,-2)
+                    .filter(s => !s.includes("entries)"))
+                    .map(s => s.includes("name") ? s : s.replace(/(.*\+.*\")(.*)\"/g,'$1***"').replace(/(.*\-.*\")(.*)\"/g,'$1***"'))
+                    .join("\n")
+            
+                    console.log(diffOutput)
+
                     await postToDiscord(config, `${newVersion.basic.contactName} (${newVersion.basic.district}) edited their booking for event ${event.name}, they have booked ${newVersion.participants.length} people (previously ${existingLatestBooking.participants.length})`)
-                    await postToDiscord(config, "TODO: The cool diff thing") 
+                    await postToDiscord(config, diffOutput) 
                 }
 
                 await queueDriveSync(event.id, config)
