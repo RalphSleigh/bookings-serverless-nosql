@@ -40,18 +40,22 @@ export const lambdaHandler = async (lambda_event: APIGatewayProxyEvent): Promise
 
         console.log(rawBody)
 
-        const result = formatDuration(intervalToDuration({ start: new Date(), end: new Date(2025, 7, 27, 12, 0 ,0)}), { delimiter: ', ' }).replace("minutes,", "minutes and")
 
-        return {
-            statusCode: 200, body: JSON.stringify({
-                "type": 4,
-                "data": {
-                    "tts": false,
-                    "content": `🌞⛺⛺⛺ Camp begins in ${result}! ⛺⛺⛺🌞`,
-                    "embeds": [],
-                    "allowed_mentions": { "parse": [] }
-                }
-            })
+        if (body.data.name === "campstarts") {
+
+            const result = formatDuration(intervalToDuration({ start: new Date(), end: new Date(2025, 7, 27, 12, 0, 0) }), { delimiter: ', ' }).replace("minutes,", "minutes and")
+
+            return {
+                statusCode: 200, body: JSON.stringify({
+                    "type": 4,
+                    "data": {
+                        "tts": false,
+                        "content": `🌞⛺🌳  Camp 100 begins in ${result}!  🌳⛺⛺🌞`,
+                        "embeds": [],
+                        "allowed_mentions": { "parse": [] }
+                    }
+                })
+            }
         }
     })
 }
