@@ -29,7 +29,7 @@ export const lambdaHandler = lambda_wrapper_json(
                                 substitutions: { emptyList: [], newFees: fees }
                             })
 
-                        await postToDiscord(config, `${current_user.userName} added an adjustmemt to booking ${booking.basic.district} of ${currency(operation.value)} (${operation.description})`)
+                        await postToDiscord(config, `${current_user.userName} added a payment to booking ${booking.basic.district} of ${currency(operation.value)} (${operation.description})`)
 
                         return { message: "Payment added" }
                     case "addAdjustment":
@@ -41,7 +41,7 @@ export const lambdaHandler = lambda_wrapper_json(
                                 substitutions: { emptyList: [], newFees: adjustmentFees }
                             })
 
-                        await postToDiscord(config, `${current_user.userName} added a payment to booking ${booking.basic.district} of ${currency(operation.value)} (${operation.description})`)
+                        await postToDiscord(config, `${current_user.userName} added an adjustment to booking ${booking.basic.district} of ${currency(operation.value)} (${operation.description})`)
 
                         return { message: "Adjustment added" }
                     case "removeFeeItem":
