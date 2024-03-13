@@ -36,5 +36,20 @@ export const lambdaHandler = async (lambda_event: APIGatewayProxyEvent): Promise
         if (body.type === 1) {
             return { statusCode: 200, body: JSON.stringify({ type: 1 }) };
         }
+
+        console.log(rawBody)
+
+        return {
+            statusCode: 200, body: JSON.stringify({
+                "type": 4,
+                "data": {
+                    "tts": false,
+                    "content": "If I knew when camp started, this might tell you!",
+                    "embeds": [],
+                    "allowed_mentions": { "parse": [] }
+                }
+            })
+        }
     })
 }
+
