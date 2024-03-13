@@ -352,6 +352,12 @@ variable "lambda_definitions" {
       code   = "error/reportError"
       path   = "error"
       method = "post"
+    },
+    discord_slashcommand = {
+      name   = "discord_slashcommand"
+      code   = "discord/slashcommand"
+      path   = "discord/slashcommand"
+      method = "post"
     }
   }
 }
