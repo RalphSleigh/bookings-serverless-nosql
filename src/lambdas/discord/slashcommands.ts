@@ -24,7 +24,7 @@ export const lambdaHandler = async (lambda_event: APIGatewayProxyEvent): Promise
             signature,
             timestamp,
             config.DISCORD_PUBLIC_KEY,
-            crypto.webcrypto.subtle
+            globalThis.crypto.subtle
         );
 
         if (!isValid) {
