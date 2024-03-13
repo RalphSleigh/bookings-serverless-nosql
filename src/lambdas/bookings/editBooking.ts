@@ -27,7 +27,7 @@ export const lambdaHandler = lambda_wrapper_json(
 
                 updateParticipantsDates(existingLatestBooking.participants, newData.participants)
                 delete newData.fees
-                
+
                 const newLatest = await BookingModel.update({ ...existingLatestBooking, ...newData, deleted: false }, { partial: false })
                 const newVersion = await BookingModel.create({ ...newLatest, version: newLatest.updated.toISOString() })
 
@@ -53,17 +53,17 @@ export const lambdaHandler = lambda_wrapper_json(
                         bookingOwner: current_user,
                     }, config)
 
-                    const diffOutput = diffString(existingLatestBooking, newVersion, {outputKeys:['name'], color: false, maxElisions: 1, excludeKeys:['created', 'updated']})
-                    .split("\n")
-                    .slice(1,-2)
-                    .filter(s => !s.includes("entries)"))
-                    .map(s => s.includes("name") ? s : s.replace(/(.*\+.*\")(.*)\"/g,'$1***"').replace(/(.*\-.*\")(.*)\"/g,'$1***"'))
-                    .join("\n")
-            
+                    const diffOutput = diffString(existingLatestBooking, newVersion, { outputKeys: ['name'], color: false, maxElisions: 1, excludeKeys: ['created', 'updated'] })
+                        .split("\n")
+                        .slice(1, -2)
+                        .filter(s => !s.includes("entries)"))
+                        .map(s => s.includes("name") ? s : s.replace(/(.*\+.*\")(.*)\"/g, '$1***"').replace(/(.*\-.*\")(.*)\"/g, '$1***"'))
+                        .join("\n")
+
                     console.log(diffOutput)
 
                     await postToDiscord(config, `${newVersion.basic.contactName} (${newVersion.basic.district}) edited their booking for event ${event.name}, they have booked ${newVersion.participants.length} people (previously ${existingLatestBooking.participants.length})`)
-                    await postToDiscord(config, diffOutput) 
+                    if (newVersion.participants.length === existingLatestBooking.participants.length) await postToDiscord(config, "```" + diffOutput + "```")
                 }
 
                 await queueDriveSync(event.id, config)
