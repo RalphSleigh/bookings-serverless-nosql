@@ -13,6 +13,7 @@ export type ConfigType = {
   DISCORD_GUILD_ID: string,
   DISCORD_CHANNEL_ID: string,
   DISCORD_WEBHOOK_URL: string,
+  DISCORD_PUBLIC_KEY: string,
   DRIVE_SYNC_ENABLED: boolean,
   EMAIL_ENABLED: boolean,
   EMAIL_FROM: string,
