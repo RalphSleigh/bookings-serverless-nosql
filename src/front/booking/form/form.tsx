@@ -1,4 +1,4 @@
-import { FormGroup, Grid, Paper, TextField, Typography, Box, Button, FormControlLabel, Switch, MenuItem, Select, FormControl, InputLabel, ButtonGroup, Stack, IconButton } from "@mui/material"
+import { FormGroup, Grid, Paper, TextField, Typography, Box, Button, FormControlLabel, Switch, MenuItem, Select, FormControl, InputLabel, ButtonGroup, Stack, IconButton, Card, CardContent, Grow, Checkbox } from "@mui/material"
 import React, { useCallback, useContext, useState } from "react";
 import { JsonBookingType, JsonEventType, JsonUserResponseType, UserResponseType, UserType } from "../../../lambda-common/onetable.js";
 import { ParticipantsForm } from "./participants.js";
@@ -15,6 +15,8 @@ import { getMemoUpdateFunctions } from "../../../shared/util.js";
 import { LoadingButton } from '@mui/lab'
 import { PartialDeep } from "type-fest";
 import { getAttendance } from "../../../shared/attendance/attendance.js";
+import { organisations } from "../../../shared/ifm.js";
+import { MemoBookingExtraContactFields } from "./extraContacts.js";
 
 const MemoParticipantsForm = React.memo(ParticipantsForm)
 
@@ -38,11 +40,12 @@ export function BookingForm({ data, event, user, update, submit, mode, deleteBoo
 
     const validationResults = validate(event, kpConfig, attendanceConfig, data, permission.permission)
     return <Grid container spacing={2} p={2} justifyContent="center">
-        <Grid  xl={6} lg={7} md={8} sm={9} xs={12} item>
+        <Grid xl={6} lg={7} md={8} sm={9} xs={12} item>
             <Box p={2}>
                 <form>
                     <Typography variant="h4">{`Booking for ${event.name}`}</Typography>
                     <BasicFields data={data.basic} update={updateSubField} />
+                    {event.bigCampMode ? <MemoBookingExtraContactFields data={data.extraContacts} update={updateSubField} /> : null}
                     <MemoParticipantsForm event={event} attendanceConfig={attendanceConfig} participants={data.participants || [{}]} update={updateSubField} kp={kpConfig} />
                     <EmergencyFields data={data.emergency} update={updateSubField} />
                     <MemoCustomQuestionFields eventCustomQuestions={event.customQuestions} data={data.customQuestions} update={updateSubField} />
@@ -86,12 +89,59 @@ function bookingGroupContactFields({ data, update }: { data: PartialDeep<JsonBoo
 
     const { updateField } = getMemoUpdateFunctions(update('basic'))
 
+    const selectedStyle = { borderColor: "success.dark", backgroundColor: "success.light", color: "success.contrastText", cursor: "pointer" }
+    const unselectedStyle = { borderColor: "divider.main", backgroundColor: "background.default", cursor: "pointer" }
+
+    const groupStyle = data?.bookingType == "group" ? selectedStyle : unselectedStyle
+    const individualStyle = data?.bookingType == "individual" ? selectedStyle : unselectedStyle
+
+    const organsationItems = organisations.map((o, i) => {
+        return <MenuItem key={i} value={o}>
+            {o}
+        </MenuItem>
+    })
+
     return <>
+        <Typography variant="h6" mt={2}>{`Booking Type`}</Typography>
+        <Typography variant="body1">Please select the type of booking you are making:</Typography>
+        <Grid container spacing={2} mt={1}>
+            <Grid xs={6} item>
+                <Card variant="outlined" sx={{ display: 'flex', flexDirection: 'column', height: '100%', ...groupStyle }} onClick={() => update('basic')(data => { return { ...data, bookingType: 'group' } })}>
+                    <CardContent>
+                        <Checkbox checked={data?.bookingType == "group"} sx={{ float: 'right', mt: -1, mr: -1 }} />
+                        <Typography variant="h5">Group Booking</Typography>
+                        <Typography variant="body1">If you are booking for a Woodcraft Folk District, Group, or other large booking, please select this option.</Typography>
+                    </CardContent>
+                </Card>
+            </Grid>
+            <Grid xs={6} item>
+                <Card variant="outlined" sx={{ display: 'flex', flexDirection: 'column', height: '100%', ...individualStyle }} onClick={() => update('basic')(data => { return { ...data, bookingType: 'individual' } })}>
+                    <CardContent>
+                        <Checkbox checked={data?.bookingType == "individual"} sx={{ float: 'right', mt: -1, mr: -1 }} />
+                        <Typography variant="h5">Individual Booking</Typography>
+                        <Typography variant="body1">If you are booking just yourself or your family members, please select this option.</Typography>
+                    </CardContent>
+                </Card>
+            </Grid>
+        </Grid>
+        <FormControl fullWidth sx={{ mt: 2 }}>
+            <InputLabel id="organisation-select-label">Organisation</InputLabel>
+            <Select
+                labelId="organisation-select-label"
+                id="organisation-select"
+                label="Organisation"
+                value={data?.organisation || "select"}
+                onChange={updateField("organisation")}>
+                {!data?.organisation ? <MenuItem key="select" value="select">Please select</MenuItem> : null}
+                {organsationItems}
+            </Select>
+        </FormControl>
+        <TextField fullWidth sx={{ mt: 2 }} required id="outlined-required" label="District" value={data?.district || ''} onChange={updateField('district')} />
         <Typography variant="h6" mt={2}>{`Your details`}</Typography>
         <TextField fullWidth sx={{ mt: 2 }} required id="outlined-required" label="Your Name" value={data?.contactName || ''} onChange={updateField('contactName')} />
         <TextField fullWidth sx={{ mt: 2 }} required id="outlined-required" type="email" label="Your email" value={data?.contactEmail || ''} onChange={updateField('contactEmail')} />
         <TextField fullWidth sx={{ mt: 2 }} required id="outlined-required" type="tel" label="Phone Number" value={data?.contactPhone || ''} onChange={updateField('contactPhone')} />
-        <TextField fullWidth sx={{ mt: 2 }} required id="outlined-required" label="District" value={data?.district || ''} onChange={updateField('district')} />
+
     </>
 }
 

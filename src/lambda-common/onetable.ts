@@ -122,7 +122,19 @@ const schema = {
                     contactName: { type: String, required: true },
                     contactEmail: { type: String, required: true },
                     contactPhone: { type: String, required: true },
+                    bookingType: { type: String, enum: ['individual', 'group'] },
                     district: { type: String },
+                    organisation: { type: String },
+                }
+            },
+            extraContacts: {
+                type: Array,
+                items: {
+                    type: Object,
+                    schema: {
+                        name: { type: String, required: true },
+                        email: { type: String, required: true },
+                    }
                 }
             },
             participants: {

@@ -11,6 +11,7 @@ export function EditOwnBookingPage({ event, booking, user }) {
 
     const submit = useCallback(() => {
         setBookingData(data => {
+            data.extraContacts = data.extraContacts?.filter(c => c.name && c.email)
             console.log(data)
             editBooking.mutate(data as JsonBookingType)
             return data

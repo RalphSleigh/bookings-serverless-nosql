@@ -5,7 +5,7 @@ import { EnsureHasPermission } from "../permissions.js";
 import { CanEditBooking } from "../../shared/permissions.js";
 import { UserContext } from "../user/userContext.js";
 import { EditOwnBookingPage } from "./editOwnBooking.js";
-import { EditBookingPage } from "./editBooking .js";
+import { EditBookingPage } from "./editBooking.js";
 
 export function EditBookingLoader({ }) {
     const user = useContext(UserContext)

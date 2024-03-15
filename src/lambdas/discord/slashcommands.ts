@@ -50,7 +50,7 @@ export const lambdaHandler = async (lambda_event: APIGatewayProxyEvent): Promise
                     "type": 4,
                     "data": {
                         "tts": false,
-                        "content": `🌞⛺🎪⛺🌲  Camp 100 begins in ${result}!  🌲⛺🎪⛺🌞`,
+                        "content": `🌞⛺⛺⛺🌲  Camp 100 begins in ${result}!  🌲⛺⛺⛺🌞`,
                         "embeds": [],
                         "allowed_mentions": { "parse": [] }
                     }
