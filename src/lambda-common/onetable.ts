@@ -58,9 +58,10 @@ const schema = {
             endDate: { type: Date, required: true },
             bookingDeadline: { type: Date, required: true },
             replyTo: { type: String, required: true },
-            kpMode: { type: String, required: true, enum: ['basic', 'vcamp'] },
+            kpMode: { type: String, required: true, enum: ['basic', 'large'] },
             bigCampMode: { type: Boolean, required: true, default: false },
             applicationsRequired: { type: Boolean, required: true, default: false },
+            allParticipantEmails: { type: Boolean, required: true, default: false },
             emailSubjectTag: { type: String, required: true },
             attendanceStructure: { type: String, required: true, enum: ['whole', 'options'] },
             attendanceData: {
@@ -263,14 +264,23 @@ interface ParticipantFields {
 interface ParticipantBasicType {
     basic: {
         name: string,
-        dob: Date
+        dob: Date,
+        email: string,
     }
 }
 
 interface ParticipantKpType {
     kp: {
         diet: "omnivore" | "pescatarian" | "vegetarian" | "vegan",
-        details: string
+        details: string,
+        nuts: boolean,
+        gluten: boolean,
+        soya: boolean,
+        dairy: boolean,
+        egg: boolean,
+        pork: boolean,
+        chickpea: boolean,
+        preferences: string,
     }
 }
 

@@ -1,14 +1,15 @@
-import { Grid, Paper, TextField, Typography, Box, Button, FormControlLabel, Switch, IconButton, CardMedia } from "@mui/material";
+import { Grid, Paper, TextField, Typography, Box, Button, FormControlLabel, Switch, IconButton, CardMedia, Divider, InputAdornment, Tooltip } from "@mui/material";
 import React, { useState } from "react";
 //import { validate } from "./validate.js";
 import { BookingType, JsonEventType, JsonParticipantType, UserType } from "../../../lambda-common/onetable.js";
-import { Lock, LockOpen, Close } from '@mui/icons-material';
+import { Lock, LockOpen, Close, HelpOutline } from '@mui/icons-material';
 import { KpStructure } from "../../../shared/kp/kp_class.js";
 import { PartialDeep } from "type-fest";
 import { UtcDatePicker } from "../../util.js";
-import { getMemoUpdateFunctions } from "../../../shared/util.js";
+import { getMemoUpdateFunctions, parseDate } from "../../../shared/util.js";
 import { getAttendance } from "../../../shared/attendance/attendance.js";
 import { AttendanceStructure } from "../../../shared/attendance/attendanceStructure.js";
+import { differenceInYears } from "date-fns";
 
 export function ParticipantsForm({ event, attendanceConfig, participants, update, kp }: { event: JsonEventType, attendanceConfig: AttendanceStructure, participants: Array<PartialDeep<JsonParticipantType>>, update: any, kp: KpStructure }) {
 
@@ -41,6 +42,34 @@ function ParticipantForm({ index, event, attendanceConfig, participant, kp, upda
 
     const [deleteLock, setDeleteLock] = useState(true)
 
+    let emailAndOptionsAttendance
+
+    if (event.attendanceStructure == "options") {
+        if (event.allParticipantEmails) {
+            emailAndOptionsAttendance = <>
+                <Grid sm={8} xs={12} item>
+                    <MemoEmailField email={participant.basic?.email} event={event} dob={participant.basic?.dob} update={basicUpdates} />
+                </Grid>
+                <Grid sm={4} xs={12} item>
+                    <attendanceConfig.ParticipantElement configuration={event.attendanceData} data={participant.attendance} update={updateSubField} />
+                </Grid>
+            </>
+        } else {
+            emailAndOptionsAttendance = <Grid xs={12} item>
+                <attendanceConfig.ParticipantElement configuration={event.attendanceData} data={participant.attendance} update={updateSubField} />
+            </Grid>
+        }
+    } else {
+        if (event.allParticipantEmails) {
+            emailAndOptionsAttendance = <Grid xs={12} item>
+                <MemoEmailField email={participant.basic?.email} event={event} dob={participant.basic?.dob} update={basicUpdates} />
+            </Grid>
+        } else {
+            emailAndOptionsAttendance = null
+        }
+    }
+
+
     return <Paper elevation={3} sx={{ mt: 2 }} id={`P${index}`}>
         <Box p={2}>
             <Grid container spacing={2}>
@@ -56,16 +85,15 @@ function ParticipantForm({ index, event, attendanceConfig, participant, kp, upda
                 <Grid sm={4} xs={12} item>
                     <UtcDatePicker label="DoB *" value={participant.basic?.dob} onChange={basicUpdates.updateDate('dob')} />
                 </Grid>
+                {emailAndOptionsAttendance}
                 <Grid xs={12} item>
+                    <Divider >Diet</Divider>
                     <kp.ParticipantFormElement data={participant.kp || {}} update={updateSubField('kp')} />
                 </Grid>
                 <Grid xs={12} item>
+                    <Divider />
                     <ParicipantMedicalForm data={participant.medical || {}} update={updateSubField('medical')} />
                 </Grid>
-                <Grid xs={12} item>
-                    <attendanceConfig.ParticipantElement configuration={event.attendanceData} data={participant.attendance} update={updateSubField('attendance')} />
-                </Grid>
-
                 {/*}Grid xs={12} item>
                     <FormControlLabel control={<Switch checked={participant.consent?.photo as boolean || false} onChange={getMemoUpdateFunctions(updateSubField('consent')).updateSwitch('photo')} />} label="Photo Consent" />
 </Grid>*/}
@@ -87,6 +115,45 @@ function ParicipantMedicalForm({ data, update }: { data: any, update: any }) {
     const { updateField } = getMemoUpdateFunctions(update)
 
     return <>
-        <TextField multiline fullWidth minRows={2} id="outlined" label="Additional medical information & medication taken:" value={data.details || ''} onChange={updateField('details')} />
+        <TextField sx={{ mt: 2 }} multiline fullWidth minRows={2} id="outlined" label="Additional medical information & medication taken:" value={data.details || ''} onChange={updateField('details')} />
     </>
 }
+
+const EmailField = ({ email, dob, event, update }: { email: Partial<Required<JsonParticipantType>["basic"]>["email"], dob: string | undefined, event: JsonEventType, update: any }) => {
+    const inputProps = {
+        endAdornment: <InputAdornment position="end">
+            <Tooltip title={`We will use this email address to contact campers with updates about camp and verify Woodcraft Folk membership.`}>
+                <IconButton
+                    aria-label="toggle password visibility"
+                    edge="end"
+                >
+                    <HelpOutline />
+                </IconButton>
+            </Tooltip>
+        </InputAdornment>,
+    }
+
+    if (dob && differenceInYears(parseDate(event.startDate)!, parseDate(dob)!) < 16) {
+        return <TextField
+            fullWidth
+            required
+            id="outlined-required"
+            type="email"
+            label="Parent/Guardian email"
+            value={email || ''}
+            onChange={update.updateField('email')}
+            InputProps={inputProps} />
+    } else {
+        return <TextField
+            fullWidth
+            required
+            id="outlined-required"
+            type="email"
+            label="Email"
+            value={email || ''}
+            onChange={update.updateField('email')}
+            InputProps={inputProps} />
+    }
+}
+
+const MemoEmailField = React.memo(EmailField)

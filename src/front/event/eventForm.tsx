@@ -69,6 +69,9 @@ export function EventForm({ data: inputData, submit, mode }: { data: any, submit
                                 <FormGroup>
                                     <FormControlLabel sx={{ mt: 2 }} control={<Switch checked={data.applicationsRequired || false} onChange={updateSwitch('applicationsRequired')} />} label="Applications required?" />
                                 </FormGroup>
+                                <FormGroup>
+                                    <FormControlLabel sx={{ mt: 2 }} control={<Switch checked={data.allParticipantEmails || false} onChange={updateSwitch('allParticipantEmails')} />} label="All participant emails" />
+                                </FormGroup>
                                 <FormControl fullWidth sx={{ mt: 2 }}>
                                     <InputLabel id="fee-select-label">KP Structure</InputLabel>
                                     <Select value={data.kpMode || "default"} label="KP  Structure" onChange={updateField("kpMode")} labelId="kp-select-label">
