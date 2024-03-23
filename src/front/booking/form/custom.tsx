@@ -1,16 +1,17 @@
-import { Box, FormControl, FormControlLabel, FormGroup, FormLabel, Grid, Radio, RadioGroup, TextField, Typography } from "@mui/material"
+import { Box, FormControl, FormControlLabel, FormGroup, FormLabel, Grid, InputLabel, MenuItem, Radio, RadioGroup, Select, TextField, Typography } from "@mui/material"
 import { JsonBookingType, JsonEventType } from "../../../lambda-common/onetable.js"
 import React from "react"
 import e from "express"
 import { getMemoUpdateFunctions } from "../../../shared/util.js"
+import { PartialDeep } from "type-fest"
 
-function customQuestionFields({ eventCustomQuestions, data = [], update }: { eventCustomQuestions: JsonEventType["customQuestions"], data: Partial<JsonBookingType>["customQuestions"], update: any }) {
+function customQuestionFields({ event, data = [], basic, update }: { event: JsonEventType, data: PartialDeep<JsonBookingType>["customQuestions"], basic: PartialDeep<JsonBookingType>["basic"], update: any }) {
 
-    if(!eventCustomQuestions || eventCustomQuestions.length === 0) return null
+    if ((!event.customQuestions || event.customQuestions.length === 0) && !event.howDidYouHear) return null
 
     const { setArrayItem, setArrayRadio } = getMemoUpdateFunctions(update('customQuestions'))
 
-    const questions = eventCustomQuestions.map((e, i) => {
+    const questions = event.customQuestions.map((e, i) => {
         switch (e.questionType) {
             case "text":
                 return <CustomQestionText key={i} i={i} question={e} data={data ? data[i] ?? '' : ''} setArrayItem={setArrayItem} />
@@ -21,10 +22,10 @@ function customQuestionFields({ eventCustomQuestions, data = [], update }: { eve
         }
     })
 
-
     return <>
         <Typography variant="h6" sx={{ mt: 2 }}>Other Stuff</Typography>
         {questions}
+        {event.howDidYouHear ? <HowDidYouHear data={basic} update={update} /> : null}
     </>
 }
 
@@ -72,6 +73,24 @@ function CustomQuestionYesNo({ i, question, data, setArrayRadio }: { i: number, 
             </RadioGroup>
         </Grid>
     </Grid>)
+}
+
+function HowDidYouHear({ data, update }: { data: PartialDeep<JsonBookingType>["basic"], update: any }) {
+    const { updateField } = getMemoUpdateFunctions(update('basic'))
+
+    return <FormControl fullWidth sx={{ mt: 2 }}>
+        <InputLabel id="how-heaer-select-label">How did you find out about Camp 100?</InputLabel>
+        <Select value={data?.howDidYouHear || "default"} label="How did you find out about Camp 100?" required onChange={updateField("howDidYouHear")} labelId="how-heaer-select-label">
+            {data?.howDidYouHear ? null : <MenuItem key="default" value="default">Please select</MenuItem>}
+            <MenuItem value="Social Media Post">Social Media Post</MenuItem>
+            <MenuItem value="Website">Website</MenuItem>
+            <MenuItem value="Word of Mouth">Word of Mouth</MenuItem>
+            <MenuItem value="Newsletter">Newsletter</MenuItem>
+            <MenuItem value="In the Press">In the Press</MenuItem>
+            <MenuItem value="Leaflet">Leaflet</MenuItem>
+            <MenuItem value="At Another Event">At Another Event</MenuItem>
+        </Select>
+    </FormControl>
 }
 
 export const MemoCustomQuestionFields = React.memo(customQuestionFields)

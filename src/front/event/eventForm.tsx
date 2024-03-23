@@ -12,6 +12,7 @@ import { FeeStructure } from "../../shared/fee/feeStructure.js";
 import { Close } from "@mui/icons-material";
 import { getMemoUpdateFunctions, parseDate } from "../../shared/util.js";
 import { DateTimePicker } from '@mui/x-date-pickers'
+import { consent } from "../../shared/consents/consent.js";
 
 export function EventForm({ data: inputData, submit, mode }: { data: any, submit: (data) => void, mode: "create" | "edit" }) {
     const user = useContext(UserContext)
@@ -27,6 +28,11 @@ export function EventForm({ data: inputData, submit, mode }: { data: any, submit
     const kpOptions = Object.entries(kp).map(([key, value]) => <MenuItem key={key} value={key}>
         {value.kpName}
     </MenuItem>)
+
+    const consentOptions = Object.entries(consent).map(([key, value]) => <MenuItem key={key} value={key}>
+        {value.consentName}
+    </MenuItem>)
+
 
     const attendanceOptions = Object.entries(attendances).map(([key, value]) => <MenuItem key={key} value={key}>
         {value.attendanceName}
@@ -72,11 +78,21 @@ export function EventForm({ data: inputData, submit, mode }: { data: any, submit
                                 <FormGroup>
                                     <FormControlLabel sx={{ mt: 2 }} control={<Switch checked={data.allParticipantEmails || false} onChange={updateSwitch('allParticipantEmails')} />} label="All participant emails" />
                                 </FormGroup>
+                                <FormGroup>
+                                    <FormControlLabel sx={{ mt: 2 }} control={<Switch checked={data.howDidYouHear || false} onChange={updateSwitch('howDidYouHear')} />} label="How did you hear question" />
+                                </FormGroup>
                                 <FormControl fullWidth sx={{ mt: 2 }}>
-                                    <InputLabel id="fee-select-label">KP Structure</InputLabel>
+                                    <InputLabel id="kp-select-label">KP Structure</InputLabel>
                                     <Select value={data.kpMode || "default"} label="KP  Structure" onChange={updateField("kpMode")} labelId="kp-select-label">
                                         {data.kpMode ? null : <MenuItem key="default" value="default">Please select</MenuItem>}
                                         {kpOptions}
+                                    </Select>
+                                </FormControl>
+                                <FormControl fullWidth sx={{ mt: 2 }}>
+                                    <InputLabel id="consent-select-label">Consent Structure</InputLabel>
+                                    <Select value={data.consentMode || "default"} label="Consent Structure" onChange={updateField("consentMode")} labelId="consent-select-label">
+                                        {data.kpMode ? null : <MenuItem key="default" value="default">Please select</MenuItem>}
+                                        {consentOptions}
                                     </Select>
                                 </FormControl>
                                 <FormControl fullWidth sx={{ mt: 2 }}>

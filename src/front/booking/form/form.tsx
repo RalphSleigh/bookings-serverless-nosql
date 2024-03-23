@@ -4,7 +4,7 @@ import { JsonBookingType, JsonEventType, JsonUserResponseType, UserResponseType,
 import { ParticipantsForm } from "./participants.js";
 import { kp } from "../../../shared/kp/kp.js"
 import { QuickList } from "./quickList.js";
-import { MemoBookingGroupEmergenecyFields, MemoBookingIndvidualEmergencyFields } from "./emergency.js";
+import { MemoEmergencyFields } from "./emergency.js";
 import { MemoCustomQuestionFields } from "./custom.js";
 import { MemoBookingMoneySection } from "./money.js";
 import { getFee } from "../../../shared/fee/fee.js";
@@ -17,6 +17,8 @@ import { PartialDeep } from "type-fest";
 import { getAttendance } from "../../../shared/attendance/attendance.js";
 import { organisations } from "../../../shared/ifm.js";
 import { MemoBookingExtraContactFields } from "./extraContacts.js";
+import { MemoCampingFields } from "./camping.js";
+import { consent } from "../../../shared/consents/consent.js";
 
 const MemoParticipantsForm = React.memo(ParticipantsForm)
 
@@ -34,11 +36,11 @@ export function BookingForm({ data, event, user, update, submit, mode, deleteBoo
     const fee = getFee(event)
 
     const BasicFields = event.bigCampMode ? MemoBookingGroupContactFields : MemoBookingIndvidualContactFields
-    const EmergencyFields = event.bigCampMode ? MemoBookingGroupEmergenecyFields : MemoBookingIndvidualEmergencyFields
     const kpConfig = React.useMemo(() => kp[event.kpMode] || kp.basic, [event]);
+    const consentConfig = React.useMemo(() => consent[event.consentMode] || consent.none, [event]);
     const attendanceConfig = React.useMemo(() => getAttendance(event), [event]);
 
-    const validationResults = validate(event, kpConfig, attendanceConfig, data, permission.permission)
+    const validationResults = validate(event, kpConfig, consentConfig, attendanceConfig, data, permission.permission)
     return <Grid container spacing={2} p={2} justifyContent="center">
         <Grid xl={6} lg={7} md={8} sm={9} xs={12} item>
             <Box p={2}>
@@ -46,9 +48,10 @@ export function BookingForm({ data, event, user, update, submit, mode, deleteBoo
                     <Typography variant="h4">{`Booking for ${event.name}`}</Typography>
                     <BasicFields data={data.basic} update={updateSubField} />
                     {event.bigCampMode ? <MemoBookingExtraContactFields data={data.extraContacts} update={updateSubField} /> : null}
-                    <MemoParticipantsForm event={event} attendanceConfig={attendanceConfig} participants={data.participants || [{}]} update={updateSubField} kp={kpConfig} />
-                    <EmergencyFields data={data.emergency} update={updateSubField} />
-                    <MemoCustomQuestionFields eventCustomQuestions={event.customQuestions} data={data.customQuestions} update={updateSubField} />
+                    <MemoParticipantsForm event={event} attendanceConfig={attendanceConfig} participants={data.participants || [{}]} update={updateSubField} kp={kpConfig} consent={consentConfig} />
+                    <MemoCampingFields event={event} data={data.camping} update={updateSubField} />
+                    <MemoEmergencyFields event={event} data={data.emergency} bookingType={data.basic?.bookingType || "individual"} update={updateSubField} />
+                    <MemoCustomQuestionFields event={event} data={data.customQuestions} basic={data.basic} update={updateSubField} />
                     <MemoBookingMoneySection fees={fee} event={event} data={data} />
                     <MemoBookingPermissionSection event={event} data={permission} update={updatePermission} />
                     <BookingValidationResults validationResults={validationResults} />

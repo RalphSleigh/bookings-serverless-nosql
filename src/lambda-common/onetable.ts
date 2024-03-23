@@ -59,9 +59,11 @@ const schema = {
             bookingDeadline: { type: Date, required: true },
             replyTo: { type: String, required: true },
             kpMode: { type: String, required: true, enum: ['basic', 'large'] },
+            consentMode: { type: String, required: true, enum: ['none', 'camp100'] },
             bigCampMode: { type: Boolean, required: true, default: false },
             applicationsRequired: { type: Boolean, required: true, default: false },
             allParticipantEmails: { type: Boolean, required: true, default: false },
+            howDidYouHear: { type: Boolean, required: true, default: false },
             emailSubjectTag: { type: String, required: true },
             attendanceStructure: { type: String, required: true, enum: ['whole', 'options'] },
             attendanceData: {
@@ -126,6 +128,7 @@ const schema = {
                     bookingType: { type: String, enum: ['individual', 'group'] },
                     district: { type: String },
                     organisation: { type: String },
+                    howDidYouHear: { type: String },
                 }
             },
             extraContacts: {
@@ -210,6 +213,14 @@ const schema = {
                     }
                 }
             },
+            camping: {
+                type: Object,
+                schema: {
+                    campWith: { type: String },
+                    canBringEquipment: { type: String },
+                    accessibilityNeeds: { type: String },
+                }
+            },
             created: { type: Date, required: true },
             updated: { type: Date, required: true },
         },
@@ -280,7 +291,9 @@ interface ParticipantKpType {
         egg: boolean,
         pork: boolean,
         chickpea: boolean,
+        diabetic: boolean,
         preferences: string,
+        contactMe: boolean
     }
 }
 
@@ -293,6 +306,8 @@ interface ParticipantMedicalType {
 interface ParticipantConsentType {
     consent: {
         photo?: Boolean
+        sre?: Boolean
+        activities?: Boolean
     }
 }
 

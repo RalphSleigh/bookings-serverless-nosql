@@ -10,8 +10,9 @@ import { getMemoUpdateFunctions, parseDate } from "../../../shared/util.js";
 import { getAttendance } from "../../../shared/attendance/attendance.js";
 import { AttendanceStructure } from "../../../shared/attendance/attendanceStructure.js";
 import { differenceInYears } from "date-fns";
+import { ConsentStructure } from "../../../shared/consents/consents_class.js";
 
-export function ParticipantsForm({ event, attendanceConfig, participants, update, kp }: { event: JsonEventType, attendanceConfig: AttendanceStructure, participants: Array<PartialDeep<JsonParticipantType>>, update: any, kp: KpStructure }) {
+export function ParticipantsForm({ event, attendanceConfig, participants, update, kp, consent }: { event: JsonEventType, attendanceConfig: AttendanceStructure, participants: Array<PartialDeep<JsonParticipantType>>, update: any, kp: KpStructure, consent: ConsentStructure}) {
 
     const { addEmptyObjectToArray, updateArrayItem, deleteArrayItem } = getMemoUpdateFunctions(update(('participants')))
 
@@ -22,7 +23,7 @@ export function ParticipantsForm({ event, attendanceConfig, participants, update
         e.preventDefault()
     }, [])
 
-    const participantsList = participants.map((p, i) => (<MemoParticipantForm key={i} index={i} event={event} attendanceConfig={attendanceConfig} participant={p} kp={kp} updateArrayItem={updateArrayItem} deleteParticipant={deleteParticipant} />))
+    const participantsList = participants.map((p, i) => (<MemoParticipantForm key={i} index={i} event={event} attendanceConfig={attendanceConfig} participant={p} kp={kp} consent={consent} updateArrayItem={updateArrayItem} deleteParticipant={deleteParticipant} />))
 
     return <Grid container spacing={0} sx={{ mt: 2 }}>
         <Grid xs={12} p={0} item>
@@ -35,7 +36,7 @@ export function ParticipantsForm({ event, attendanceConfig, participants, update
     </Grid>
 }
 
-function ParticipantForm({ index, event, attendanceConfig, participant, kp, updateArrayItem, deleteParticipant }: { index: number, event: JsonEventType, attendanceConfig: AttendanceStructure, participant: PartialDeep<JsonParticipantType>, kp: KpStructure, updateArrayItem: any, deleteParticipant: any }) {
+function ParticipantForm({ index, event, attendanceConfig, participant, kp, consent, updateArrayItem, deleteParticipant }: { index: number, event: JsonEventType, attendanceConfig: AttendanceStructure, participant: PartialDeep<JsonParticipantType>, kp: KpStructure, consent: ConsentStructure, updateArrayItem: any, deleteParticipant: any }) {
 
     const { updateSubField } = getMemoUpdateFunctions(updateArrayItem(index))
     const basicUpdates = getMemoUpdateFunctions(updateSubField('basic'))
@@ -94,6 +95,10 @@ function ParticipantForm({ index, event, attendanceConfig, participant, kp, upda
                     <Divider />
                     <ParicipantMedicalForm data={participant.medical || {}} update={updateSubField('medical')} />
                 </Grid>
+                <Grid xs={12} item>
+                    <Divider />
+                    <consent.ParticipantFormElement data={participant.consent || {}} update={updateSubField('consent')} />
+                </Grid>
                 {/*}Grid xs={12} item>
                     <FormControlLabel control={<Switch checked={participant.consent?.photo as boolean || false} onChange={getMemoUpdateFunctions(updateSubField('consent')).updateSwitch('photo')} />} label="Photo Consent" />
 </Grid>*/}
@@ -115,7 +120,29 @@ function ParicipantMedicalForm({ data, update }: { data: any, update: any }) {
     const { updateField } = getMemoUpdateFunctions(update)
 
     return <>
-        <TextField sx={{ mt: 2 }} multiline fullWidth minRows={2} id="outlined" label="Additional medical information & medication taken:" value={data.details || ''} onChange={updateField('details')} />
+        <TextField
+            sx={{ mt: 2 }}
+            multiline
+            fullWidth
+            minRows={2}
+            id="outlined"
+            label="Additional medical information, medication taken or accessibility requirements:"
+            value={data.details || ''}
+            onChange={updateField('details')}
+            InputProps={{
+                endAdornment: <InputAdornment position="end">
+                    <Tooltip title={`LONG WORDAGE HERE`}>
+                        <IconButton
+                            aria-label="toggle password visibility"
+                            edge="end"
+                        >
+                            <HelpOutline />
+                        </IconButton>
+                    </Tooltip>
+                </InputAdornment>,
+                sx: { alignItems: "flex-start" }
+            }}
+        />
     </>
 }
 

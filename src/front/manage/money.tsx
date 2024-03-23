@@ -58,6 +58,7 @@ const MoneyTable = ({ event, bookings, onRowClick }: { event: JsonEventType, boo
         const paidUp = paid >= rows[0]
 
         return <TableRow key={i} onClick={() => onRowClick(i)} hover>
+            {fees.hasPaymentReference ? <TableCell>{fees.getPaymentReference(b)}</TableCell> : null}
             <TableCell>{event.bigCampMode ? b.basic.district : b.basic.contactName}</TableCell>
             {rows.map((v, i) => <TableCell key={i}>{currency(v)}</TableCell>)}
             <TableCell>{currency(paid)} {paidUp ? '✅' : ''}</TableCell>
@@ -71,6 +72,7 @@ const MoneyTable = ({ event, bookings, onRowClick }: { event: JsonEventType, boo
         <Table size="small">
             <TableHead>
                 <TableRow>
+                    {fees.hasPaymentReference ? <TableCell><strong>Reference</strong></TableCell> : null}
                     <TableCell><strong>Booking</strong></TableCell>
                     {valueHeaders}
                     <TableCell><strong>Paid</strong></TableCell>
@@ -80,6 +82,7 @@ const MoneyTable = ({ event, bookings, onRowClick }: { event: JsonEventType, boo
                 {rows}
                 <TableRow>
                     <TableCell><strong>Totals</strong></TableCell>
+                    {fees.hasPaymentReference ? <TableCell></TableCell> : null}
                     {totalsRow}
                     <TableCell><strong>{currency(totalPaid)}</strong></TableCell>
                 </TableRow>

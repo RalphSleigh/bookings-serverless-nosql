@@ -13,6 +13,7 @@ export interface FeeLine {
 
 export abstract class FeeStructure {
     public abstract readonly feeName: string
+    public abstract readonly hasPaymentReference: boolean
     public abstract ConfigurationElement: React.FC<{ attendanceData: JsonEventType["attendanceData"], data: Partial<JsonEventType["feeData"]>, update: (data) => void}>
     public abstract supportedAttendanceStructures: AttendanceTypes[]
     public enabledForAttendance = (attendance:AttendanceStructure | null): boolean => {
@@ -22,4 +23,5 @@ export abstract class FeeStructure {
     public abstract DescriptionElement: React.FC<{event: JsonEventType, booking: PartialDeep<JsonBookingType>}>
     public abstract EmailElement: React.FC<{event: EventType, booking: BookingType}>
     public abstract getValueLabels: () => string[]
-} 
+    public abstract getPaymentReference(booking: PartialDeep<JsonBookingType> & { userId: string }): string | undefined
+}

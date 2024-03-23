@@ -2,16 +2,13 @@ import React from "react";
 import Markdown from 'react-markdown'
 import { Grid, InputAdornment, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from "@mui/material";
 import { FeeLine, FeeStructure } from "./feeStructure.js";
-import { AttendanceStructure } from "../attendance/attendanceStructure.js";
 import { BookingType, EalingFeeEventType, EventType, JsonBookingType, JsonEventType, JsonParticipantType, LargeFeeEventType, ParticipantType } from "../../lambda-common/onetable.js";
 import { differenceInYears, format } from "date-fns";
 import { Markdown as EmailMarkdown } from "@react-email/markdown";
 import { getMemoUpdateFunctions, parseDate } from "../util.js";
 import { PartialDeep } from "type-fest";
-import { WholeAttendance } from "../attendance/whole.js";
 import { OptionsAttendance } from "../attendance/options.js";
 import { DateTimePicker } from '@mui/x-date-pickers'
-import { NumberType } from "aws-sdk/clients/pinpointsmsvoicev2.js";
 import { JsonBookingWithExtraType } from "../computedDataTypes.js";
 
 const paymentInstructions = `Please make bank transfers to:  
@@ -24,6 +21,7 @@ Please include a sensible reference and drop [NAME](mailto:email) an email to le
 
 export class Large extends FeeStructure {
     public feeName = "Large Camp Style"
+    public hasPaymentReference = true
     public supportedAttendanceStructures = [OptionsAttendance]
 
     public ConfigurationElement = ({ attendanceData, data, update }: { attendanceData: JsonEventType["attendanceData"], data: Partial<JsonEventType["feeData"]>, update: any }) => {
@@ -88,9 +86,11 @@ export class Large extends FeeStructure {
             if (free > 0) results.push({ description: `${free} Under 5s for free`, values: [0] })
             for (const [band, item] of Object.entries(totals)) {
                 for (const [index, option] of Object.entries(item)) {
-                    results.push({ description: `${option.count} ${option.count == 1 ? 'Person' : 'People'} for the ${event.attendanceData!.options![index]} before ${option.band.description}`, 
-                    tooltip:`${format(option.band.beforeDate!, 'PPPp')}`,
-                    values: [option.count * option.band.fees[index]] })
+                    results.push({
+                        description: `${option.count} ${option.count == 1 ? 'Person' : 'People'} for the ${event.attendanceData!.options![index]} before ${option.band.description}`,
+                        tooltip: `${format(option.band.beforeDate!, 'PPPp')}`,
+                        values: [option.count * option.band.fees[index]]
+                    })
                 }
             }
             return results
@@ -99,7 +99,7 @@ export class Large extends FeeStructure {
         }
     }
 
-    public DescriptionElement = ({ event, booking }: { event: JsonEventType, booking: PartialDeep<JsonBookingType> }) => {
+    public DescriptionElement = ({ event, booking }: { event: JsonEventType, booking: PartialDeep<JsonBookingType>}) => {
 
         const feeData = event.feeData as EalingFeeEventType["feeData"]
         const valueHeaders = this.getValueLabels().map((l, i) => <TableCell component="th" key={i}><b>{l}</b></TableCell>)
@@ -134,7 +134,6 @@ export class Large extends FeeStructure {
         })
 
         const adjustments = booking.fees?.filter(f => f.type === "adjustment").map((f, i) => {
-
             totals.forEach((v, i) => {
                 if (!totals[i]) totals[i] = 0
                 totals[i] += f.value
@@ -148,7 +147,7 @@ export class Large extends FeeStructure {
         })
 
         return (<>
-            <Typography variant="body2" mt={2}>PLACEHOLDER: SOME TEXT ABOUT THE FEES SHOULD GO HERE? IDK</Typography>
+            <Typography variant="body2" mt={2}>PLACEHOLDER: SOME TEXT ABOUT THE FEES SHOULD GO HERE? IDK BTW YOUR PAYMENT REFERENCE IS {this.getPaymentReference(booking as PartialDeep<JsonBookingType> & { userId: string })}</Typography>
             <TableContainer component={Paper} sx={{ mt: 2, p: 1 }}>
                 <Table size="small">
                     <TableHead>
@@ -209,6 +208,10 @@ export class Large extends FeeStructure {
     }
 
     public getValueLabels = () => (["Fee"])
+
+    public getPaymentReference(booking: PartialDeep<JsonBookingType> & { userId: string }){
+        return `C100-${booking.userId.toUpperCase().substring(0,5)}`
+    }
 }
 
 const currency = c => c.toLocaleString(undefined, { style: "currency", currency: "GBP" })

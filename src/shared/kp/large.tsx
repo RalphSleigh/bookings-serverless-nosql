@@ -16,11 +16,16 @@ export class Large implements KpStructure {
             return word.charAt(0).toUpperCase() + word.slice(1);
         };
 
+        const updateDietSelect = (e) => {
+            update(data => ({ ...data, 'diet': e.target.value, pork: e.target.value !== "omnivore", dairy: data.dairy || e.target.value == "vegan", egg: data.egg || e.target.value == "vegan" }))
+            e.preventDefault()
+        }
+
         const kpOptions = KpStructure.dietOptions.map(d => <MenuItem key={d} value={d}>
             {capitalizeWord(d)}
         </MenuItem>)
 
-        return <Grid container spacing={2} sx={{mt:1}}>
+        return <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item sm={8} xs={12}>
                 <Typography variant="body1">Choose the diet you want on camp. Only choose Omni if you want to eat meat on camp.
                     Camp is a great time to try out a veggy diet.
@@ -29,27 +34,42 @@ export class Large implements KpStructure {
             <Grid item sm={4} xs={12}>
                 <FormControl required fullWidth>
                     <InputLabel id="diet-select-label">Diet</InputLabel>
-                    <Select fullWidth value={data.diet || "default"} label="Diet" required onChange={updateField("diet")} labelId="diet-select-label">
+                    <Select fullWidth value={data.diet || "default"} label="Diet" required onChange={updateDietSelect} labelId="diet-select-label">
                         {data.diet ? null : <MenuItem key="default" value="default">Please select</MenuItem>}
                         {kpOptions}
                     </Select>
                 </FormControl>
             </Grid>
             <Grid item xs={12}>
-                <Typography variant="subtitle1">Simple Dietary Requirements, please select all that apply:</Typography>
-                <FormGroup row>
-                    <FormControlLabel checked={data.nuts} onChange={updateSwitch('nuts')} control={<Checkbox />} label="Nut Free" />
-                    <FormControlLabel checked={data.gluten} onChange={updateSwitch('gluten')} control={<Checkbox />} label="Gluten Free" />
-                    <FormControlLabel checked={data.soya} onChange={updateSwitch('soya')} control={<Checkbox />} label="Soya Free" />
-                    <FormControlLabel checked={data.dairy} onChange={updateSwitch('dairy')} control={<Checkbox />} label="Dairy/Lactose Free" />
-                    <FormControlLabel checked={data.egg} onChange={updateSwitch('egg')} control={<Checkbox />} label="Egg Free" />
-                    <FormControlLabel checked={data.pork} onChange={updateSwitch('pork')} disabled={data.diet !== "omnivore"} control={<Checkbox />} label="Pork Free" />
-                    <FormControlLabel checked={data.chickpea} onChange={updateSwitch('chickpea')} control={<Checkbox />} label="Chickpea Free" />
-                </FormGroup>
+                <Typography variant="subtitle1"><strong>Dietary Requirements:</strong> Please include any known allergies even if the diet you have selected would exclude them:</Typography>
+                <Grid container>
+                    <Grid item xs={12} sm={6} md={4} xl={3}>
+                        <FormControlLabel checked={data.nuts || false} onChange={updateSwitch('nuts')} control={<Checkbox />} label="Nut Free" />
+                    </Grid><Grid item xs={12} sm={6} md={4} xl={3}>
+                        <FormControlLabel checked={data.gluten || false} onChange={updateSwitch('gluten')} control={<Checkbox />} label="Gluten Free" />
+                    </Grid><Grid item xs={12} sm={6} md={4} xl={3}>
+                        <FormControlLabel checked={data.soya || false} onChange={updateSwitch('soya')} control={<Checkbox />} label="Soya Free" />
+                    </Grid><Grid item xs={12} sm={6} md={4} xl={3}>
+                        <FormControlLabel checked={data.dairy || false} onChange={updateSwitch('dairy')} disabled={data.diet == "vegan"} control={<Checkbox />} label="Dairy/Lactose Free" />
+                    </Grid><Grid item xs={12} sm={6} md={4} xl={3}>
+                        <FormControlLabel checked={data.egg || false} onChange={updateSwitch('egg')} disabled={data.diet == "vegan"} control={<Checkbox />} label="Egg Free" />
+                    </Grid><Grid item xs={12} sm={6} md={4} xl={3}>
+                        <FormControlLabel checked={data.pork || false} onChange={updateSwitch('pork')} disabled={data.diet && data.diet !== "omnivore"} control={<Checkbox />} label="Pork Free" />
+                    </Grid><Grid item xs={12} sm={6} md={4} xl={3}>
+                        <FormControlLabel checked={data.chickpea || false} onChange={updateSwitch('chickpea')} control={<Checkbox />} label="Chickpea Free" />
+                    </Grid><Grid item xs={12} sm={6} md={4} xl={3}>
+                        <FormControlLabel checked={data.diabetic || false} onChange={updateSwitch('diabetic')} control={<Checkbox />} label="Diabetic" />
+                    </Grid>
+                </Grid>
+            </Grid>
+            <Grid item xs={12}>
+                <TextField multiline fullWidth minRows={2} id="outlined" label="Any other dietary restrictions, allergies, intolerances, elimination diets and diet related medical conditions:" placeholder={`This is your everything else section for things that didn’t fit into the tick boxes above.`} value={data.details || ''} onChange={updateField('details')} />
+            </Grid>
+            <Grid item xs={12}>
+                <FormControlLabel checked={data.contactMe} onChange={updateSwitch('contactMe')} control={<Checkbox />} label=" My allergies or dietary needs are complicated and I would like to be contacted by the camp team" />
             </Grid>
             <Grid item xs={12}>
                 <TextField
-                    sx={{ mt: 2 }}
                     multiline
                     fullWidth
                     minRows={2}
@@ -72,9 +92,6 @@ export class Large implements KpStructure {
                         sx: { alignItems: "flex-start" }
                     }}
                 />
-            </Grid>
-            <Grid item xs={12}>
-                <TextField multiline fullWidth minRows={2} id="outlined" label="Any other dietary restrictions, allergies, intolerances or elimination diets:" placeholder={`This is your everything else section for things that didn’t fit into the tick boxes above.`} value={data.details || ''} onChange={updateField('details')} />
             </Grid>
         </Grid >
     }

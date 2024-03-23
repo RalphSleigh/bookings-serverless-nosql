@@ -4,10 +4,11 @@ import { Alert, AlertTitle } from "@mui/material"
 import { KpStructure } from "../../../shared/kp/kp_class.js"
 import { PartialDeep } from "type-fest"
 import { AttendanceStructure } from "../../../shared/attendance/attendanceStructure.js"
+import { ConsentStructure } from "../../../shared/consents/consents_class.js"
 
 type validationResults = string[]
 
-export function validate(event: JsonEventType, kpConfig: KpStructure, attendanceConfig: AttendanceStructure, data: PartialDeep<JsonBookingType>, permission: Boolean): validationResults {
+export function validate(event: JsonEventType, kpConfig: KpStructure, consentConfig: ConsentStructure, attendanceConfig: AttendanceStructure, data: PartialDeep<JsonBookingType>, permission: Boolean): validationResults {
     const results: validationResults = []
     const bigCamp = event.bigCampMode
 
@@ -19,7 +20,7 @@ export function validate(event: JsonEventType, kpConfig: KpStructure, attendance
     }
 
     if (data.participants) data.participants.forEach((participant, i) => {
-        results.push(...vaildateParticipant(event, kpConfig, attendanceConfig, participant, i))
+        results.push(...vaildateParticipant(event, kpConfig, consentConfig, attendanceConfig, participant, i))
     })
 
     if (!data.emergency?.name) results.push("Please enter an emergency contact name")
@@ -36,7 +37,7 @@ export function validate(event: JsonEventType, kpConfig: KpStructure, attendance
     return results
 }
 
-function vaildateParticipant(event: JsonEventType, kpConfig: KpStructure, attendanceConfig: AttendanceStructure, participant: Partial<JsonBookingType["participants"][0]>, i: number): validationResults {
+function vaildateParticipant(event: JsonEventType, kpConfig: KpStructure, consentConfig: ConsentStructure, attendanceConfig: AttendanceStructure, participant: Partial<JsonBookingType["participants"][0]>, i: number): validationResults {
     const results: validationResults = []
     const bigCamp = event.bigCampMode
 
@@ -46,6 +47,7 @@ function vaildateParticipant(event: JsonEventType, kpConfig: KpStructure, attend
         if (!participant.basic?.dob) results.push(`Please enter a date of birth for ${participant.basic?.name}`)
         results.push(...kpConfig.validate(participant))
         results.push(...attendanceConfig.validate(participant))
+        results.push(...consentConfig.validate(participant))
     }
 
     return results
