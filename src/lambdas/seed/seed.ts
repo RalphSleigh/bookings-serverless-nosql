@@ -56,6 +56,7 @@ const randomCamp100Participant: () => ParticipantType = () => {
 const camp100Booking = (user, event): OnetableBookingType => {
     //@ts-ignore
     const booking: OnetableBookingType = {
+        version: "latest",
         deleted: false,
         userId: user.id,
         eventId: event.id,
