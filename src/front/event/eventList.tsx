@@ -53,7 +53,7 @@ function EventCard({ event, booking }: { event: JsonEventType, booking?: JsonBoo
         <Paper sx={{ p: 2 }} elevation={4}>
             <BookingButton event={event} booking={booking} />
             <Typography variant="h5">{event.name}</Typography>
-            <Typography sx={{ mt: 1 }} variant="body1">{format(startDate, startDataFormat)} - {format(endDate, 'do MMMM')}</Typography>
+            <Typography sx={{ mt: 1 }} variant="body1">{format(startDate, startDataFormat)} - {format(endDate, 'do MMMM yyyy')}</Typography>
             {event.description ? <Markdown>{event.description}</Markdown> : null}
             {booking && !booking.deleted ? <YourBooking event={event} booking={booking}></YourBooking> : null}
             <Typography align='right'>

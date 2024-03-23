@@ -157,7 +157,7 @@ const schema = {
                             type: Object,
                             //Currently unsupported
                             //schema: {
-                            //    name: { type: String, required: true }
+                            //    option: { type: String, required: true }
                             //},
                         },
                         kp: {
@@ -276,7 +276,7 @@ interface ParticipantBasicType {
     basic: {
         name: string,
         dob: Date,
-        email: string,
+        email?: string,
     }
 }
 
@@ -307,7 +307,6 @@ interface ParticipantConsentType {
     consent: {
         photo?: Boolean
         sre?: Boolean
-        activities?: Boolean
     }
 }
 

@@ -47,7 +47,7 @@ function vaildateParticipant(event: JsonEventType, kpConfig: KpStructure, consen
         if (!participant.basic?.dob) results.push(`Please enter a date of birth for ${participant.basic?.name}`)
         results.push(...kpConfig.validate(participant))
         results.push(...attendanceConfig.validate(participant))
-        results.push(...consentConfig.validate(participant))
+        results.push(...consentConfig.validate(event, participant))
     }
 
     return results

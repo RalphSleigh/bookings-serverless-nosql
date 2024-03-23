@@ -97,7 +97,7 @@ function ParticipantForm({ index, event, attendanceConfig, participant, kp, cons
                 </Grid>
                 <Grid xs={12} item>
                     <Divider />
-                    <consent.ParticipantFormElement data={participant.consent || {}} update={updateSubField('consent')} />
+                    <consent.ParticipantFormElement event={event} data={participant.consent || {}} basic={participant.basic || {}} update={updateSubField('consent')} />
                 </Grid>
                 {/*}Grid xs={12} item>
                     <FormControlLabel control={<Switch checked={participant.consent?.photo as boolean || false} onChange={getMemoUpdateFunctions(updateSubField('consent')).updateSwitch('photo')} />} label="Photo Consent" />
