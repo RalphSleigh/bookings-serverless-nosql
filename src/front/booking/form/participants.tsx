@@ -93,7 +93,7 @@ function ParticipantForm({ index, event, attendanceConfig, participant, kp, cons
                 </Grid>
                 <Grid xs={12} item>
                     <Divider />
-                    <ParicipantMedicalForm data={participant.medical || {}} update={updateSubField('medical')} />
+                    <ParicipantMedicalForm event={event} data={participant.medical || {}} update={updateSubField('medical')} />
                 </Grid>
                 <Grid xs={12} item>
                     <Divider />
@@ -115,7 +115,7 @@ function ParticipantForm({ index, event, attendanceConfig, participant, kp, cons
 
 const MemoParticipantForm = React.memo(ParticipantForm)
 
-function ParicipantMedicalForm({ data, update }: { data: any, update: any }) {
+function ParicipantMedicalForm({ event, data, update }: { event: JsonEventType, data: any, update: any }) {
 
     const { updateField } = getMemoUpdateFunctions(update)
 
@@ -129,11 +129,11 @@ function ParicipantMedicalForm({ data, update }: { data: any, update: any }) {
             label="Additional medical information, medication taken or accessibility requirements:"
             value={data.details || ''}
             onChange={updateField('details')}
-            InputProps={{
+            InputProps={event.bigCampMode ?{
                 endAdornment: <InputAdornment position="end">
                     <Tooltip title={`LONG WORDAGE HERE`}>
                         <IconButton
-                            aria-label="toggle password visibility"
+                            aria-label="help tooltip"
                             edge="end"
                         >
                             <HelpOutline />
@@ -141,7 +141,7 @@ function ParicipantMedicalForm({ data, update }: { data: any, update: any }) {
                     </Tooltip>
                 </InputAdornment>,
                 sx: { alignItems: "flex-start" }
-            }}
+            } : {}}
         />
     </>
 }
