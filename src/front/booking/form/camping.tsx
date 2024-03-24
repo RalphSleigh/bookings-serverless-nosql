@@ -14,9 +14,9 @@ function campingFields({ event, data, update }: { event: JsonEventType, data: Pa
     const { updateField } = getMemoUpdateFunctions(update('camping'))
     return <>
         <Typography variant="h6" sx={{ mt: 2 }}>Camping</Typography>
-        <TextField fullWidth sx={{ mt: 2 }} required id="outlined-required" label="Who do you want to camp with?" value={data?.campWith || ''} onChange={updateField('campWith')} />
-        <TextField multiline fullWidth sx={{ mt: 2 }} required id="outlined-required" label="What camping equipment can you provide?" value={data?.canBringEquipment || ''} onChange={updateField('canBringEquipment')} />
-        <TextField multiline fullWidth sx={{ mt: 2 }} required id="outlined-required" label="Details of any accessibility needs for your campers" value={data?.accessibilityNeeds || ''} onChange={updateField('accessibilityNeeds')} placeholder="e.g Do you need an electric connection, ready access to a fridge or to be close to central areas" />
+        <TextField autoComplete="off" fullWidth sx={{ mt: 2 }} required id="outlined-required" label="Who do you want to camp with?" value={data?.campWith || ''} onChange={updateField('campWith')} />
+        <TextField autoComplete="off" multiline fullWidth sx={{ mt: 2 }} required id="outlined-required" label="What camping equipment can you provide?" value={data?.canBringEquipment || ''} onChange={updateField('canBringEquipment')} />
+        <TextField autoComplete="off" multiline fullWidth sx={{ mt: 2 }} required id="outlined-required" label="Details of any accessibility needs for your campers" value={data?.accessibilityNeeds || ''} onChange={updateField('accessibilityNeeds')} placeholder="e.g Do you need an electric connection, ready access to a fridge or to be close to central areas" />
     </>
 }
 

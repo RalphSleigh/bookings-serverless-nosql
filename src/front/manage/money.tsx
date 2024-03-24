@@ -233,10 +233,10 @@ const MoneyModal = ({ selectedBooking, booking, event, users, handleClose }: { s
             </Grid>
             <Grid container spacing={2}>
                 <Grid item xs={12} sm={3}>
-                    <TextField fullWidth sx={{ mt: 2 }} error={!numberValid} required id="outlined-required" label="Value" type="text" inputProps={{ inputMode: "numeric" }} InputProps={{ startAdornment: <InputAdornment position="start">£</InputAdornment> }} value={feeItem.value} onChange={updateField('value')} />
+                    <TextField autoComplete="off" fullWidth sx={{ mt: 2 }} error={!numberValid} required id="outlined-required" label="Value" type="text" inputProps={{ inputMode: "numeric" }} InputProps={{ startAdornment: <InputAdornment position="start">£</InputAdornment> }} value={feeItem.value} onChange={updateField('value')} />
                 </Grid>
                 <Grid item xs={12} sm={9}>
-                    <TextField fullWidth sx={{ mt: 2 }} required id="outlined-required" label="Description" type="text" value={feeItem.description} onChange={updateField('description')} />
+                    <TextField autoComplete="off" fullWidth sx={{ mt: 2 }} required id="outlined-required" label="Description" type="text" value={feeItem.description} onChange={updateField('description')} />
                 </Grid>
                 <Grid item xs={12}>
                     <Button variant="contained" color="success" disabled={!numberValid || feeMutation.isPending || feeItem.description == ""} onClick={submitPayment}>Add Payment</Button>

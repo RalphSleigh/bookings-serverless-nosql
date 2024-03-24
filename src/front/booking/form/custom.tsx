@@ -33,7 +33,7 @@ function CustomQestionText({ i, question, data, setArrayItem }: { i: number, que
     const update = setArrayItem(i)
     return (<Grid container spacing={2} mt={1} mb={1}>
         <Grid item xs>
-            <TextField fullWidth id="outlined-required" label={question.questionLabel} value={data || ''} onChange={update} />
+            <TextField autoComplete="off" fullWidth id="outlined-required" label={question.questionLabel} value={data || ''} onChange={update} />
         </Grid>
     </Grid>)
 }
@@ -42,7 +42,7 @@ function CustomQestionLongText({ i, question, data, setArrayItem }: { i: number,
     const update = setArrayItem(i)
     return (<Grid container spacing={2} mt={1} mb={1}>
         <Grid item xs>
-            <TextField multiline minRows={3} fullWidth id="outlined-required" label={question.questionLabel} value={data || ''} onChange={update} />
+            <TextField autoComplete="off" multiline minRows={3} fullWidth id="outlined-required" label={question.questionLabel} value={data || ''} onChange={update} />
         </Grid>
     </Grid>)
 }

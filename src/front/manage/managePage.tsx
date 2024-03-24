@@ -55,8 +55,8 @@ export function Component() {
         <Grid container spacing={2} p={2}>
         {shouldShowSearch(location) ? <><Grid xs={12} item sx={{ displayPrint: "none" }}>
             <FormControlLabel sx={{ float: "right" }} control={<Switch checked={displayAdvanced} onChange={() => setDisplayAdvanced(!displayAdvanced)} />} label="Advanced" />
-            <TextField sx={{ mr: 1, mt: 1 }} size="small" margin="dense" label="Participant search" value={participantSearch} onChange={updateParticipantSearch} />
-            <TextField sx={{ mr: 1, mt: 1 }} size="small" margin="dense" label="Booking search" value={bookingSearch} onChange={updateBookingSearch} />
+            <TextField autoComplete="off" sx={{ mr: 1, mt: 1 }} size="small" margin="dense" label="Participant search" value={participantSearch} onChange={updateParticipantSearch} />
+            <TextField autoComplete="off" sx={{ mr: 1, mt: 1 }} size="small" margin="dense" label="Booking search" value={bookingSearch} onChange={updateBookingSearch} />
         </Grid>
             {displayAdvanced ? <Grid xs={12} item sx={{ displayPrint: "none" }}>
                 <FormControlLabel sx={{ float: "right" }} control={<Switch checked={displayDeleted} onChange={() => setDisplayDeleted(!displayDeleted)} />} label="Show Cancelled" />

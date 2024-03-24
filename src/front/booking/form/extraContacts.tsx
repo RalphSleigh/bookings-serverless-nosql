@@ -31,6 +31,7 @@ const ExtraContactPerson = ({ data, update, last }: { data: Partial<NonNullable<
     return <Grid container spacing={2} sx={{ mt: 1 }}>
         <Grid item xs={12} sm={6}>
             <TextField
+                autoComplete="off"
                 fullWidth
                 id="outlined-required"
                 label="Name"
@@ -39,6 +40,7 @@ const ExtraContactPerson = ({ data, update, last }: { data: Partial<NonNullable<
         </Grid>
         <Grid item xs={12} sm={6}>
             <TextField
+                autoComplete="off"
                 fullWidth
                 id="outlined-required"
                 type="email"

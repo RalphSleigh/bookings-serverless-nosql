@@ -63,13 +63,14 @@ export class Large implements KpStructure {
                 </Grid>
             </Grid>
             <Grid item xs={12}>
-                <TextField multiline fullWidth minRows={2} id="outlined" label="Any other dietary restrictions, allergies, intolerances, elimination diets and diet related medical conditions:" placeholder={`This is your everything else section for things that didn’t fit into the tick boxes above.`} value={data.details || ''} onChange={updateField('details')} />
+                <TextField autoComplete="off" multiline fullWidth minRows={2} id="outlined" label="Any other dietary restrictions, allergies, intolerances, elimination diets and diet related medical conditions:" placeholder={`This is your everything else section for things that didn’t fit into the tick boxes above.`} value={data.details || ''} onChange={updateField('details')} />
             </Grid>
             <Grid item xs={12}>
                 <FormControlLabel checked={data.contactMe} onChange={updateSwitch('contactMe')} control={<Checkbox />} label=" My allergies or dietary needs are complicated and I would like to be contacted by the camp team" />
             </Grid>
             <Grid item xs={12}>
                 <TextField
+                    autoComplete="off"
                     multiline
                     fullWidth
                     minRows={2}

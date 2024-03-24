@@ -82,9 +82,9 @@ function bookingIndvidualContactFields({ data, update }: { data: PartialDeep<Jso
 
     return <>
         <Typography variant="h6" mt={2}>{`Your details`}</Typography>
-        <TextField fullWidth sx={{ mt: 2 }} required id="outlined-required" label="Your Name" value={data?.contactName || ''} onChange={updateField('contactName')} />
-        <TextField fullWidth sx={{ mt: 2 }} required id="outlined-required" type="email" label="Your email" value={data?.contactEmail || ''} onChange={updateField('contactEmail')} />
-        <TextField fullWidth sx={{ mt: 2 }} required id="outlined-required" type="tel" label="Phone Number" value={data?.contactPhone || ''} onChange={updateField('contactPhone')} />
+        <TextField autoComplete="name" fullWidth sx={{ mt: 2 }} required id="outlined-required" label="Your Name" value={data?.contactName || ''} onChange={updateField('contactName')} />
+        <TextField autoComplete="email" fullWidth sx={{ mt: 2 }} required id="outlined-required" type="email" label="Your email" value={data?.contactEmail || ''} onChange={updateField('contactEmail')} />
+        <TextField autoComplete="tel" fullWidth sx={{ mt: 2 }} required id="outlined-required" type="tel" label="Phone Number" value={data?.contactPhone || ''} onChange={updateField('contactPhone')} />
     </>
 }
 
@@ -139,11 +139,11 @@ function bookingGroupContactFields({ data, update }: { data: PartialDeep<JsonBoo
                 {organsationItems}
             </Select>
         </FormControl>
-        <TextField fullWidth sx={{ mt: 2 }} required id="outlined-required" label="District" value={data?.district || ''} onChange={updateField('district')} />
+        <TextField autoComplete="off" fullWidth sx={{ mt: 2 }} required id="outlined-required" label="District" value={data?.district || ''} onChange={updateField('district')} />
         <Typography variant="h6" mt={2}>{`Your details`}</Typography>
-        <TextField fullWidth sx={{ mt: 2 }} required id="outlined-required" label="Your Name" value={data?.contactName || ''} onChange={updateField('contactName')} />
-        <TextField fullWidth sx={{ mt: 2 }} required id="outlined-required" type="email" label="Your email" value={data?.contactEmail || ''} onChange={updateField('contactEmail')} />
-        <TextField fullWidth sx={{ mt: 2 }} required id="outlined-required" type="tel" label="Phone Number" value={data?.contactPhone || ''} onChange={updateField('contactPhone')} />
+        <TextField autoComplete="name" fullWidth sx={{ mt: 2 }} required id="outlined-required" label="Your Name" value={data?.contactName || ''} onChange={updateField('contactName')} />
+        <TextField autoComplete="email" fullWidth sx={{ mt: 2 }} required id="outlined-required" type="email" label="Your email" value={data?.contactEmail || ''} onChange={updateField('contactEmail')} />
+        <TextField autoComplete="tel" fullWidth sx={{ mt: 2 }} required id="outlined-required" type="tel" label="Phone Number" value={data?.contactPhone || ''} onChange={updateField('contactPhone')} />
 
     </>
 }

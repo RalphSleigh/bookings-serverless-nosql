@@ -23,8 +23,8 @@ function bookingIndvidualEmergencyFields({ data, update }: { data: PartialDeep<J
     return <>
         <Typography variant="h6" sx={{ mt: 2 }}>Emergency</Typography>
         <Typography sx={{ mt: 1 }}>Please provide details of someone we can contact in case of an emergency during the event (a second person is better even if you are not attending yourself)</Typography>
-        <TextField fullWidth sx={{ mt: 2 }} required id="outlined-required" label="Name" value={data?.name || ''} onChange={updateField('name')} />
-        <TextField fullWidth  sx={{ mt: 2 }} required id="outlined-required" type="tel" label="Phone" value={data?.phone || ''} onChange={updateField('phone')} />
+        <TextField autoComplete="off" fullWidth sx={{ mt: 2 }} required id="outlined-required" label="Name" value={data?.name || ''} onChange={updateField('name')} />
+        <TextField autoComplete="off" fullWidth  sx={{ mt: 2 }} required id="outlined-required" type="tel" label="Phone" value={data?.phone || ''} onChange={updateField('phone')} />
     </>
 }
 
@@ -35,8 +35,8 @@ function bookingGroupEmergencyFields({ data, update }: { data: PartialDeep<JsonB
     return <>
         <Typography variant="h6" sx={{ mt: 2 }}>Emergency</Typography>
         <Typography sx={{ mt: 1}}>As you are making an individual booking, please provide some emergency contact details of someone not attending the event.</Typography>
-        <TextField fullWidth sx={{ mt: 2 }} required id="outlined-required" label="Name" value={data?.name || ''} onChange={updateField('name')} />
-        <TextField fullWidth sx={{ mt: 2 }} required id="outlined-required" type="tel" label="Phone" value={data?.phone || ''} onChange={updateField('phone')} />
+        <TextField autoComplete="off" fullWidth sx={{ mt: 2 }} required id="outlined-required" label="Name" value={data?.name || ''} onChange={updateField('name')} />
+        <TextField autoComplete="off" fullWidth sx={{ mt: 2 }} required id="outlined-required" type="tel" label="Phone" value={data?.phone || ''} onChange={updateField('phone')} />
     </>
 }
 

@@ -76,6 +76,7 @@ function ParticipantForm({ index, event, attendanceConfig, participant, kp, cons
             <Grid container spacing={2}>
                 <Grid sm={8} xs={12} item>
                     <TextField
+                        autoComplete="off"
                         fullWidth
                         required
                         id="outlined-required"
@@ -121,6 +122,7 @@ function ParicipantMedicalForm({ event, data, update }: { event: JsonEventType, 
 
     return <>
         <TextField
+            autoComplete="off"
             sx={{ mt: 2 }}
             multiline
             fullWidth
@@ -162,6 +164,7 @@ const EmailField = ({ email, dob, event, update }: { email: Partial<Required<Jso
 
     if (dob && differenceInYears(parseDate(event.startDate)!, parseDate(dob)!) < 16) {
         return <TextField
+            autoComplete="off"
             fullWidth
             required
             id="outlined-required"
@@ -172,6 +175,7 @@ const EmailField = ({ email, dob, event, update }: { email: Partial<Required<Jso
             InputProps={inputProps} />
     } else {
         return <TextField
+            autoComplete="off"
             fullWidth
             required
             id="outlined-required"

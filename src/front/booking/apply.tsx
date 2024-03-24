@@ -62,10 +62,10 @@ export function CreateApplicationPage({ event, user }: { event: JsonEventType, u
                     </Grid>
                     <Grid xs={12} item>
                         <form>
-                            <TextField fullWidth sx={{ mt: 2 }} required id="outlined-required" label="Name" value={applicationData.name || ''} onChange={updateField('name')} />
-                            <TextField fullWidth sx={{ mt: 2 }} required id="outlined-required" label="Email" value={applicationData.email || ''} onChange={updateField('email')} />
-                            <TextField fullWidth sx={{ mt: 2 }} disabled={applicationData.bookingType == "individual"} required id="outlined-required" label="Group/District" value={applicationData.district || ''} onChange={updateField('district')} />
-                            <TextField fullWidth inputProps={{ inputMode: "numeric" }} sx={{ mt: 2 }} required id="outlined-required" label="Predicted Number of Campers" value={applicationData.predictedParticipants || ''} onChange={updateNumber('predictedParticipants')} />
+                            <TextField autoComplete="name" fullWidth sx={{ mt: 2 }} required id="outlined-required" label="Name" value={applicationData.name || ''} onChange={updateField('name')} />
+                            <TextField autoComplete="email" fullWidth sx={{ mt: 2 }} required id="outlined-required" label="Email" value={applicationData.email || ''} onChange={updateField('email')} />
+                            <TextField autoComplete="off" fullWidth sx={{ mt: 2 }} disabled={applicationData.bookingType == "individual"} required id="outlined-required" label="Group/District" value={applicationData.district || ''} onChange={updateField('district')} />
+                            <TextField autoComplete="off" fullWidth inputProps={{ inputMode: "numeric" }} sx={{ mt: 2 }} required id="outlined-required" label="Predicted Number of Campers" value={applicationData.predictedParticipants || ''} onChange={updateNumber('predictedParticipants')} />
                             <LoadingButton
                                 sx={{ mt: 2 }}
                                 onClick={submit}
