@@ -12,6 +12,11 @@ const EventBookingTimelineModel: Model<EventBookingTimelineType> = table.getMode
 const BookingModel: Model<OnetableBookingType> = table.getModel<OnetableBookingType>('Booking')
 
 const randomCamp100Participant: () => ParticipantType = () => {
+    
+    const diet = getRandomDiet()
+    const complicated = Math.random() < 0.10
+
+
     //@ts-ignore
     const participant: ParticipantType = {
         basic: {
@@ -27,18 +32,18 @@ const randomCamp100Participant: () => ParticipantType = () => {
             option: getRandomAttendance()
         },
         kp: {
-            diet: getRandomDiet(),
-            details: getRandomDietExtra(),
-            nuts: randomBool(0.05),
-            gluten: randomBool(0.05),
-            dairy: randomBool(0.05),
-            soya: randomBool(0.05),
-            egg: randomBool(0.05),
-            pork: randomBool(0.05),
-            chickpea: randomBool(0.05),
-            diabetic: randomBool(0.02),
-            contactMe: randomBool(0.05),
-            preferences: faker.lorem.sentence(),
+            diet: diet,
+            details: complicated ? getRandomDietExtra() : "",
+            nuts: complicated && randomBool(0.25),
+            gluten: complicated && randomBool(0.25),
+            dairy: complicated && randomBool(0.25) || diet == "vegan",
+            soya: complicated && randomBool(0.25),
+            egg: complicated && randomBool(0.25) || diet == "vegan",
+            pork:complicated && randomBool(0.25) || diet != "omnivore",
+            chickpea: complicated && randomBool(0.25),
+            diabetic: complicated && randomBool(0.25),
+            contactMe: complicated && randomBool(0.25),
+            preferences: complicated ? getRandomDietPreference() : "",
         },
         medical: {
             details: getRandomMedical(),
@@ -240,6 +245,19 @@ function getDays() {
     return 15
 }
 
+function getRandomDietPreference() {
+    const extras = [
+        "Really hates mushrooms",
+        "Loves cheese",
+        "Will only eat food that is blue",
+        "Prfers no pasta",
+        "No spicy food",
+        "Not a salad fan",
+        "Primal need to microwave tuna",
+    ];
+    return Math.random() > 0.5 ? extras[getRandomInt(0, extras.length)] : "";
+}
+
 function getRandomDietExtra() {
     const extras = [
         "Allergic to nuts",
@@ -257,7 +275,7 @@ function getRandomDietExtra() {
         "No rabbit food please",
         "NO NUTS! THEY WILL DIE"
     ];
-    return Math.random() > 0.95 ? extras[getRandomInt(0, extras.length)] : "";
+    return Math.random() > 0.5 ? extras[getRandomInt(0, extras.length)] : "";
 }
 
 function getRandomMedical() {
