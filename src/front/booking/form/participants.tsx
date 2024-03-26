@@ -12,7 +12,7 @@ import { AttendanceStructure } from "../../../shared/attendance/attendanceStruct
 import { differenceInYears } from "date-fns";
 import { ConsentStructure } from "../../../shared/consents/consents_class.js";
 
-export function ParticipantsForm({ event, attendanceConfig, participants, update, kp, consent }: { event: JsonEventType, attendanceConfig: AttendanceStructure, participants: Array<PartialDeep<JsonParticipantType>>, update: any, kp: KpStructure, consent: ConsentStructure}) {
+export function ParticipantsForm({ event, attendanceConfig, participants, update, kp, consent }: { event: JsonEventType, attendanceConfig: AttendanceStructure, participants: Array<PartialDeep<JsonParticipantType>>, update: any, kp: KpStructure, consent: ConsentStructure }) {
 
     const { addEmptyObjectToArray, updateArrayItem, deleteArrayItem } = getMemoUpdateFunctions(update(('participants')))
 
@@ -85,7 +85,12 @@ function ParticipantForm({ index, event, attendanceConfig, participant, kp, cons
                         onChange={basicUpdates.updateField('name')} />
                 </Grid>
                 <Grid sm={4} xs={12} item>
-                    <UtcDatePicker label="DoB *" value={participant.basic?.dob} onChange={basicUpdates.updateDate('dob')} />
+                    <UtcDatePicker
+                        label="DoB *"
+                        value={participant.basic?.dob}
+                        onChange={basicUpdates.updateDate('dob')}
+                        slotProps={{ field: { autocomplete: "off" } }}
+                    />
                 </Grid>
                 {emailAndOptionsAttendance}
                 <Grid xs={12} item>
@@ -131,7 +136,7 @@ function ParicipantMedicalForm({ event, data, update }: { event: JsonEventType, 
             label="Additional medical information, medication taken or accessibility requirements:"
             value={data.details || ''}
             onChange={updateField('details')}
-            InputProps={event.bigCampMode ?{
+            InputProps={event.bigCampMode ? {
                 endAdornment: <InputAdornment position="end">
                     <Tooltip title={`LONG WORDAGE HERE`}>
                         <IconButton

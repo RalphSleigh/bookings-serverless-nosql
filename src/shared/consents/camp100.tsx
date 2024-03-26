@@ -20,7 +20,7 @@ export class Camp100 implements ConsentStructure {
             <Grid container spacing={2} sx={{ mt: 1 }}>
                 <Grid item xs>
                     <Box pt={1}>
-                        <FormLabel id={`consent-photo-label`} radioGroup={`consent-photo`}><strong>Image Consent:</strong> I have permission for photos and recordings of this individual to be taken at the event and used by Woodcraft Folk. IFM and other external bodies for publications and during the event on-site.</FormLabel>
+                        <FormLabel id={`consent-photo-label`} radioGroup={`consent-photo`}><strong>Image Consent:</strong> I have permission for photos and recordings of this individual to be taken at the event and used by Woodcraft Folk. IFM and other external bodies for publications, social media and during the event on site.</FormLabel>
                     </Box>
                 </Grid><Grid item>
                     <RadioGroup

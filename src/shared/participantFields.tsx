@@ -9,11 +9,12 @@ import { getAgeGroup } from "./woodcraft.js";
 import { useMediaQuery, useTheme } from "@mui/material";
 
 abstract class Field {
-    event: any;
+    event: JsonEventType | OnetableEventType;
     abstract fieldName: string
     roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "Money", "KP"]
     defaultValue: string = "N/A"
 
+    enabledCSV: boolean = true
     visbileMobile: boolean = true
     visibleDesktop: boolean = true
 
@@ -63,6 +64,17 @@ class Name extends Field {
     }
 }
 
+class Email extends Field {
+    fieldName = "Email"
+    visbileMobile = false
+    enabled(): boolean {
+        return this.event.allParticipantEmails
+    }
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.basic.email
+    }
+}
+
 class BookedBy extends Field {
     fieldName = "Booked By"
     value (participant: JsonParticipantWithExtraType) {
@@ -85,8 +97,20 @@ class Age extends Field {
     }
 }
 
+class AttendanceOption extends Field {
+    fieldName = "Attendance Option"
+    visbileMobile = false
+    enabled(): boolean {
+        return this.event.attendanceStructure == "options"
+    }
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.attendance.option
+    }
+}
+
 class Diet extends Field {
     fieldName = "Diet"
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
     value (participant: JsonParticipantWithExtraType | ParticipantType) {
         return participant.kp?.diet
     }
@@ -98,6 +122,7 @@ class Diet extends Field {
 
 class AddtionalDiet extends Field {
     fieldName = "Additional Diet"
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
     visbileMobile = false
     defaultValue = ""
     value (participant: JsonParticipantWithExtraType | ParticipantType) {
@@ -105,17 +130,147 @@ class AddtionalDiet extends Field {
     }
 }
 
-class Photo extends Field {
-    fieldName = "Photo"
+class DietPreferences extends Field {
+    fieldName = "Diet Preferences"
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
+    visbileMobile = false
+    enabled(): boolean {
+        return this.event.kpMode == "large"
+    }
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.kp?.preferences
+    }
+}
+
+class DietNutAllergy extends Field {
+    fieldName = "Nut Allergy"
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
+    visbileMobile = false
+    enabled(): boolean {
+        return this.event.kpMode == "large"
+    }
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.kp?.nuts
+    }
+}
+
+class DietGlutenAllergy extends Field {
+    fieldName = "Gluten Allergy"
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
+    visbileMobile = false
+    enabled(): boolean {
+        return this.event.kpMode == "large"
+    }
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.kp?.gluten
+    }
+}
+
+class DietSoyaAllergy extends Field {
+    fieldName = "Soya Allergy"
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
+    visbileMobile = false
+    enabled(): boolean {
+        return this.event.kpMode == "large"
+    }
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.kp?.soya
+    }
+}
+
+class DietDairyAllergy extends Field {
+    fieldName = "Dairy Allergy"
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
+    visbileMobile = false
+    enabled(): boolean {
+        return this.event.kpMode == "large"
+    }
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.kp?.dairy
+    }
+}
+
+class DietEggAllergy extends Field {
+    fieldName = "Egg Allergy"
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
+    visbileMobile = false
+    enabled(): boolean {
+        return this.event.kpMode == "large"
+    }
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.kp?.egg
+    }
+}
+
+class DietPorkAllergy extends Field {
+    fieldName = "No Pork"
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
+    visbileMobile = false
+    enabled(): boolean {
+        return this.event.kpMode == "large"
+    }
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.kp?.pork
+    }
+}
+
+class DietChickpeaAllergy extends Field {
+    fieldName = "Chickpea Allergy"
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
+    visbileMobile = false
+    enabled(): boolean {
+        return this.event.kpMode == "large"
+    }
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.kp?.chickpea
+    }
+}
+
+class DietDiabetic extends Field {
+    fieldName = "Diabetic"
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
+    visbileMobile = false
+    enabled(): boolean {
+        return this.event.kpMode == "large"
+    }
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.kp?.diabetic
+    }
+}
+
+class DietContactMe extends Field {
+    fieldName = "Contact Me"
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
+    visbileMobile = false
+    enabled(): boolean {
+        return this.event.kpMode == "large"
+    }
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.kp?.contactMe
+    }
+}
+
+class PhotoConsent extends Field {
+    fieldName = "Photo Consent"
     visbileMobile = false
     roles: Array<RoleType["role"]> = ["Owner", "Manage", "View"]
+    enabled(): boolean {
+        return this.event.consentMode == "camp100"
+    }
     value (participant: JsonParticipantWithExtraType) {
         return participant.consent?.photo
     }
+}
 
+class RSEConsent extends Field {
+    fieldName = "RSE Consent"
+    visbileMobile = false
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View"]
     enabled(): boolean {
-        //return this.event.bigCampMode
-        return false
+        return this.event.consentMode == "camp100"
+    }
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.consent?.sre
     }
 }
 
@@ -173,11 +328,24 @@ export class ParticipantFields {
         this.fields = [
             new Name(event),
             new Age(event),
+            new Email(event),
+            new AttendanceOption(event),
             new BookedBy(event),
             new Diet(event),
             new AddtionalDiet(event),
+            new DietPreferences(event),
+            new DietNutAllergy(event),
+            new DietGlutenAllergy(event),
+            new DietSoyaAllergy(event),
+            new DietDairyAllergy(event),
+            new DietEggAllergy(event),
+            new DietPorkAllergy(event),
+            new DietChickpeaAllergy(event),
+            new DietDiabetic(event),
+            new DietContactMe(event),
             new Medical(event),
-            new Photo(event),
+            new PhotoConsent(event),
+            new RSEConsent(event),
             new Created(event),
             new Updated(event),
         ]    
@@ -188,11 +356,11 @@ export class ParticipantFields {
     }
 
     getCSVHeaders(user) {
-        return this.fields.filter(f => f.enabled() && f.permission(user)).map(f => f.fieldName)
+        return this.fields.filter(f => f.enabledCSV && f.enabled() && f.permission(user)).map(f => f.fieldName)
     }
 
     getCSVValues(participant: JsonParticipantWithExtraType | ParticipantType, user) {
-        return this.fields.filter(f => f.enabled() && f.permission(user)).map(f => f.csvCellValue(participant))
+        return this.fields.filter(f => f.enabledCSV && f.enabled() && f.permission(user)).map(f => f.csvCellValue(participant))
     }
 
     getDefaultColumnVisibility(user: JsonUserType | UserResponseType): GridColumnVisibilityModel {

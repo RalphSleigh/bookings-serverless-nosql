@@ -1,13 +1,13 @@
 import React, { useContext, useMemo } from "react";
 import { Outlet, useOutletContext, useResolvedPath, useLocation } from "react-router-dom";
 import { manageLoaderContext } from "./manageLoader.js";
-import { Button, ButtonGroup, FormControlLabel, Grid, Link, Switch, Tab, Tabs, TextField } from "@mui/material";
+import { Button, ButtonGroup, FormControlLabel, Grid, Link, Modal, Paper, Switch, Tab, Tabs, TextField, Typography } from "@mui/material";
 import { useDisableDriveSync, useEventBookings, useHistoricalEventBookings } from "../queries.js";
 import { JsonBookingType, JsonEventType, JsonUserResponseType } from "../../lambda-common/onetable.js";
 import { SuspenseWrapper } from "../suspense.js";
 import { UserContext } from "../user/userContext.js";
 import { CanCreateAnyRole, CanManageApplications, CanSeeMoneyPage } from "../../shared/permissions.js";
-import { bookingsBookingSearch, bookingsParticipantSearch, useDebounceState } from "../util.js";
+import { bookingsBookingSearch, bookingsParticipantSearch, useDebounceState, useStickyState } from "../util.js";
 import { JsonBookingWithExtraType } from "../../shared/computedDataTypes.js";
 import { ReactErrorBoundary } from "../app/errors.js";
 import { addComputedFieldsToBookingsQueryResult } from "../../shared/util.js";
@@ -25,6 +25,8 @@ export function Component() {
     const rolesPath = useResolvedPath('roles')
     const moneyPath = useResolvedPath('money')
 
+    const [acceptedPolicy, setAcceptedPolicy] = useStickyState<boolean>(false, "acceptedManagementPolicy")
+
     const [displayAdvanced, setDisplayAdvanced] = React.useState<boolean>(false)
     const [displayDeleted, setDisplayDeleted] = React.useState<boolean>(false)
     const [participantSearch, debouncedParticipantSearch, setParticipantSearch] = useDebounceState<string>("", 500)
@@ -40,7 +42,10 @@ export function Component() {
 
     const Loader = timeline.latest ? MemoLatestDataLoader : MemoTimeLineDataLoader
 
-    return <><Grid container spacing={0}>
+    return <>
+    
+    <Grid container spacing={0}>
+    <UsagePolicyModal accepted={acceptedPolicy} handleClose={() => setAcceptedPolicy(true)} />
         <Grid xs={12} item>
             <Tabs value={!location.pathname.endsWith("manage") ? location.pathname : participantPath.pathname} variant="scrollable" scrollButtons="auto">
                 <Tab label="Participants" value={participantPath.pathname} href={participantPath.pathname} component={Link} />
@@ -126,4 +131,34 @@ const SyncWidget: React.FC<{ user: JsonUserResponseType }> = props => {
     }
 
     return <FormControlLabel sx={{ float: "right" }} control={<Switch checked={user.tokens} onChange={change} />} label="Drive Sync" />
+}
+
+const UsagePolicyModal = ({ accepted, handleClose }: {accepted: boolean, handleClose: () => void }) => {
+    const style = {
+        position: 'absolute' as 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        p: 2,
+        outline: 'none'
+    }
+
+    if (accepted) return null
+
+    return (<Modal
+        open={!accepted}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description">
+        <Paper elevation={6} sx={style}>
+            <Typography id="modal-modal-title" variant="h6">
+                POLICY
+            </Typography>
+            <Grid container spacing={2}>
+                <Grid item xs={12} sm>
+                    <Typography variant="body1">This is the policy</Typography>
+                    <Button onClick={handleClose}>Accept</Button>
+                </Grid>
+            </Grid>
+        </Paper>
+    </Modal>)
 }
