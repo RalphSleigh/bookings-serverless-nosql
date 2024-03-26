@@ -152,6 +152,12 @@ class DietNutAllergy extends Field {
     value (participant: JsonParticipantWithExtraType) {
         return participant.kp?.nuts
     }
+    dataGridCellRenderer(params): ReactNode {
+        const value = this.value(params.value)
+        if(value === true) return "❌"
+        if(value === false) return ""
+        return ""
+    }
 }
 
 class DietGlutenAllergy extends Field {
@@ -163,6 +169,12 @@ class DietGlutenAllergy extends Field {
     }
     value (participant: JsonParticipantWithExtraType) {
         return participant.kp?.gluten
+    }
+    dataGridCellRenderer(params): ReactNode {
+        const value = this.value(params.value)
+        if(value === true) return "❌"
+        if(value === false) return ""
+        return ""
     }
 }
 
@@ -176,6 +188,12 @@ class DietSoyaAllergy extends Field {
     value (participant: JsonParticipantWithExtraType) {
         return participant.kp?.soya
     }
+    dataGridCellRenderer(params): ReactNode {
+        const value = this.value(params.value)
+        if(value === true) return "❌"
+        if(value === false) return ""
+        return ""
+    }
 }
 
 class DietDairyAllergy extends Field {
@@ -187,6 +205,12 @@ class DietDairyAllergy extends Field {
     }
     value (participant: JsonParticipantWithExtraType) {
         return participant.kp?.dairy
+    }
+    dataGridCellRenderer(params): ReactNode {
+        const value = this.value(params.value)
+        if(value === true) return "❌"
+        if(value === false) return ""
+        return ""
     }
 }
 
@@ -200,6 +224,12 @@ class DietEggAllergy extends Field {
     value (participant: JsonParticipantWithExtraType) {
         return participant.kp?.egg
     }
+    dataGridCellRenderer(params): ReactNode {
+        const value = this.value(params.value)
+        if(value === true) return "❌"
+        if(value === false) return ""
+        return ""
+    }
 }
 
 class DietPorkAllergy extends Field {
@@ -211,6 +241,12 @@ class DietPorkAllergy extends Field {
     }
     value (participant: JsonParticipantWithExtraType) {
         return participant.kp?.pork
+    }
+    dataGridCellRenderer(params): ReactNode {
+        const value = this.value(params.value)
+        if(value === true) return "❌"
+        if(value === false) return ""
+        return ""
     }
 }
 
@@ -224,6 +260,12 @@ class DietChickpeaAllergy extends Field {
     value (participant: JsonParticipantWithExtraType) {
         return participant.kp?.chickpea
     }
+    dataGridCellRenderer(params): ReactNode {
+        const value = this.value(params.value)
+        if(value === true) return "❌"
+        if(value === false) return ""
+        return ""
+    }
 }
 
 class DietDiabetic extends Field {
@@ -235,6 +277,12 @@ class DietDiabetic extends Field {
     }
     value (participant: JsonParticipantWithExtraType) {
         return participant.kp?.diabetic
+    }
+    dataGridCellRenderer(params): ReactNode {
+        const value = this.value(params.value)
+        if(value === true) return "❌"
+        if(value === false) return ""
+        return ""
     }
 }
 
@@ -248,6 +296,12 @@ class DietContactMe extends Field {
     value (participant: JsonParticipantWithExtraType) {
         return participant.kp?.contactMe
     }
+    dataGridCellRenderer(params): ReactNode {
+        const value = this.value(params.value)
+        if(value === true) return "❌"
+        if(value === false) return ""
+        return ""
+    }
 }
 
 class PhotoConsent extends Field {
@@ -259,6 +313,12 @@ class PhotoConsent extends Field {
     }
     value (participant: JsonParticipantWithExtraType) {
         return participant.consent?.photo
+    }
+    dataGridCellRenderer(params): ReactNode {
+        const value = this.value(params.value)
+        if(value === true) return "✔️"
+        if(value === false) return "❌"
+        return ""
     }
 }
 
