@@ -33,16 +33,16 @@ abstract class Field {
     }
 
     dataGridColumnDef(): GridColDef {
-        return { field: this.fieldName, headerName: this.fieldName, renderCell: this.dataGridCellRenderer.bind(this), valueGetter: params => params.row.participant, sortComparator: this.sortComparator.bind(this), flex: 1 }
+        return { field: this.fieldName, headerName: this.fieldName, renderCell: this.dataGridCellRenderer.bind(this), valueGetter: params => this.value.bind(this)(params.row.participant), sortComparator: this.sortComparator.bind(this), flex: 1 }
     }
 
     dataGridCellRenderer(params): ReactNode {
-        const value = this.value(params.value)
-        if(value === undefined) return this.defaultValue
-        return <>{value.toString()}</>
+        //const value = this.value(params.value)
+        if(params.value === undefined) return this.defaultValue
+        return <>{params.value.toString()}</>
     }
 
-    sortComparator(a: JsonParticipantWithExtraType | ParticipantType, b: JsonParticipantWithExtraType | ParticipantType) {
+    sortComparator(a: any, b: any) {
         if(this.value(a) === undefined) return 1
         if(this.value(b) === undefined) return -1
         return this.value(a).toString().localeCompare(this.value(b).toString())
@@ -114,9 +114,9 @@ class Diet extends Field {
     value (participant: JsonParticipantWithExtraType | ParticipantType) {
         return participant.kp?.diet
     }
-    sortComparator(a: JsonParticipantWithExtraType | ParticipantType, b: JsonParticipantWithExtraType | ParticipantType) {
+    sortComparator(a: string, b: string) {
         const sortIndex = ["omnivore", "pescatarian", "vegetarian", "vegan"]
-        return sortIndex.indexOf(a.kp?.diet!) - sortIndex.indexOf(b.kp?.diet!)
+        return sortIndex.indexOf(a) - sortIndex.indexOf(b)
     }
 }
 
@@ -153,7 +153,8 @@ class DietNutAllergy extends Field {
         return participant.kp?.nuts
     }
     dataGridCellRenderer(params): ReactNode {
-        const value = this.value(params.value)
+        //const value = this.value(params.value)
+        const value = params.value
         if(value === true) return "❌"
         if(value === false) return ""
         return ""
@@ -171,7 +172,8 @@ class DietGlutenAllergy extends Field {
         return participant.kp?.gluten
     }
     dataGridCellRenderer(params): ReactNode {
-        const value = this.value(params.value)
+        //const value = this.value(params.value)
+        const value = params.value
         if(value === true) return "❌"
         if(value === false) return ""
         return ""
@@ -189,7 +191,8 @@ class DietSoyaAllergy extends Field {
         return participant.kp?.soya
     }
     dataGridCellRenderer(params): ReactNode {
-        const value = this.value(params.value)
+        //const value = this.value(params.value)
+        const value = params.value
         if(value === true) return "❌"
         if(value === false) return ""
         return ""
@@ -207,7 +210,8 @@ class DietDairyAllergy extends Field {
         return participant.kp?.dairy
     }
     dataGridCellRenderer(params): ReactNode {
-        const value = this.value(params.value)
+       //const value = this.value(params.value)
+       const value = params.value
         if(value === true) return "❌"
         if(value === false) return ""
         return ""
@@ -225,7 +229,8 @@ class DietEggAllergy extends Field {
         return participant.kp?.egg
     }
     dataGridCellRenderer(params): ReactNode {
-        const value = this.value(params.value)
+        //const value = this.value(params.value)
+        const value = params.value
         if(value === true) return "❌"
         if(value === false) return ""
         return ""
@@ -243,7 +248,8 @@ class DietPorkAllergy extends Field {
         return participant.kp?.pork
     }
     dataGridCellRenderer(params): ReactNode {
-        const value = this.value(params.value)
+        //const value = this.value(params.value)
+        const value = params.value
         if(value === true) return "❌"
         if(value === false) return ""
         return ""
@@ -261,7 +267,8 @@ class DietChickpeaAllergy extends Field {
         return participant.kp?.chickpea
     }
     dataGridCellRenderer(params): ReactNode {
-        const value = this.value(params.value)
+        //const value = this.value(params.value)
+        const value = params.value
         if(value === true) return "❌"
         if(value === false) return ""
         return ""
@@ -279,7 +286,8 @@ class DietDiabetic extends Field {
         return participant.kp?.diabetic
     }
     dataGridCellRenderer(params): ReactNode {
-        const value = this.value(params.value)
+        //const value = this.value(params.value)
+        const value = params.value
         if(value === true) return "❌"
         if(value === false) return ""
         return ""
@@ -297,7 +305,8 @@ class DietContactMe extends Field {
         return participant.kp?.contactMe
     }
     dataGridCellRenderer(params): ReactNode {
-        const value = this.value(params.value)
+        //const value = this.value(params.value)
+        const value = params.value
         if(value === true) return "❌"
         if(value === false) return ""
         return ""
@@ -315,7 +324,8 @@ class PhotoConsent extends Field {
         return participant.consent?.photo
     }
     dataGridCellRenderer(params): ReactNode {
-        const value = this.value(params.value)
+        //const value = this.value(params.value)
+        const value = params.value
         if(value === true) return "✔️"
         if(value === false) return "❌"
         return ""
@@ -333,7 +343,8 @@ class RSEConsent extends Field {
         return participant.consent?.sre
     }
     dataGridCellRenderer(params): ReactNode {
-        const value = this.value(params.value)
+        //const value = this.value(params.value)
+        const value = params.value
         if(value === true) return "✔️"
         if(value === false) return "❌"
         return ""
@@ -358,7 +369,8 @@ class Created extends Field {
     }
 
     dataGridCellRenderer(params: any): ReactNode {
-        const value = this.value(params.value)
+        //const value = this.value(params.value)
+        const value = params.value
         return <>{formatDistanceToNow(value)} ago</>
     }
 }
@@ -371,7 +383,8 @@ class Updated extends Field {
     }
 
     dataGridCellRenderer(params: any): ReactNode {
-        const value = this.value(params.value)
+        //const value = this.value(params.value)
+        const value = params.value
         return <>{formatDistanceToNow(value)} ago</>
     }
 }
