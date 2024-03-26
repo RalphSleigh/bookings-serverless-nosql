@@ -332,6 +332,12 @@ class RSEConsent extends Field {
     value (participant: JsonParticipantWithExtraType) {
         return participant.consent?.sre
     }
+    dataGridCellRenderer(params): ReactNode {
+        const value = this.value(params.value)
+        if(value === true) return "✔️"
+        if(value === false) return "❌"
+        return ""
+    }
 }
 
 class Medical extends Field {
