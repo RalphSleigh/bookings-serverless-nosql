@@ -6,6 +6,8 @@ import { auth, plus } from '@googleapis/plus'
 import jwt from 'jsonwebtoken'
 import cookie from 'cookie'
 import fetch, { Headers } from 'node-fetch'
+import { PublishCommand, SNSClient } from '@aws-sdk/client-sns';
+import am_in_lambda from '../../../lambda-common/am_in_lambda.js';
 
 /**
  *
@@ -65,10 +67,24 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
                 body: ''
             } as APIGatewayProxyResult
         } catch (e) {
-                console.log("Error getting user from login")
-                console.log(e)
-                throw e
-            
+            console.log("Error getting user from login")
+            console.log(e)
+            if (am_in_lambda()) {
+                const client = new SNSClient({})
+                const input = { // PublishInput
+                    TopicArn: process.env.SNS_QUEUE_ARN,
+                    Message: JSON.stringify(e), // required  
+                }
+                const command = new PublishCommand(input)
+                const response = await client.send(command)
+            }
+            return {
+                statusCode: 301,
+                headers: {
+                    Location: "/login?error=true",
+                },
+                body: ''
+            } as APIGatewayProxyResult
         }
     })
 
