@@ -134,6 +134,7 @@ class DietPreferences extends Field {
     fieldName = "Diet Preferences"
     roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
     visbileMobile = false
+    defaultValue = ""
     enabled(): boolean {
         return this.event.kpMode == "large"
     }

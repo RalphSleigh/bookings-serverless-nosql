@@ -10,7 +10,7 @@ import { PartialDeep } from "type-fest";
 
 export function CreateBookingPage({ event, user, application }: { event: JsonEventType, user: JsonUserResponseType, application: JsonApplicationType | undefined }) {
     const createBooking = useCreateBooking(event)
-    const [bookingData, setBookingData] = useState<PartialDeep<JsonBookingType>>({ eventId: event.id, basic: { contactName: user!.userName, contactEmail: user?.email, bookingType: application?.bookingType, district: application?.district } })
+    const [bookingData, setBookingData] = useState<PartialDeep<JsonBookingType>>({ eventId: event.id, userId: user.id, basic: { contactName: user!.userName, contactEmail: user?.email, bookingType: application?.bookingType, district: application?.district } })
     const setSnackbar = useContext(SnackBarContext)
 
     const submit = useCallback(() => {

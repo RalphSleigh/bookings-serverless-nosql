@@ -1,4 +1,4 @@
-import { FormGroup, Grid, Paper, TextField, Typography, Box, Button, FormControlLabel, Switch, MenuItem, Select, FormControl, InputLabel, ButtonGroup, Stack, IconButton, Card, CardContent, Grow, Checkbox } from "@mui/material"
+import { FormGroup, Grid, Paper, TextField, Typography, Box, Button, FormControlLabel, Switch, MenuItem, Select, FormControl, InputLabel, ButtonGroup, Stack, IconButton, Card, CardContent, Grow, Checkbox, Alert, AlertTitle } from "@mui/material"
 import React, { useCallback, useContext, useState } from "react";
 import { JsonBookingType, JsonEventType, JsonUserResponseType, UserResponseType, UserType } from "../../../lambda-common/onetable.js";
 import { ParticipantsForm } from "./participants.js";
@@ -84,6 +84,9 @@ function bookingIndvidualContactFields({ data, update }: { data: PartialDeep<Jso
         <Typography variant="h6" mt={2}>{`Your details`}</Typography>
         <TextField autoComplete="name" fullWidth sx={{ mt: 2 }} required id="outlined-required" label="Your Name" value={data?.contactName || ''} onChange={updateField('contactName')} />
         <TextField autoComplete="email" fullWidth sx={{ mt: 2 }} required id="outlined-required" type="email" label="Your email" value={data?.contactEmail || ''} onChange={updateField('contactEmail')} />
+        {data?.contactEmail?.includes("privaterelay.appleid.com") ? <Alert severity="warning" sx={{ mt: 2, pt: 2 }}>
+            <AlertTitle>This appears to be an Apple private relay address, we recommend you provide your actual email address, otherwise we may be unable to contact you.</AlertTitle>
+        </Alert> : null}
         <TextField autoComplete="tel" fullWidth sx={{ mt: 2 }} required id="outlined-required" type="tel" label="Phone Number" value={data?.contactPhone || ''} onChange={updateField('contactPhone')} />
     </>
 }
@@ -143,8 +146,10 @@ function bookingGroupContactFields({ data, update }: { data: PartialDeep<JsonBoo
         <Typography variant="h6" mt={2}>{`Your details`}</Typography>
         <TextField autoComplete="name" fullWidth sx={{ mt: 2 }} required id="outlined-required" label="Your Name" value={data?.contactName || ''} onChange={updateField('contactName')} />
         <TextField autoComplete="email" fullWidth sx={{ mt: 2 }} required id="outlined-required" type="email" label="Your email" value={data?.contactEmail || ''} onChange={updateField('contactEmail')} />
+        {data?.contactEmail?.includes("privaterelay.appleid.com") ? <Alert severity="warning" sx={{ mt: 2, pt: 2 }}>
+            <AlertTitle>This appears to be an Apple private relay address, we recommend you provide your actual email address, otherwise we may be unable to contact you.</AlertTitle>
+        </Alert> : null}
         <TextField autoComplete="tel" fullWidth sx={{ mt: 2 }} required id="outlined-required" type="tel" label="Phone Number" value={data?.contactPhone || ''} onChange={updateField('contactPhone')} />
-
     </>
 }
 

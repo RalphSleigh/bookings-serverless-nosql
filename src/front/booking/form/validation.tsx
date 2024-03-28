@@ -12,19 +12,25 @@ export function validate(event: JsonEventType, kpConfig: KpStructure, consentCon
     const results: validationResults = []
     const bigCamp = event.bigCampMode
 
+
+    if (bigCamp) {
+        if (!data.basic?.district) results.push("Please enter your group/district name")
+        if (!data.basic?.bookingType) results.push("Please select your booking type")
+        if (!data.basic?.organisation) results.push("Please select your organisation")
+    }
+
     if (!data.basic?.contactName) results.push("Please enter your contact name")
     if (!data.basic?.contactEmail) results.push("Please enter your contact email")
     if (!data.basic?.contactPhone) results.push("Please enter your contact phone")
-    if (bigCamp) {
-        if (!data.basic?.district) results.push("Please enter your group/district name")
-    }
 
     if (data.participants) data.participants.forEach((participant, i) => {
         results.push(...vaildateParticipant(event, kpConfig, consentConfig, attendanceConfig, participant, i))
     })
 
-    if (!data.emergency?.name) results.push("Please enter an emergency contact name")
-    if (!data.emergency?.phone) results.push("Please enter an emergency contact phone number")
+    if (bigCamp && data.basic?.bookingType === "individual") {
+        if (!data.emergency?.name) results.push("Please enter an emergency contact name")
+        if (!data.emergency?.phone) results.push("Please enter an emergency contact phone number")
+    }
 
     event.customQuestions.forEach((question, i) => {
         if (question.questionType === "yesnochoice") {
@@ -32,14 +38,13 @@ export function validate(event: JsonEventType, kpConfig: KpStructure, consentCon
         }
     })
 
-    if(permission !== true) results.push("Please tick the permission checkbox")  
+    if (permission !== true) results.push("Please tick the permission checkbox")
 
     return results
 }
 
 function vaildateParticipant(event: JsonEventType, kpConfig: KpStructure, consentConfig: ConsentStructure, attendanceConfig: AttendanceStructure, participant: Partial<JsonBookingType["participants"][0]>, i: number): validationResults {
     const results: validationResults = []
-    const bigCamp = event.bigCampMode
 
     if (!participant.basic?.name) results.push(`Please enter a name for Camper #${i + 1}`)
 
