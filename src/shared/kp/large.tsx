@@ -17,7 +17,7 @@ export class Large implements KpStructure {
         };
 
         const updateDietSelect = (e) => {
-            update(data => ({ ...data, 'diet': e.target.value, pork: e.target.value !== "omnivore", dairy: data.dairy || e.target.value == "vegan", egg: data.egg || e.target.value == "vegan" }))
+            update(data => ({ ...(data || {}), 'diet': e.target.value, pork: e.target.value !== "omnivore", dairy: data.dairy || e.target.value == "vegan", egg: data.egg || e.target.value == "vegan" }))
             e.preventDefault()
         }
 
