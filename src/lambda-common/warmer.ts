@@ -1,4 +1,4 @@
-import { Lambda } from "aws-sdk"
+import { Lambda } from "@aws-sdk/client-lambda"
 import am_in_lambda from "./am_in_lambda.js"
 import { log } from "./logging.js"
 
