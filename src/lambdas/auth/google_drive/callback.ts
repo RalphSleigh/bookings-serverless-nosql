@@ -22,7 +22,7 @@ import { UserType, table } from '../../../lambda-common/onetable.js';
 const UserModel = table.getModel<UserType>('User')
 
 export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {//@ts-ignore
-    return lambda_wrapper_raw(async (config) => {
+    return lambda_wrapper_raw(event, async (config) => {
         try {
             const oauth2Client = new auth.OAuth2(
                 config.GOOGLE_CLIENT_ID,

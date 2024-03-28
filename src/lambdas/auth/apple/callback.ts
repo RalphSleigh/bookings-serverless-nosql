@@ -19,7 +19,7 @@ import { URLSearchParams } from 'node:url'
  */
 
 export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => { //@ts-ignore
-    return lambda_wrapper_raw(async (config) => {
+    return lambda_wrapper_raw(event, async (config) => {
         console.log(event.body)
         const data = Object.fromEntries(new URLSearchParams(event.body!))
 

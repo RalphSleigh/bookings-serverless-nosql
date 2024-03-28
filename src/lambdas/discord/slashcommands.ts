@@ -12,7 +12,7 @@ import { formatDuration, intervalToDuration } from 'date-fns';
 
 
 export const lambdaHandler = async (lambda_event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => { //@ts-ignore
-    return lambda_wrapper_raw(async (config) => {
+    return lambda_wrapper_raw(lambda_event, async (config) => {
         console.log(JSON.stringify(lambda_event))
 
 

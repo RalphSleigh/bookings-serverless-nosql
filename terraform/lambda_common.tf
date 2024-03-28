@@ -51,6 +51,14 @@ data "aws_iam_policy_document" "lambda_exec_role_policy" {
 
     effect = "Allow"
   }
+
+  statement {
+     actions = [
+      "lambda:InvokeFunction",
+      "lambda:InvokeAsync"
+     ]
+     resources = ["arn:aws:lambda:eu-west-2:${data.aws_caller_identity.current.account_id}:*:*"]
+  }
 }
 
 resource "aws_iam_policy" "lambda_execution_policy" {

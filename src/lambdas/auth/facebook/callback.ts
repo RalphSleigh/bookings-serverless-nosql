@@ -18,7 +18,7 @@ import fetch, { Headers } from 'node-fetch'
  */
 
 export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    return lambda_wrapper_raw(async (config) => {
+    return lambda_wrapper_raw(event, async (config) => {
 
         console.log(event)
 

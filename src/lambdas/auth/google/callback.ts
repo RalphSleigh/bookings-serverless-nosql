@@ -18,7 +18,7 @@ import fetch, { Headers } from 'node-fetch'
  */
 
 export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {//@ts-ignore
-    return lambda_wrapper_raw(async (config) => {
+    return lambda_wrapper_raw(event, async (config) => {
 
         const oauth2Client = new auth.OAuth2(
             config.GOOGLE_CLIENT_ID,

@@ -6,6 +6,7 @@ import { get_user_from_event } from './user.js';
 import { UserResponseType } from './onetable.js';
 import { PermissionError } from '../shared/permissions.js';
 import { PublishCommand, SNSClient } from '@aws-sdk/client-sns';
+import { is_warmer_event } from './warmer.js';
 
 export type LambdaJSONHandlerEvent = Pick<APIGatewayProxyEvent, Exclude<keyof APIGatewayProxyEvent, 'body'>> & {
     body: any
@@ -19,6 +20,14 @@ export function lambda_wrapper_json(
     return async (lambda_event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
         try {
             const config = await get_config()
+
+            if(is_warmer_event(lambda_event)) {
+                console.log("Evocation was a warmer event")
+                //@ts-ignore
+                return {}
+            }
+
+
             const user = await get_user_from_event(lambda_event, config)
 
             //log(`User ${user.userName} calling ${lambda_event.httpMethod} ${lambda_event.path}`)
@@ -92,9 +101,14 @@ export function lambda_wrapper_json(
     }
 }
 
-export async function lambda_wrapper_raw(handler: (config: ConfigType) => Promise<APIGatewayProxyResult>): Promise<APIGatewayProxyResult> {
+export async function lambda_wrapper_raw(lambda_event, handler: (config: ConfigType) => Promise<APIGatewayProxyResult>): Promise<APIGatewayProxyResult> {
     try {
         const config = await get_config()
+        if(is_warmer_event(lambda_event)) {
+            console.log("Evocation was a warmer event")
+            //@ts-ignore
+            return {}
+        }
         return await handler(config)
     }
     catch (e) {

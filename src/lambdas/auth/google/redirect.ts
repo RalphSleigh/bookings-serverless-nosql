@@ -1,6 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { lambda_wrapper_raw } from '../../../lambda-common/lambda_wrappers.js'
 import { auth } from '@googleapis/plus'
+import { warm } from '../../../lambda-common/warmer.js';
 
 /**
  *
@@ -13,8 +14,10 @@ import { auth } from '@googleapis/plus'
  */
 
 export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => { //@ts-ignore
-    return lambda_wrapper_raw(async (config) => {
+    return lambda_wrapper_raw(event, async (config) => {
 
+
+        await warm(["function_auth_google_callback"])
         console.log(event)
 
         const oauth2Client = new auth.OAuth2(
