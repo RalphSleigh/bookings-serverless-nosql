@@ -234,9 +234,9 @@ function getRandomInt(min: number, max: number) {
 }
 
 function getRandomAttendance() {
-    if (Math.random() < 0.10) return "First half";
-    if (Math.random() < 0.10) return "Second half";
-    return "Whole camp";
+    if (Math.random() < 0.10) return 1;
+    if (Math.random() < 0.10) return 2;
+    return 0;
 }
 
 function getDays() {
