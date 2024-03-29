@@ -264,6 +264,7 @@ const schema = {
 
 export interface ParticipantAttendanceType {
     option?: number
+}
 
 interface ParticipantFields {
     created: Date,
