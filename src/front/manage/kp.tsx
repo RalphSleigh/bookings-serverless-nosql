@@ -168,7 +168,8 @@ const LargeKP = ({ event, bookings }: { event: JsonEventType, bookings: Required
         <TableCell sx={{verticalAlign: 'top'}}>{p.basic.name}</TableCell>
         <TableCell sx={{verticalAlign: 'top'}}>{p.ageGroup.displayAgeGroup(p.age)}</TableCell>
         <TableCell sx={{verticalAlign: 'top'}}>{p.attendance.option}</TableCell>
-        <TableCell><Typography>
+        <TableCell sx={{verticalAlign: 'top'}}>{p.kp.diet}</TableCell>
+        <TableCell>
             {isNonEmptyString(p.kp.details) ? <><strong>Requirements:</strong>< br />
                 {p.kp.details}
                 <br /><br /></> : null}
@@ -176,9 +177,9 @@ const LargeKP = ({ event, bookings }: { event: JsonEventType, bookings: Required
             {p.kp.preferences}
             <br /><br /></> : null}
             { no ? <><strong>No: </strong>{no}<br /></> : null}
-            {p.kp.diabetic ? <strong>Diabetic</strong> : null}
+            {p.kp.diabetic ? <><strong>Diabetic</strong><br /></> : null}
             {p.kp.contactMe ? <strong>Needs are complex, please contact me</strong> : null}
-        </Typography></TableCell>
+        </TableCell>
     </TableRow>})
 
     return <Grid xs={12} p={2} item>
@@ -213,6 +214,7 @@ const LargeKP = ({ event, bookings }: { event: JsonEventType, bookings: Required
                         <TableCell><strong>Name</strong></TableCell>
                         <TableCell><strong>Age</strong></TableCell>
                         <TableCell><strong>Attendance</strong></TableCell>
+                        <TableCell><strong>Diet</strong></TableCell>
                         <TableCell><strong>Details</strong></TableCell>
                     </TableRow>
                 </TableHead>
