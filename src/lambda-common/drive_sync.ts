@@ -1,6 +1,6 @@
 import { sheets, auth } from "@googleapis/sheets"
 import { drive } from '@googleapis/drive'
-import { BookingType, EventType, FoundUserResponseType, OnetableEventType, ParticipantType, RoleType, UserType, UserWithRoles, table } from "./onetable.js"
+import { BookingType, EventType, FoundUserResponseType, JsonBookingType, OnetableEventType, ParticipantType, RoleType, UserType, UserWithRoles, table } from "./onetable.js"
 import { filterDataByRoles } from "./roles.js"
 import { ParticipantFields, CSVCurrent } from "../shared/participantFields.js"
 import { User } from "discord.js"
@@ -49,6 +49,7 @@ export async function syncEventToDrive(eventId, config) {
     const roles = await RoleModel.find({ sk: { begins: eventId } })
     const users = await UserModel.scan()
     const bookings = await BookingModel.find({ sk: { begins: `event:${eventId}:version` } }) as BookingType[]
+    //@ts-ignore
     const betterBookings = addComputedFieldsToBookingsQueryResult(bookings, event)
     if (event) {
         for (const user of users) {
@@ -56,6 +57,7 @@ export async function syncEventToDrive(eventId, config) {
             const userRoles = roles.filter(r => r.userId === user.id)
             if (userRoles.length > 0) {
                 const fullUser: UserWithRoles = { roles: userRoles, ...user }
+                //@ts-ignore
                 const filtered = filterDataByRoles(event, betterBookings, fullUser)
                 const participants = getParticipantRecords(filtered)
                 try {
