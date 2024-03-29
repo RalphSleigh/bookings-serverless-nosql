@@ -48,6 +48,9 @@ export function lambda_wrapper_json(
             }
             since("done permissions") 
             */
+
+            log(`${user?.userName} (${user?.id} ${lambda_event.headers['X-Forwarded-For']}) called ${lambda_event.httpMethod} ${lambda_event.path}`)
+
             const response = await handler(lambda_event, config, user)
 
             if (response && response.statusCode) return response //we want a raw response
@@ -109,6 +112,9 @@ export async function lambda_wrapper_raw(lambda_event, handler: (config: ConfigT
             //@ts-ignore
             return {}
         }
+
+        log(`${lambda_event.headers['X-Forwarded-For']} called ${lambda_event.httpMethod} ${lambda_event.path}`)
+
         return await handler(config)
     }
     catch (e) {
