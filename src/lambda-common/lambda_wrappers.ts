@@ -49,7 +49,7 @@ export function lambda_wrapper_json(
             since("done permissions") 
             */
 
-            log(`${user?.userName} (${user?.id} ${lambda_event.headers['X-Forwarded-For']}) called ${lambda_event.httpMethod} ${lambda_event.path}`)
+            log(`${user?.userName} (${user?.id} ${lambda_event.headers?.['X-Forwarded-For']}) called ${lambda_event.httpMethod} ${lambda_event.path}`)
 
             const response = await handler(lambda_event, config, user)
 
@@ -113,7 +113,7 @@ export async function lambda_wrapper_raw(lambda_event, handler: (config: ConfigT
             return {}
         }
 
-        log(`${lambda_event.headers['X-Forwarded-For']} called ${lambda_event.httpMethod} ${lambda_event.path}`)
+        log(`${lambda_event.headers?.['X-Forwarded-For']} called ${lambda_event.httpMethod} ${lambda_event.path}`)
 
         return await handler(config)
     }
