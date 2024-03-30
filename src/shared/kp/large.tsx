@@ -7,7 +7,7 @@ import { HelpOutline } from '@mui/icons-material';
 
 export class Large implements KpStructure {
     kpName = "Large"
-    ParticipantFormElement({ data = {}, update }: { data: Partial<Required<JsonParticipantType>["kp"]>, update: any }) {
+    ParticipantFormElement({ index, data = {}, update }: { index: number, data: Partial<Required<JsonParticipantType>["kp"]>, update: any }) {
 
 
         const { updateField, updateSwitch } = getMemoUpdateFunctions(update)
@@ -63,7 +63,17 @@ export class Large implements KpStructure {
                 </Grid>
             </Grid>
             <Grid item xs={12}>
-                <TextField autoComplete="off" multiline fullWidth minRows={2} id="outlined" label="Any other dietary restrictions, allergies, intolerances, elimination diets and diet related medical conditions:" placeholder={`This is your everything else section for things that didn’t fit into the tick boxes above.`} value={data.details || ''} onChange={updateField('details')} />
+                <TextField 
+                autoComplete="off" 
+                multiline 
+                fullWidth 
+                minRows={2} 
+                name={`${index}-participant-diet-restrictions`}
+                id={`${index}-participant-restrictions`}
+                label="Any other dietary restrictions, allergies, intolerances, elimination diets and diet related medical conditions:" 
+                placeholder={`This is your everything else section for things that didn’t fit into the tick boxes above.`} 
+                value={data.details || ''} 
+                onChange={updateField('details')} />
             </Grid>
             <Grid item xs={12}>
                 <FormControlLabel checked={data.contactMe} onChange={updateSwitch('contactMe')} control={<Checkbox />} label=" My allergies or dietary needs are complicated and I would like to be contacted by the camp team" />
@@ -74,7 +84,8 @@ export class Large implements KpStructure {
                     multiline
                     fullWidth
                     minRows={2}
-                    id="outlined"
+                    name={`${index}-participant-diet-preferences`}
+                    id={`${index}-participant-diet-preferences`}
                     label={`Food dislikes/preferences:`}
                     placeholder={`e.g. "I really hate mushrooms"`}
                     value={data.preferences || ''}

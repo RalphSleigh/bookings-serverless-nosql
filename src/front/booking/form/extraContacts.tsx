@@ -11,7 +11,7 @@ function bookingExtraContactFields({ data, update }: { data: PartialDeep<JsonBoo
     const { updateArrayItem } = getMemoUpdateFunctions(update('extraContacts'))
 
     const contacts = [...(data || [{}]), {}].map((d, i) => {
-        return <ExtraContactPerson key={i} data={d} update={updateArrayItem(i)} last={!Array.isArray(data) || i == data.length} />
+        return <ExtraContactPerson key={i} i={i} data={d} update={updateArrayItem(i)} last={!Array.isArray(data) || i == data.length} />
     })
 
     return <>
@@ -22,7 +22,7 @@ function bookingExtraContactFields({ data, update }: { data: PartialDeep<JsonBoo
 }
 
 
-const ExtraContactPerson = ({ data, update, last }: { data: Partial<NonNullable<JsonBookingType["extraContacts"]>[0]>, update: any, last: boolean }) => {
+const ExtraContactPerson = ({ i, data, update, last }: { i: number, data: Partial<NonNullable<JsonBookingType["extraContacts"]>[0]>, update: any, last: boolean }) => {
 
     if (!data.email && !data.name && !last) return null
 
@@ -32,8 +32,8 @@ const ExtraContactPerson = ({ data, update, last }: { data: Partial<NonNullable<
         <Grid item xs={12} sm={6}>
             <TextField
                 autoComplete="off"
+                
                 fullWidth
-                id="outlined-required"
                 label="Name"
                 value={data?.name || ''}
                 onChange={updateField('name')} />
@@ -42,7 +42,8 @@ const ExtraContactPerson = ({ data, update, last }: { data: Partial<NonNullable<
             <TextField
                 autoComplete="off"
                 fullWidth
-                id="outlined-required"
+                name={`extra-contact-email-${i}`} 
+                id={`extra-contact-email-${i}`} 
                 type="email"
                 label="Email"
                 value={data?.email || ''}

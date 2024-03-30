@@ -6,7 +6,7 @@ import { getMemoUpdateFunctions } from "../util.js";
 
 export class Basic implements KpStructure {
     kpName = "Basic"
-    ParticipantFormElement({ data = {}, update }: { data: Partial<Required<JsonParticipantType>["kp"]>, update: any }) {
+    ParticipantFormElement({ index, data = {}, update }: { index: number, data: Partial<Required<JsonParticipantType>["kp"]>, update: any }) {
 
 
         const { updateField } = getMemoUpdateFunctions(update)

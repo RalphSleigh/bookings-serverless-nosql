@@ -49,7 +49,7 @@ function ParticipantForm({ index, event, attendanceConfig, participant, kp, cons
         if (event.allParticipantEmails) {
             emailAndOptionsAttendance = <>
                 <Grid sm={8} xs={12} item>
-                    <MemoEmailField email={participant.basic?.email} event={event} dob={participant.basic?.dob} update={basicUpdates} />
+                    <MemoEmailField index={index} email={participant.basic?.email} event={event} dob={participant.basic?.dob} update={basicUpdates} />
                 </Grid>
                 <Grid sm={4} xs={12} item>
                     <attendanceConfig.ParticipantElement configuration={event.attendanceData} data={participant.attendance} update={updateSubField} />
@@ -63,7 +63,7 @@ function ParticipantForm({ index, event, attendanceConfig, participant, kp, cons
     } else {
         if (event.allParticipantEmails) {
             emailAndOptionsAttendance = <Grid xs={12} item>
-                <MemoEmailField email={participant.basic?.email} event={event} dob={participant.basic?.dob} update={basicUpdates} />
+                <MemoEmailField index={index} email={participant.basic?.email} event={event} dob={participant.basic?.dob} update={basicUpdates} />
             </Grid>
         } else {
             emailAndOptionsAttendance = null
@@ -79,7 +79,8 @@ function ParticipantForm({ index, event, attendanceConfig, participant, kp, cons
                         autoComplete="off"
                         fullWidth
                         required
-                        id="outlined-required"
+                        name={`${index}-participant-name`}
+                        id={`${index}-participant-name`}
                         label="Name"
                         value={participant.basic?.name || ''}
                         onChange={basicUpdates.updateField('name')} />
@@ -89,17 +90,17 @@ function ParticipantForm({ index, event, attendanceConfig, participant, kp, cons
                         label="DoB *"
                         value={participant.basic?.dob}
                         onChange={basicUpdates.updateDate('dob')}
-                        slotProps={{ field: { autocomplete: "off" } }}
+                        slotProps={{ field: { autoComplete: "off" } }}
                     />
                 </Grid>
                 {emailAndOptionsAttendance}
                 <Grid xs={12} item>
                     <Divider >Diet</Divider>
-                    <kp.ParticipantFormElement data={participant.kp || {}} update={updateSubField('kp')} />
+                    <kp.ParticipantFormElement index={index} data={participant.kp || {}} update={updateSubField('kp')} />
                 </Grid>
                 <Grid xs={12} item>
                     <Divider />
-                    <ParicipantMedicalForm event={event} data={participant.medical || {}} update={updateSubField('medical')} />
+                    <ParicipantMedicalForm index={index} event={event} data={participant.medical || {}} update={updateSubField('medical')} />
                 </Grid>
                 <Grid xs={12} item>
                     <Divider />
@@ -121,7 +122,7 @@ function ParticipantForm({ index, event, attendanceConfig, participant, kp, cons
 
 const MemoParticipantForm = React.memo(ParticipantForm)
 
-function ParicipantMedicalForm({ event, data, update }: { event: JsonEventType, data: any, update: any }) {
+function ParicipantMedicalForm({ index, event, data, update }: { index: number, event: JsonEventType, data: any, update: any }) {
 
     const { updateField } = getMemoUpdateFunctions(update)
 
@@ -132,7 +133,8 @@ function ParicipantMedicalForm({ event, data, update }: { event: JsonEventType, 
             multiline
             fullWidth
             minRows={2}
-            id="outlined"
+            name={`${index}-participant-medical`}
+            id={`${index}-participant-medical`}
             label="Additional medical information, medication taken or accessibility requirements:"
             value={data.details || ''}
             onChange={updateField('details')}
@@ -153,7 +155,7 @@ function ParicipantMedicalForm({ event, data, update }: { event: JsonEventType, 
     </>
 }
 
-const EmailField = ({ email, dob, event, update }: { email: Partial<Required<JsonParticipantType>["basic"]>["email"], dob: string | undefined, event: JsonEventType, update: any }) => {
+const EmailField = ({ index, email, dob, event, update }: { index: number, email: Partial<Required<JsonParticipantType>["basic"]>["email"], dob: string | undefined, event: JsonEventType, update: any }) => {
     const inputProps = {
         endAdornment: <InputAdornment position="end">
             <Tooltip title={`We will use this email address to contact campers with updates about camp and verify Woodcraft Folk membership.`}>
@@ -172,7 +174,8 @@ const EmailField = ({ email, dob, event, update }: { email: Partial<Required<Jso
             autoComplete="off"
             fullWidth
             required
-            id="outlined-required"
+            name={`${index}-participant-email`}
+            id={`${index}-participant-email`}
             type="email"
             label="Parent/Guardian email"
             value={email || ''}
@@ -183,7 +186,8 @@ const EmailField = ({ email, dob, event, update }: { email: Partial<Required<Jso
             autoComplete="off"
             fullWidth
             required
-            id="outlined-required"
+            name={`${index}-participant-email`}
+            id={`${index}-participant-email`}
             type="email"
             label="Email"
             value={email || ''}
