@@ -62,10 +62,10 @@ export function CreateApplicationPage({ event, user }: { event: JsonEventType, u
                     </Grid>
                     <Grid xs={12} item>
                         <form>
-                            <TextField autoComplete="name" name="name" id="name" fullWidth sx={{ mt: 2 }} label="Name" value={applicationData.name || ''} onChange={updateField('name')} />
-                            <TextField autoComplete="email" name="email" id="email" fullWidth sx={{ mt: 2 }} required label="Email" value={applicationData.email || ''} onChange={updateField('email')} />
-                            <TextField autoComplete="off" name="group" id="group" fullWidth sx={{ mt: 2 }} disabled={applicationData.bookingType == "individual"} required label="Group/District" value={applicationData.district || ''} onChange={updateField('district')} />
-                            <TextField autoComplete="off" name="predicted" id="predicted" fullWidth inputProps={{ inputMode: "numeric" }} sx={{ mt: 2 }} required label="Predicted Number of Campers" value={applicationData.predictedParticipants || ''} onChange={updateNumber('predictedParticipants')} />
+                            <TextField autoComplete="name" name="name" id="name" inputProps={{'data-form-type': 'name'}} fullWidth sx={{ mt: 2 }} label="Name" value={applicationData.name || ''} onChange={updateField('name')} />
+                            <TextField autoComplete="email" name="email" id="email" inputProps={{'data-form-type': 'phone'}} fullWidth sx={{ mt: 2 }} required label="Email" value={applicationData.email || ''} onChange={updateField('email')} />
+                            <TextField autoComplete="off" name="group" id="group" inputProps={{'data-form-type': 'other'}} fullWidth sx={{ mt: 2 }} disabled={applicationData.bookingType == "individual"} required label="Group/District" value={applicationData.district || ''} onChange={updateField('district')} />
+                            <TextField autoComplete="off" name="predicted" id="predicted" fullWidth inputProps={{ inputMode: "numeric", "data-form-type": "other" }} sx={{ mt: 2 }} required label="Predicted Number of Campers" value={applicationData.predictedParticipants || ''} onChange={updateNumber('predictedParticipants')} />
                             <LoadingButton
                                 sx={{ mt: 2 }}
                                 onClick={submit}

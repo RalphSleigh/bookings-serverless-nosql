@@ -32,7 +32,9 @@ const ExtraContactPerson = ({ i, data, update, last }: { i: number, data: Partia
         <Grid item xs={12} sm={6}>
             <TextField
                 autoComplete="off"
-                
+                name={`extra-contact-name-${i}`} 
+                id={`extra-contact-name-${i}`} 
+                inputProps={{'data-form-type': 'other'}} 
                 fullWidth
                 label="Name"
                 value={data?.name || ''}
@@ -43,7 +45,8 @@ const ExtraContactPerson = ({ i, data, update, last }: { i: number, data: Partia
                 autoComplete="off"
                 fullWidth
                 name={`extra-contact-email-${i}`} 
-                id={`extra-contact-email-${i}`} 
+                id={`extra-contact-email-${i}`}
+                inputProps={{'data-form-type': 'other'}} 
                 type="email"
                 label="Email"
                 value={data?.email || ''}

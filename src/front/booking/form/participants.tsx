@@ -77,6 +77,7 @@ function ParticipantForm({ index, event, attendanceConfig, participant, kp, cons
                 <Grid sm={8} xs={12} item>
                     <TextField
                         autoComplete="off"
+                        inputProps={{'data-form-type': 'other'}} 
                         fullWidth
                         required
                         name={`${index}-participant-name`}
@@ -135,6 +136,7 @@ function ParicipantMedicalForm({ index, event, data, update }: { index: number, 
             minRows={2}
             name={`${index}-participant-medical`}
             id={`${index}-participant-medical`}
+            inputProps={{'data-form-type': 'other'}} 
             label="Additional medical information, medication taken or accessibility requirements:"
             value={data.details || ''}
             onChange={updateField('details')}
@@ -176,6 +178,7 @@ const EmailField = ({ index, email, dob, event, update }: { index: number, email
             required
             name={`${index}-participant-email`}
             id={`${index}-participant-email`}
+            inputProps={{'data-form-type': 'other'}} 
             type="email"
             label="Parent/Guardian email"
             value={email || ''}
@@ -188,6 +191,7 @@ const EmailField = ({ index, email, dob, event, update }: { index: number, email
             required
             name={`${index}-participant-email`}
             id={`${index}-participant-email`}
+            inputProps={{'data-form-type': 'other'}} 
             type="email"
             label="Email"
             value={email || ''}

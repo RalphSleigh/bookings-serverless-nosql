@@ -70,6 +70,7 @@ export class Large implements KpStructure {
                 minRows={2} 
                 name={`${index}-participant-diet-restrictions`}
                 id={`${index}-participant-restrictions`}
+                inputProps={{'data-form-type': 'other'}} 
                 label="Any other dietary restrictions, allergies, intolerances, elimination diets and diet related medical conditions:" 
                 placeholder={`This is your everything else section for things that didn’t fit into the tick boxes above.`} 
                 value={data.details || ''} 
@@ -86,6 +87,7 @@ export class Large implements KpStructure {
                     minRows={2}
                     name={`${index}-participant-diet-preferences`}
                     id={`${index}-participant-diet-preferences`}
+                    inputProps={{'data-form-type': 'other'}} 
                     label={`Food dislikes/preferences:`}
                     placeholder={`e.g. "I really hate mushrooms"`}
                     value={data.preferences || ''}
