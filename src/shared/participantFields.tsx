@@ -43,9 +43,9 @@ abstract class Field {
     }
 
     sortComparator(a: any, b: any) {
-        if(this.value(a) === undefined) return 1
-        if(this.value(b) === undefined) return -1
-        return this.value(a).toString().localeCompare(this.value(b).toString())
+        if(a === undefined) return 1
+        if(b === undefined) return -1
+        return a.toString().localeCompare(b.toString())
     }
 
     csvCellValue(participant: JsonParticipantWithExtraType | ParticipantType) {
@@ -114,7 +114,7 @@ class AttendanceOption extends Field {
         return this.event.attendanceStructure == "options"
     }
     value (participant: JsonParticipantWithExtraType) {
-        return participant.attendance.option
+        return this.event.attendanceData?.options?.[participant.attendance.option!]
     }
 }
 
