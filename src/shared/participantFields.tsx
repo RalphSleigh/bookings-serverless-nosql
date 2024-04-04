@@ -85,11 +85,21 @@ class BookedBy extends Field {
 class Age extends Field {
     fieldName = "Age"
     value (participant: JsonParticipantWithExtraType | ParticipantType) {
-        if('age' in participant) return participant.ageGroup.displayAgeGroup(participant.age)
+        return participant
+        
+    }
+
+    dataGridCellRenderer(params): ReactNode {
+        if('age' in params.value) return params.value.ageGroup.displayAgeGroup(params.value.age)
         const startDate = parseDate(this.event.startDate)!
-        const age = differenceInYears(startDate, parseDate(participant.basic.dob)!)
+        const age = differenceInYears(startDate, parseDate(params.value.basic.dob)!)
         return getAgeGroup(age).displayAgeGroup(age)
     }
+
+    csvCellValue(participant: JsonParticipantWithExtraType | ParticipantType) {
+        return participant.basic.dob
+    }
+
     sortComparator(a: JsonParticipantWithExtraType | ParticipantType, b: JsonParticipantWithExtraType | ParticipantType) {
         if('age' in a && 'age' in b) return a.age - b.age
         const startDate = parseDate(this.event.startDate)!
