@@ -93,6 +93,9 @@ handlerSetup('/api/booking/delete', 'bookings/deletebooking', "POST")
 //handlerSetup('/api/booking/event/:id', 'bookings/event/handler')
 //handlerSetup('/api/booking/syncmax', 'bookings/syncmax/handler', "POST")
 
+handlerSetup('/api/event/:eventid/sheet', 'bookings/getBookingHasSheet')
+handlerSetup('/api/event/:eventid/createSheet', 'bookings/createSheetForBooking', "POST")
+handlerSetup('/api/event/:eventid/getParticipantsFromSheet', 'bookings/getParticipantsFromSheet')
 
 
 //handlerSetup('/api/village/create', 'village/create/handler', "POST")

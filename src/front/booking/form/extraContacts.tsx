@@ -10,7 +10,7 @@ function bookingExtraContactFields({ data, update }: { data: PartialDeep<JsonBoo
 
     const { updateArrayItem } = getMemoUpdateFunctions(update('extraContacts'))
 
-    const contacts = [...(data || [{}]), {}].map((d, i) => {
+    const contacts = (Array.isArray(data) ? [...data, {}] : [{}]).map(d => d || {}).map((d, i) => {
         return <ExtraContactPerson key={i} i={i} data={d} update={updateArrayItem(i)} last={!Array.isArray(data) || i == data.length} />
     })
 
