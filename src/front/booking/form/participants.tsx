@@ -76,7 +76,7 @@ function ParticipantForm({ index, event, attendanceConfig, participant, kp, cons
             <Grid container spacing={2}>
                 <Grid sm={8} xs={12} item>
                     <TextField
-                        autoComplete={`${index}-participant name`}
+                        autoComplete={`section-${index}-participant name`}
                         inputProps={{'data-form-type': 'other'}} 
                         fullWidth
                         required
@@ -129,7 +129,7 @@ function ParicipantMedicalForm({ index, event, data, update }: { index: number, 
 
     return <>
         <TextField
-            autoComplete={`${index}-participant medical`}
+            autoComplete={`section-${index}-participant medical`}
             sx={{ mt: 2 }}
             multiline
             fullWidth
@@ -173,7 +173,7 @@ const EmailField = ({ index, email, dob, event, update }: { index: number, email
 
     if (dob && differenceInYears(parseDate(event.startDate)!, parseDate(dob)!) < 16) {
         return <TextField
-            autoComplete={`${index}-participant email`}
+            autoComplete={`section-${index}-participant email`}
             fullWidth
             required
             name={`${index}-participant-email`}
@@ -186,7 +186,7 @@ const EmailField = ({ index, email, dob, event, update }: { index: number, email
             InputProps={inputProps} />
     } else {
         return <TextField
-            autoComplete={`${index}-participant email`}
+            autoComplete={`section-${index}-participant email`}
             fullWidth
             required
             name={`${index}-participant-email`}
