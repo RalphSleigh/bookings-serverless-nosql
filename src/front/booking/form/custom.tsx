@@ -33,7 +33,7 @@ function CustomQestionText({ i, question, data, setArrayItem }: { i: number, que
     const update = setArrayItem(i)
     return (<Grid container spacing={2} mt={1} mb={1}>
         <Grid item xs>
-            <TextField autoComplete="off" name={`customquestion-${i}`} id={`customquestion-${i}`} inputProps={{'data-form-type': 'other'}} fullWidth label={question.questionLabel} value={data || ''} onChange={update} />
+            <TextField autoComplete={`customquestion-${i} answer`} name={`customquestion-${i}`} id={`customquestion-${i}`} inputProps={{'data-form-type': 'other'}} fullWidth label={question.questionLabel} value={data || ''} onChange={update} />
         </Grid>
     </Grid>)
 }
@@ -42,7 +42,7 @@ function CustomQestionLongText({ i, question, data, setArrayItem }: { i: number,
     const update = setArrayItem(i)
     return (<Grid container spacing={2} mt={1} mb={1}>
         <Grid item xs>
-            <TextField autoComplete="off" name={`customquestion=${i}`} id={`customquestion-${i}`} inputProps={{'data-form-type': 'other'}} multiline minRows={3} fullWidth label={question.questionLabel} value={data || ''} onChange={update} />
+            <TextField autoComplete={`customquestion-${i} answer`} name={`customquestion=${i}`} id={`customquestion-${i}`} inputProps={{'data-form-type': 'other'}} multiline minRows={3} fullWidth label={question.questionLabel} value={data || ''} onChange={update} />
         </Grid>
     </Grid>)
 }

@@ -14,7 +14,7 @@ export function validate(event: JsonEventType, kpConfig: KpStructure, consentCon
 
 
     if (bigCamp) {
-        if (!data.basic?.district) results.push("Please enter your group/district name")
+        if (data.basic?.bookingType == "group" && !data.basic?.district) results.push("Please enter your group/district name")
         if (!data.basic?.bookingType) results.push("Please select your booking type")
         if (!data.basic?.organisation) results.push("Please select your organisation")
     }

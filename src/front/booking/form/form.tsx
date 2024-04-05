@@ -142,7 +142,7 @@ function bookingGroupContactFields({ data, update }: { data: PartialDeep<JsonBoo
                 {organsationItems}
             </Select>
         </FormControl>
-        <TextField autoComplete="off" name="group" id="group" inputProps={{'data-form-type': 'other'}} fullWidth sx={{ mt: 2 }} required label="District" value={data?.district || ''} onChange={updateField('district')} />
+        <TextField autoComplete="group" name="group" id="group" inputProps={{'data-form-type': 'other'}} fullWidth sx={{ mt: 2 }} required={data?.bookingType == "group"} label="District" value={data?.district || ''} onChange={updateField('district')} />
         <Typography variant="h6" mt={2}>{`Your details`}</Typography>
         <TextField autoComplete="name" name="name" id="name" inputProps={{'data-form-type': 'name'}} fullWidth sx={{ mt: 2 }} required label="Your Name" value={data?.contactName || ''} onChange={updateField('contactName')} />
         <TextField autoComplete="email" name="email" id="email" inputProps={{'data-form-type': 'email'}} fullWidth sx={{ mt: 2 }} required type="email" label="Your email" value={data?.contactEmail || ''} onChange={updateField('contactEmail')} />

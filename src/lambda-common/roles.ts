@@ -8,7 +8,7 @@ abstract class RoleFilter {
     }
 
     abstract filterBooking(bookings: BookingType): Boolean
-    abstract filterParticipantFields(participant: ParticipantType): ParticipantType
+    abstract filterParticipantFields(participant: ParticipantType): Partial<ParticipantType>
 }
 
 class AdminFilter extends RoleFilter {
