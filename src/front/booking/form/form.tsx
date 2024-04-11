@@ -103,7 +103,7 @@ function bookingGroupContactFields({ data, update }: { data: PartialDeep<JsonBoo
 
     const organsationItems = organisations.map((o, i) => {
         return <MenuItem key={i} value={o[0]}>
-            {o}
+            {o[0]}
         </MenuItem>
     })
 
