@@ -85,7 +85,7 @@ function bookingIndvidualContactFields({ data, update }: { data: PartialDeep<Jso
         <TextField autoComplete="name" name="name" id="name" inputProps={{'data-form-type': 'name'}} fullWidth sx={{ mt: 2 }} required label="Your Name" value={data?.contactName || ''} onChange={updateField('contactName')} />
         <TextField autoComplete="email" name="email" id="email" inputProps={{'data-form-type': 'email'}} fullWidth sx={{ mt: 2 }} required type="email" label="Your email" value={data?.contactEmail || ''} onChange={updateField('contactEmail')} />
         {data?.contactEmail?.includes("privaterelay.appleid.com") ? <Alert severity="warning" sx={{ mt: 2, pt: 2 }}>
-            <AlertTitle>This appears to be an Apple private relay address, we recommend you provide your actual email address, otherwise we may be unable to contact you.</AlertTitle>
+            <AlertTitle>This appears to be an Apple private relay address, we recommend you provide your actual email address, otherwise we may be unable to contact you. This will not be shared outside the camp team.</AlertTitle>
         </Alert> : null}
         <TextField autoComplete="tel" name="telephone" id="telephone" inputProps={{'data-form-type': 'phone'}} fullWidth sx={{ mt: 2 }} required type="tel" label="Phone Number" value={data?.contactPhone || ''} onChange={updateField('contactPhone')} />
     </>
@@ -102,10 +102,12 @@ function bookingGroupContactFields({ data, update }: { data: PartialDeep<JsonBoo
     const individualStyle = data?.bookingType == "individual" ? selectedStyle : unselectedStyle
 
     const organsationItems = organisations.map((o, i) => {
-        return <MenuItem key={i} value={o}>
+        return <MenuItem key={i} value={o[0]}>
             {o}
         </MenuItem>
     })
+
+    const districtRequired = data?.bookingType == "group" && data?.organisation == "Woodcraft Folk"
 
     return <>
         <Typography variant="h6" mt={2}>{`Booking Type`}</Typography>
@@ -142,12 +144,12 @@ function bookingGroupContactFields({ data, update }: { data: PartialDeep<JsonBoo
                 {organsationItems}
             </Select>
         </FormControl>
-        <TextField autoComplete="group" name="group" id="group" inputProps={{'data-form-type': 'other'}} fullWidth sx={{ mt: 2 }} required={data?.bookingType == "group"} label="District" value={data?.district || ''} onChange={updateField('district')} />
+        <TextField autoComplete="group" name="group" id="group" inputProps={{'data-form-type': 'other'}} fullWidth sx={{ mt: 2 }} required={districtRequired} label="District" value={data?.district || ''} onChange={updateField('district')} />
         <Typography variant="h6" mt={2}>{`Your details`}</Typography>
         <TextField autoComplete="name" name="name" id="name" inputProps={{'data-form-type': 'name'}} fullWidth sx={{ mt: 2 }} required label="Your Name" value={data?.contactName || ''} onChange={updateField('contactName')} />
         <TextField autoComplete="email" name="email" id="email" inputProps={{'data-form-type': 'email'}} fullWidth sx={{ mt: 2 }} required type="email" label="Your email" value={data?.contactEmail || ''} onChange={updateField('contactEmail')} />
         {data?.contactEmail?.includes("privaterelay.appleid.com") ? <Alert severity="warning" sx={{ mt: 2, pt: 2 }}>
-            <AlertTitle>This appears to be an Apple private relay address, we recommend you provide your actual email address, otherwise we may be unable to contact you.</AlertTitle>
+            <AlertTitle>This appears to be an Apple private relay address, we recommend you provide your actual email address, otherwise we may be unable to contact you. This will not be shared outside the camp team.</AlertTitle>
         </Alert> : null}
         <TextField autoComplete="tel" name="telephone" id="telephone" inputProps={{'data-form-type': 'phone'}} fullWidth sx={{ mt: 2 }} required type="tel" label="Phone Number" value={data?.contactPhone || ''} onChange={updateField('contactPhone')} />
     </>
