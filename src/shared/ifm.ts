@@ -47,4 +47,4 @@ export const organisations = [["Woodcraft Folk","Western and Northern Europe and
 ["Noar Oved Vehalomed - Israel", "Middle East, Latin America, Asia, and Africa"],
 ["Independence Youth Union - Palestine", "Middle East, Latin America, Asia, and Africa"],
 ["Independent Youth Forum - Palestine", "Middle East, Latin America, Asia, and Africa"],
-["Palestinian Red Crescent Society - Palestine	MIDDLE	Middle East, Latin America, Asia, and Africa"]]
+["Palestinian Red Crescent Society - Palestine","Middle East, Latin America, Asia, and Africa"]]
