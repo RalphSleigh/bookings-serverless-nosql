@@ -1,7 +1,7 @@
 import { Grid, Paper, TextField, Typography, Box, Button, FormControlLabel, Switch, IconButton, CardMedia, Divider, InputAdornment, Tooltip } from "@mui/material";
 import React, { useState } from "react";
 //import { validate } from "./validate.js";
-import { BookingType, JsonBookingType, JsonEventType, JsonParticipantType, UserType } from "../../../lambda-common/onetable.js";
+import { BookingType, JsonEventType, JsonParticipantType, UserType } from "../../../lambda-common/onetable.js";
 import { Lock, LockOpen, Close, HelpOutline } from '@mui/icons-material';
 import { KpStructure } from "../../../shared/kp/kp_class.js";
 import { PartialDeep } from "type-fest";
@@ -14,7 +14,7 @@ import { ConsentStructure } from "../../../shared/consents/consents_class.js";
 import { SheetsWidget } from "./sheetsInput.js";
 import { SuspenseElement } from "../../suspense.js";
 
-export function ParticipantsForm({ event, attendanceConfig, participants, update, kp, consent, basic }: { event: JsonEventType, attendanceConfig: AttendanceStructure, participants: Array<PartialDeep<JsonParticipantType>>, update: any, kp: KpStructure, consent: ConsentStructure, basic: JsonBookingType["basic"] }) {
+export function ParticipantsForm({ event, attendanceConfig, participants, update, kp, consent }: { event: JsonEventType, attendanceConfig: AttendanceStructure, participants: Array<PartialDeep<JsonParticipantType>>, update: any, kp: KpStructure, consent: ConsentStructure }) {
 
     const { addEmptyObjectToArray, updateArrayItem, deleteArrayItem } = getMemoUpdateFunctions(update(('participants')))
 
@@ -30,7 +30,7 @@ export function ParticipantsForm({ event, attendanceConfig, participants, update
     return <Grid container spacing={0} sx={{ mt: 2 }}>
         <Grid xs={12} p={0} item>
             <Typography variant="h6">Campers</Typography>
-            {event.bigCampMode ? <SuspenseElement><SheetsWidget event={event} update={update} basic={basic} /></SuspenseElement> : null}
+{event.bigCampMode ? <SuspenseElement><SheetsWidget event={event} update={update} basic={basic} /></SuspenseElement> : null}
             {participantsList}
             <Button sx={{ mt: 2 }} variant="contained" onClick={addEmptyObjectToArray}>
                 Add person
@@ -79,8 +79,8 @@ function ParticipantForm({ index, event, attendanceConfig, participant, kp, cons
             <Grid container spacing={2}>
                 <Grid sm={8} xs={12} item>
                     <TextField
-                        autoComplete="off"
-                        inputProps={{ 'data-form-type': 'other' }}
+                        autoComplete={`section-${index}-participant name`}
+                        inputProps={{'data-form-type': 'other'}} 
                         fullWidth
                         required
                         name={`${index}-participant-name`}
@@ -132,14 +132,14 @@ function ParicipantMedicalForm({ index, event, data, update }: { index: number, 
 
     return <>
         <TextField
-            autoComplete="off"
+            autoComplete={`section-${index}-participant medical`}
             sx={{ mt: 2 }}
             multiline
             fullWidth
             minRows={2}
             name={`${index}-participant-medical`}
             id={`${index}-participant-medical`}
-            inputProps={{ 'data-form-type': 'other' }}
+            inputProps={{'data-form-type': 'other'}} 
             label="Additional medical information, medication taken or accessibility requirements:"
             value={data.details || ''}
             onChange={updateField('details')}
@@ -176,12 +176,12 @@ const EmailField = ({ index, email, dob, event, update }: { index: number, email
 
     if (dob && differenceInYears(parseDate(event.startDate)!, parseDate(dob)!) < 16) {
         return <TextField
-            autoComplete="off"
+            autoComplete={`section-${index}-participant email`}
             fullWidth
             required
             name={`${index}-participant-email`}
             id={`${index}-participant-email`}
-            inputProps={{ 'data-form-type': 'other' }}
+            inputProps={{'data-form-type': 'other'}} 
             type="email"
             label="Parent/Guardian email"
             value={email || ''}
@@ -189,12 +189,12 @@ const EmailField = ({ index, email, dob, event, update }: { index: number, email
             InputProps={inputProps} />
     } else {
         return <TextField
-            autoComplete="off"
+            autoComplete={`section-${index}-participant email`}
             fullWidth
             required
             name={`${index}-participant-email`}
             id={`${index}-participant-email`}
-            inputProps={{ 'data-form-type': 'other' }}
+            inputProps={{'data-form-type': 'other'}} 
             type="email"
             label="Email"
             value={email || ''}
