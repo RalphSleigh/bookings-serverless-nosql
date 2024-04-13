@@ -6,8 +6,6 @@ import { useContext } from 'react';
 import { set } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { ApplicationOperationType, BookingOperationType } from '../shared/computedDataTypes.js';
-import { HasSheetType } from '../lambda-common/sheets_input.js';
-import { onSpaceOrEnter } from '@mui/x-date-pickers/internals';
 
 export function useEnv() {
     return useSuspenseQuery({
@@ -359,27 +357,3 @@ export function useApplicationOperation(eventId) {
     );
 }
 
-export function useHasSheet(eventId) {
-    return useSuspenseQuery({
-        queryKey: ['event', eventId, 'hasSheet'],
-        queryFn: async () => (await axios.get(`/api/event/${eventId}/sheet`)).data
-    }) as QueryObserverSuccessResult<{ sheet: HasSheetType }>;
-}
-
-export function useCreateSheet(eventId) {
-    const queryClient = useQueryClient()
-    return useMutation<{ sheet: HasSheetType }, any, JsonBookingType["basic"]>({
-        mutationFn: async (data) => (await axios.post(`/api/event/${eventId}/createSheet`, data)).data,
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ['event', eventId, 'hasSheet']
-            })
-        },
-    })
-}
-
-export function useGetParticipantsFromSheet(eventId) {
-    return useMutation<{ participants: JsonBookingType["participants"] }>({
-        mutationFn: async () => (await axios.get(`/api/event/${eventId}/getParticipantsFromSheet`)).data
-    })
-}

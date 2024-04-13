@@ -95,6 +95,9 @@ const schema = {
                                 fees: { type: Array, required: true, items: { type: Number, required: true } }
                             }
                         }
+                    },
+                    regionalPrices: {
+                        type: Object,
                     }
                 }
             },
@@ -331,6 +334,7 @@ export interface LargeFeeEventType {
             description: string
             fees: number[]
         }>
+        regionalPrices: Record<string, number>
     }
 }
 

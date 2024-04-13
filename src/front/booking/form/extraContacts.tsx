@@ -10,7 +10,7 @@ function bookingExtraContactFields({ data, update }: { data: PartialDeep<JsonBoo
 
     const { updateArrayItem } = getMemoUpdateFunctions(update('extraContacts'))
 
-    const contacts = (Array.isArray(data) ? [...data, {}] : [{}]).map(d => d || {}).map((d, i) => {
+    const contacts = (Array.isArray(data) ? [...data, {}] : [{}] ).map((d, i) => {
         return <ExtraContactPerson key={i} i={i} data={d} update={updateArrayItem(i)} last={!Array.isArray(data) || i == data.length} />
     })
 
@@ -31,7 +31,7 @@ const ExtraContactPerson = ({ i, data, update, last }: { i: number, data: Partia
     return <Grid container spacing={2} sx={{ mt: 1 }}>
         <Grid item xs={12} sm={6}>
             <TextField
-                autoComplete="off"
+                autoComplete={`section-extra-contact-${i} name`} 
                 name={`extra-contact-name-${i}`} 
                 id={`extra-contact-name-${i}`} 
                 inputProps={{'data-form-type': 'other'}} 
@@ -42,7 +42,7 @@ const ExtraContactPerson = ({ i, data, update, last }: { i: number, data: Partia
         </Grid>
         <Grid item xs={12} sm={6}>
             <TextField
-                autoComplete="off"
+                autoComplete={`section-extra-contact-${i} email`} 
                 fullWidth
                 name={`extra-contact-email-${i}`} 
                 id={`extra-contact-email-${i}`}
