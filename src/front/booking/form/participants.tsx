@@ -1,7 +1,7 @@
 import { Grid, Paper, TextField, Typography, Box, Button, FormControlLabel, Switch, IconButton, CardMedia, Divider, InputAdornment, Tooltip } from "@mui/material";
 import React, { useState } from "react";
 //import { validate } from "./validate.js";
-import { BookingType, JsonEventType, JsonParticipantType, UserType } from "../../../lambda-common/onetable.js";
+import { BookingType, JsonBookingType, JsonEventType, JsonParticipantType, UserType } from "../../../lambda-common/onetable.js";
 import { Lock, LockOpen, Close, HelpOutline } from '@mui/icons-material';
 import { KpStructure } from "../../../shared/kp/kp_class.js";
 import { PartialDeep } from "type-fest";
@@ -11,10 +11,12 @@ import { getAttendance } from "../../../shared/attendance/attendance.js";
 import { AttendanceStructure } from "../../../shared/attendance/attendanceStructure.js";
 import { differenceInYears } from "date-fns";
 import { ConsentStructure } from "../../../shared/consents/consents_class.js";
+import { SheetsWidget } from "./sheetsInput.js";
+import { SuspenseElement } from "../../suspense.js";
 
-export function ParticipantsForm({ event, attendanceConfig, participants, update, kp, consent }: { event: JsonEventType, attendanceConfig: AttendanceStructure, participants: Array<PartialDeep<JsonParticipantType>>, update: any, kp: KpStructure, consent: ConsentStructure }) {
+export function ParticipantsForm({ event, attendanceConfig, basic, participants, update, kp, consent }: { event: JsonEventType, attendanceConfig: AttendanceStructure, basic:JsonBookingType["basic"], participants: Array<PartialDeep<JsonParticipantType>>, update: any, kp: KpStructure, consent: ConsentStructure }) {
 
-    const { addEmptyObjectToArray, updateArrayItem, deleteArrayItem } = getMemoUpdateFunctions(update(('participants')))
+    const { addEmptyObjectToArray, updateArrayItem, deleteArrayItem } = getMemoUpdateFunctions(update('participants'))
 
     const deleteParticipant = React.useCallback((i, name) => e => {
         if (confirm(`Are you sure you want to remove ${name || ''}?`)) {
@@ -28,6 +30,7 @@ export function ParticipantsForm({ event, attendanceConfig, participants, update
     return <Grid container spacing={0} sx={{ mt: 2 }}>
         <Grid xs={12} p={0} item>
             <Typography variant="h6">Campers</Typography>
+            {event.bigCampMode ? <SuspenseElement><SheetsWidget event={event} update={update} basic={basic} /></SuspenseElement> : null}
             {participantsList}
             <Button sx={{ mt: 2 }} variant="contained" onClick={addEmptyObjectToArray}>
                 Add person
