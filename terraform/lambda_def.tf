@@ -362,19 +362,19 @@ variable "lambda_definitions" {
     get_booking_has_sheet = {
       name   = "get_booking_has_sheet"
       code   = "bookings/getBookingHasSheet"
-      path   = "event/{eventid}/sheet"
+      path   = "event/{id}/sheet"
       method = "get"
     },
     create_sheet_for_booking = {
       name   = "create_sheet_for_booking"
       code   = "bookings/createSheetForBooking"
-      path   = "event/{eventid}/createSheet"
+      path   = "event/{id}/createSheet"
       method = "post"
     },
     get_participants_from_sheet = {
       name   = "get_participants_from_sheet"
       code   = "bookings/getParticipantsFromSheet"
-      path   = "event/{eventid}/getParticipantsFromSheet"
+      path   = "event/{id}/getParticipantsFromSheet"
       method = "get"
     }
   }

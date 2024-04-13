@@ -20,7 +20,7 @@ const EventModel: Model<OnetableEventType> = table.getModel<OnetableEventType>('
 export const lambdaHandler = lambda_wrapper_json(
     async (lambda_event, config, current_user) => {
     if(!current_user) throw new Error("User not found")
-    const eventId = lambda_event.pathParameters?.eventid
+    const eventId = lambda_event.pathParameters?.id
     const event = await EventModel.get({id: eventId})
     if(event == null) throw new Error("Event not found")
     CanBookIntoEvent.throw({user: current_user, event:event})
