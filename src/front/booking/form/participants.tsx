@@ -30,7 +30,7 @@ export function ParticipantsForm({ event, attendanceConfig, participants, update
     return <Grid container spacing={0} sx={{ mt: 2 }}>
         <Grid xs={12} p={0} item>
             <Typography variant="h6">Campers</Typography>
-            {event.bigCampMode ? <SuspenseElement><SheetsWidget event={event} update={update} basic={basic} /></SuspenseElement> : null}
+
             {participantsList}
             <Button sx={{ mt: 2 }} variant="contained" onClick={addEmptyObjectToArray}>
                 Add person
