@@ -6,6 +6,7 @@ import { LoadingButton } from "@mui/lab";
 import { PostAdd, ListAlt, Download } from "@mui/icons-material";
 import { HasSheetType } from "../../../lambda-common/sheets_input.js";
 import { drive_v3 } from "@googleapis/drive";
+import { getMemoUpdateFunctions } from "../../../shared/util.js";
 
 export const SheetsWidget: React.FC<{ event: JsonEventType, basic: JsonBookingType["basic"], update: any }> = ({ event, basic, update }) => {
 
@@ -21,19 +22,25 @@ const SheetExistsState: React.FC<{ event: JsonEventType, sheet: drive_v3.Schema$
     const getParticipantsDataMutation = useGetParticipantsFromSheet(event.id)
 
     const importFunction = e => {
-        getParticipantsDataMutation.mutate()
+        if (confirm("This will overwrite your current campers with data from the sheet, are you sure?")) {
+            getParticipantsDataMutation.mutate()
+        }
         e.preventDefault()
     }
 
     const updateParticipantsEffect = useEffect(() => {
         if (getParticipantsDataMutation.isSuccess) {
-            update(getParticipantsDataMutation.data)
+            update("participants")(p => {
+                console.log(p)
+                return getParticipantsDataMutation.data.participants
+            })
         }
     }, [getParticipantsDataMutation.isSuccess])
 
     return <Alert severity="success" sx={{ mt: 2 }} icon={<ListAlt />}>
         <AlertTitle>Spreadsheet Input</AlertTitle>
         Your sheet has been created and shared with your account. You can access it <a href={sheet.webViewLink!} target="_blank">here</a>. Once you have filled it in, click the button below to import your data.
+        {getParticipantsDataMutation.isSuccess && <><br /><br />Data Imported, please resolve any validation errors and then submit the form.</>}
         <Box
             mt={1}
             //margin
@@ -44,7 +51,7 @@ const SheetExistsState: React.FC<{ event: JsonEventType, sheet: drive_v3.Schema$
                 sx={{ mt: 1 }}
                 onClick={importFunction}
                 endIcon={<Download />}
-                //loading={createSheet.isPending}
+                loading={getParticipantsDataMutation.isPending}
                 loadingPosition="end"
                 variant="outlined"
                 color="success">
