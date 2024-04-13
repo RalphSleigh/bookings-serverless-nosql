@@ -64,7 +64,7 @@ export class Large implements KpStructure {
             </Grid>
             <Grid item xs={12}>
                 <TextField 
-                autoComplete="off" 
+                autoComplete={`section-${index}-participant diet-restrictions`}
                 multiline 
                 fullWidth 
                 minRows={2} 
@@ -81,7 +81,7 @@ export class Large implements KpStructure {
             </Grid>
             <Grid item xs={12}>
                 <TextField
-                    autoComplete="off"
+                    autoComplete={`section-${index}-participant diet-preferences`}
                     multiline
                     fullWidth
                     minRows={2}

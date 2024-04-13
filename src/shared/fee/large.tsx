@@ -10,6 +10,7 @@ import { PartialDeep } from "type-fest";
 import { OptionsAttendance } from "../attendance/options.js";
 import { DateTimePicker } from '@mui/x-date-pickers'
 import { JsonBookingWithExtraType } from "../computedDataTypes.js";
+import { organisations } from "../ifm.js";
 
 const paymentInstructions = `Please make bank transfers to:  
 
@@ -28,11 +29,25 @@ export class Large extends FeeStructure {
 
         const { updateSubField } = getMemoUpdateFunctions(update)
         const { updateArrayItem } = getMemoUpdateFunctions(updateSubField('largeCampBands'))
+        const { updateField } = getMemoUpdateFunctions(updateSubField('regionalPrices'))
 
 
         const bands = [...(data.largeCampBands || []), {}].map((band, i) => {
             return <FeeBandConfig key={i} attendanceData={attendanceData} data={band} update={updateArrayItem(i)} />
         })
+
+        const regionItems = organisations.reduce((acc, org) => {
+            if(!(acc.includes(org[1])))acc.push(org[1])
+            return acc
+        },[]).map((r, i) => <TextField
+            InputProps={{ startAdornment: <InputAdornment position="start">£</InputAdornment> }}
+            key={i}
+            fullWidth
+            id="outlined-required"
+            label={r}
+            type="number" //@ts-ignore
+            value={data.regionalPrices?.[r] || ""} 
+            onChange={updateField(r)} />)
 
         return <>
             <Typography sx={{ mt: 2 }} variant="h5">Large Camp Fee Options</Typography>
@@ -40,6 +55,9 @@ export class Large extends FeeStructure {
             <Grid container spacing={2}>
                 <Grid item xs={12}>
                     {bands}
+                </Grid>
+                <Grid item xs={12}>
+                    {regionItems}
                 </Grid>
             </Grid>
         </>
@@ -83,6 +101,16 @@ export class Large extends FeeStructure {
             }
 
             const results: FeeLine[] = []
+
+            const region = organisations.find(o => o[0] === booking.basic?.organisation)?.[1]
+            if(region && feeData.regionalPrices && feeData.regionalPrices[region]){
+                const price = feeData.regionalPrices[region]
+                const paying = validParticipants.length - free
+                if (free > 0) results.push({ description: `${free} Under 5s for free`, values: [0] })
+                if (paying > 0) results.push({ description: `${paying} ${paying == 1 ? 'Person' : 'People'} for the ${region} price`, values: [paying * price] })
+                return results
+            }
+ 
             if (free > 0) results.push({ description: `${free} Under 5s for free`, values: [0] })
             for (const [band, item] of Object.entries(totals)) {
                 for (const [index, option] of Object.entries(item)) {

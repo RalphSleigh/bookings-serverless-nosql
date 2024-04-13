@@ -43,9 +43,9 @@ abstract class Field {
     }
 
     sortComparator(a: any, b: any) {
-        if(this.value(a) === undefined) return 1
-        if(this.value(b) === undefined) return -1
-        return this.value(a).toString().localeCompare(this.value(b).toString())
+        if(a === undefined) return 1
+        if(b === undefined) return -1
+        return a.toString().localeCompare(b.toString())
     }
 
     csvCellValue(participant: JsonParticipantWithExtraType | ParticipantType) {
@@ -85,11 +85,21 @@ class BookedBy extends Field {
 class Age extends Field {
     fieldName = "Age"
     value (participant: JsonParticipantWithExtraType | ParticipantType) {
-        if('age' in participant) return participant.ageGroup.displayAgeGroup(participant.age)
+        return participant
+        
+    }
+
+    dataGridCellRenderer(params): ReactNode {
+        if('age' in params.value) return params.value.ageGroup.displayAgeGroup(params.value.age)
         const startDate = parseDate(this.event.startDate)!
-        const age = differenceInYears(startDate, parseDate(participant.basic.dob)!)
+        const age = differenceInYears(startDate, parseDate(params.value.basic.dob)!)
         return getAgeGroup(age).displayAgeGroup(age)
     }
+
+    csvCellValue(participant: JsonParticipantWithExtraType | ParticipantType) {
+        return participant.basic.dob
+    }
+
     sortComparator(a: JsonParticipantWithExtraType | ParticipantType, b: JsonParticipantWithExtraType | ParticipantType) {
         if('age' in a && 'age' in b) return a.age - b.age
         const startDate = parseDate(this.event.startDate)!
@@ -104,7 +114,7 @@ class AttendanceOption extends Field {
         return this.event.attendanceStructure == "options"
     }
     value (participant: JsonParticipantWithExtraType) {
-        return participant.attendance.option
+        return this.event.attendanceData?.options?.[participant.attendance.option!]
     }
 }
 
