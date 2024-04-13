@@ -358,6 +358,22 @@ variable "lambda_definitions" {
       code   = "discord/slashcommands"
       path   = "discord/slashcommands"
       method = "post"
+    },
+    get_booking_has_sheet = {
+      name   = "get_booking_has_sheet"
+      code   = "booking/getBookingHasSheet"
+      path   = "event/{eventid}/sheet"
+    },
+    create_sheet_for_booking = {
+      name   = "create_sheet_for_booking"
+      code   = "bookings/createSheetForBooking"
+      path   = "event/{eventid}/createSheet"
+      method = "post"
+    },
+    get_participants_from_sheet = {
+      name   = "get_participants_from_sheet"
+      code   = "bookings/getParticipantsFromSheet"
+      path   = "event/{eventid}/getParticipantsFromSheet"
     }
   }
 }

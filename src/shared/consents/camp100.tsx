@@ -68,7 +68,7 @@ export class Camp100 implements ConsentStructure {
             const ageAtStart = participant.basic.dob ? differenceInYears(parseDate(event.startDate)!, parseDate(participant.basic.dob)!) : 18
 
             if (typeof participant.consent?.photo !== "boolean") results.push(`Please answer photo consent for ${participant.basic?.name}`)
-            if (ageAtStart >= 12 && typeof participant.consent?.sre !== "boolean") results.push(`Please answer SRE consent for ${participant.basic?.name}`)
+            if (ageAtStart >= 12 && typeof participant.consent?.sre !== "boolean") results.push(`Please answer RSE consent for ${participant.basic?.name}`)
         }
         return results
     }
