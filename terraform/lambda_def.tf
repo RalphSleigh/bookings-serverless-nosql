@@ -363,6 +363,7 @@ variable "lambda_definitions" {
       name   = "get_booking_has_sheet"
       code   = "bookings/getBookingHasSheet"
       path   = "event/{eventid}/sheet"
+      method = "get"
     },
     create_sheet_for_booking = {
       name   = "create_sheet_for_booking"
@@ -374,6 +375,7 @@ variable "lambda_definitions" {
       name   = "get_participants_from_sheet"
       code   = "bookings/getParticipantsFromSheet"
       path   = "event/{eventid}/getParticipantsFromSheet"
+      method = "get"
     }
   }
 }
