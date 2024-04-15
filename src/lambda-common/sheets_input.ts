@@ -89,7 +89,7 @@ export async function createSheetForBooking(config: ConfigType, event: OnetableE
         } else {
             const newEventFolder = await drive_instance.files.create({
                 requestBody: {
-                    name: `${config.BASE_URL} ${event.name} (${event.id})`,
+                    name: `${config.BASE_URL} - ${event.name} (${event.id})`,
                     mimeType: 'application/vnd.google-apps.folder',
                     parents: [rootFolder.data.files[0].id!],
                 },
@@ -106,7 +106,7 @@ export async function createSheetForBooking(config: ConfigType, event: OnetableE
         } else {
             const newUserFolder = await drive_instance.files.create({
                 requestBody: {
-                    name: `${basic.district} ${user.userName} (${user.id})`,
+                    name: `${basic.district} - ${user.userName} (${user.id})`,
                     mimeType: 'application/vnd.google-apps.folder',
                     parents: [eventFolderId!],
                 },
