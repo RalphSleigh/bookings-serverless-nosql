@@ -73,7 +73,9 @@ const CreateSheetState: React.FC<{ event: JsonEventType, basic: JsonBookingType[
 
     return <Alert severity="success" sx={{ mt: 2 }} icon={<ListAlt />}>
         <AlertTitle>Spreadsheet Input</AlertTitle>
-        Rather than filling in the form below with details of your cammpers, we can create you a Google Sheet to fill in and then import the data. This may be easier for larger groups. Clicking the button below will create a Google Sheet and share it with the email you have provided ({basic?.contactEmail}).
+        Rather than filling in the form below with details of your campers, we can create you a Google Sheet to fill in and then import the data. This may be easier for larger groups. Clicking the button below will create a Google Sheet and share it with the email you have provided ({basic?.contactEmail}).
+        <br /><br />
+        Using this method will overwrite any data you have already entered on the form below.
         {notGotNeededData && <><br /><br />Please fill in your name, email and district to use this feature.</>}
         <Box
             mt={1}

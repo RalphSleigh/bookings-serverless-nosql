@@ -6,6 +6,7 @@ import { KpStructure } from "../shared/kp/kp_class.js";
 import { parse } from "date-fns";
 import { parseDate } from "../shared/util.js";
 import { ResetTvOutlined } from "@mui/icons-material";
+import { ConfigType } from "./config.js";
 
 
 async function getGoogleDriveAuth(config) {
@@ -52,10 +53,10 @@ export async function getHasSheet(config, event: OnetableEventType, user: UserTy
         const rootFolder = await drive_instance.files.list({ q: `name = 'shared_sheets' and mimeType = 'application/vnd.google-apps.folder' and trashed = false` })
         if (!rootFolder.data?.files?.[0]) throw new Error("Root folder not found")
 
-        const eventFolder = await drive_instance.files.list({ q: `name = '${event.id}' and mimeType = 'application/vnd.google-apps.folder' and '${rootFolder.data.files[0].id}' in parents and trashed = false` })
+        const eventFolder = await drive_instance.files.list({ q: `name contains '${event.id}' and mimeType = 'application/vnd.google-apps.folder' and '${rootFolder.data.files[0].id}' in parents and trashed = false` })
         if (!eventFolder.data?.files?.[0]) throw new Error("Event folder not found")
 
-        const userFolder = await drive_instance.files.list({ q: `name = '${user.id}' and mimeType = 'application/vnd.google-apps.folder' and '${eventFolder.data.files[0].id}' in parents and trashed = false` })
+        const userFolder = await drive_instance.files.list({ q: `name contains '${user.id}' and mimeType = 'application/vnd.google-apps.folder' and '${eventFolder.data.files[0].id}' in parents and trashed = false` })
         if (!userFolder.data?.files?.[0]) throw new Error("Event folder not found")
 
         const userFile = await drive_instance.files.list({ q: `'${userFolder.data.files[0].id}' in parents and trashed = false`, fields: 'files(id, name, webViewLink)' })
@@ -66,7 +67,7 @@ export async function getHasSheet(config, event: OnetableEventType, user: UserTy
     }
 }
 
-export async function createSheetForBooking(config, event: OnetableEventType, user: UserType, basic: JsonBookingType["basic"]) {
+export async function createSheetForBooking(config: ConfigType, event: OnetableEventType, user: UserType, basic: JsonBookingType["basic"]) {
 
     if (!basic.contactEmail || !basic.contactName || !basic.district) throw new Error("Need basic infomation")
 
@@ -82,13 +83,13 @@ export async function createSheetForBooking(config, event: OnetableEventType, us
 
 
         let eventFolderId: string | undefined | null
-        const eventFolder = await drive_instance.files.list({ q: `name = '${event.id}' and mimeType = 'application/vnd.google-apps.folder' and '${rootFolder.data.files[0].id}' in parents and trashed = false` })
+        const eventFolder = await drive_instance.files.list({ q: `name contains '${event.id}' and mimeType = 'application/vnd.google-apps.folder' and '${rootFolder.data.files[0].id}' in parents and trashed = false` })
         if (eventFolder.data?.files?.[0]) {
             eventFolderId = eventFolder.data.files[0].id
         } else {
             const newEventFolder = await drive_instance.files.create({
                 requestBody: {
-                    name: event.id,
+                    name: `${config.BASE_URL} ${event.name} (${event.id})`,
                     mimeType: 'application/vnd.google-apps.folder',
                     parents: [rootFolder.data.files[0].id!],
                 },
@@ -99,13 +100,13 @@ export async function createSheetForBooking(config, event: OnetableEventType, us
 
 
         let userFolderId: string | undefined | null
-        const userFolder = await drive_instance.files.list({ q: `name = '${user.id}' and mimeType = 'application/vnd.google-apps.folder' and '${eventFolderId}' in parents and trashed = false` })
+        const userFolder = await drive_instance.files.list({ q: `name contains '${user.id}' and mimeType = 'application/vnd.google-apps.folder' and '${eventFolderId}' in parents and trashed = false` })
         if (userFolder.data?.files?.[0]) {
             userFolderId = userFolder.data.files[0].id
         } else {
             const newUserFolder = await drive_instance.files.create({
                 requestBody: {
-                    name: user.id,
+                    name: `${basic.district} ${user.userName} (${user.id})`,
                     mimeType: 'application/vnd.google-apps.folder',
                     parents: [eventFolderId!],
                 },
@@ -138,7 +139,7 @@ export async function createSheetForBooking(config, event: OnetableEventType, us
                                 "columnIndex": 0
                             },
                             rows: [{
-                                values: ['Name', 'Email', 'Date of Birth', 'Attendance', 'Dietary Requirements', 'Dietary Details', 'Dietary Preferences', 'Nut Free', 'Gluten Free', 'Soya Free', 'Dairy Free', 'Egg Free', 'Pork Free', 'Chickpea Free', 'Diabetic', 'Contact Me', 'Photo Consent', 'RSE Consent', 'Medical Details'].map(v => { return { userEnteredValue: { stringValue: v } } })
+                                values: ['Name', 'Email', 'Date of Birth', 'Attendance', 'Dietary Requirements', 'Dietary Details', 'Dietary Preferences', 'Nut Free', 'Gluten Free', 'Soya Free', 'Dairy Free', 'Egg Free', 'Pork Free', 'Chickpea Free', 'Diabetic', 'Complicated Needs - Contact Me', 'Photo Consent', 'RSE Consent (12+ only)', 'Medical Details'].map(v => { return { userEnteredValue: { stringValue: v } } })
                             }],
                             fields: "userEnteredValue.stringValue"
                         }
@@ -199,7 +200,7 @@ export async function createSheetForBooking(config, event: OnetableEventType, us
                                 "startColumnIndex": 7,
                                 "endColumnIndex": 16
                             },
-                            cell: { dataValidation: { condition: { type: "ONE_OF_LIST", values: [{ userEnteredValue: "Yes" }, { userEnteredValue: "No" }] }, showCustomUi: true } },
+                            cell: { dataValidation: { condition: { type: "BOOLEAN", values: [{ userEnteredValue: "Yes" }, { userEnteredValue: "No" }] }, showCustomUi: true } },
                             fields: "dataValidation"
                         },
 
@@ -245,10 +246,10 @@ export async function getParticipantsFromSheet(config, event: OnetableEventType,
         const rootFolder = await drive_instance.files.list({ q: `name = 'shared_sheets' and mimeType = 'application/vnd.google-apps.folder' and trashed = false` })
         if (!rootFolder.data?.files?.[0]) throw new Error("Root folder not found")
 
-        const eventFolder = await drive_instance.files.list({ q: `name = '${event.id}' and mimeType = 'application/vnd.google-apps.folder' and '${rootFolder.data.files[0].id}' in parents and trashed = false` })
+        const eventFolder = await drive_instance.files.list({ q: `name contains '${event.id}' and mimeType = 'application/vnd.google-apps.folder' and '${rootFolder.data.files[0].id}' in parents and trashed = false` })
         if (!eventFolder.data?.files?.[0]) throw new Error("Event folder not found")
 
-        const userFolder = await drive_instance.files.list({ q: `name = '${user.id}' and mimeType = 'application/vnd.google-apps.folder' and '${eventFolder.data.files[0].id}' in parents and trashed = false` })
+        const userFolder = await drive_instance.files.list({ q: `name contains '${user.id}' and mimeType = 'application/vnd.google-apps.folder' and '${eventFolder.data.files[0].id}' in parents and trashed = false` })
         if (!userFolder.data?.files?.[0]) throw new Error("Event folder not found")
 
         const userFile = await drive_instance.files.list({ q: `'${userFolder.data.files[0].id}' in parents and trashed = false`, fields: 'files(id, name, webViewLink)' })
@@ -279,13 +280,19 @@ export async function getParticipantsFromSheet(config, event: OnetableEventType,
 }
 
 function getParticipantFromRow(row: NonNullable<sheets_v4.Schema$ValueRange["values"]>[number], event: OnetableEventType): Partial<JsonParticipantType> {
+
+    let dob: string = ""
+    try {
+        dob = toUtcDate(parse(row[2], 'yyyy-MM-dd', new Date(2000, 0, 1, 0, 0, 0, 0)))!.toISOString()
+    } catch (e) { }
+
     const result: Partial<JsonParticipantType> = {
         basic: {
             name: row[0],
             email: row[1],
-            dob: toUtcDate(parse(row[2], 'yyyy-MM-dd', new Date(2000, 0, 1, 0, 0, 0, 0)))!.toISOString(),
+            dob: dob
         },
-        attendance: {    
+        attendance: {
         },
         kp: {
             diet: row[4],
@@ -309,7 +316,7 @@ function getParticipantFromRow(row: NonNullable<sheets_v4.Schema$ValueRange["val
 
     const attendance = event.attendanceData?.options?.findIndex(o => o === row[3])
 
-    if(typeof attendance == "number" && attendance > -1) result.attendance!.option = attendance
+    if (typeof attendance == "number" && attendance > -1) result.attendance!.option = attendance
 
     if (row[16]) result.consent!.photo = row[16] === "Yes"
     if (row[17]) result.consent!.sre = row[17] === "Yes"
