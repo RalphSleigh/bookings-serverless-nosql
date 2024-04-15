@@ -220,7 +220,7 @@ export async function createSheetForBooking(config, event: OnetableEventType, us
             }
         })
 
-        drive_instance.permissions.create({
+        await drive_instance.permissions.create({
             fileId: newSheet.data.id!,
             emailMessage: `You can fill in this sheet with the details of your campers for ${event.name}, once you have filled it in, return to the booking form to import the data.`,
             requestBody: {
