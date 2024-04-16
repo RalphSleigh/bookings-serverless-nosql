@@ -7,6 +7,7 @@ import { parse } from "date-fns";
 import { parseDate } from "../shared/util.js";
 import { ResetTvOutlined } from "@mui/icons-material";
 import { ConfigType } from "./config.js";
+import { query } from "express";
 
 
 async function getGoogleDriveAuth(config) {
@@ -67,7 +68,7 @@ export async function getHasSheet(config, event: OnetableEventType, user: UserTy
     }
 }
 
-export async function createSheetForBooking(config: ConfigType, event: OnetableEventType, user: UserType, basic: JsonBookingType["basic"]) {
+export async function createSheetForBooking(config: ConfigType, event: OnetableEventType, user: UserType, basic: JsonBookingType["basic"], locales: string[]) {
 
     if (!basic.contactEmail || !basic.contactName || !basic.district) throw new Error("Need basic infomation")
 
@@ -130,96 +131,135 @@ export async function createSheetForBooking(config: ConfigType, event: OnetableE
         const update = await sheets_instance.spreadsheets.batchUpdate({
             spreadsheetId: newSheet.data.id!,
             requestBody: {
-                requests: [
-                    {
-                        updateCells: {
-                            start: {
-                                "sheetId": 0,
-                                "rowIndex": 0,
-                                "columnIndex": 0
-                            },
-                            rows: [{
-                                values: ['Name', 'Email', 'Date of Birth', 'Attendance', 'Dietary Requirements', 'Dietary Details', 'Dietary Preferences', 'Nut Free', 'Gluten Free', 'Soya Free', 'Dairy Free', 'Egg Free', 'Pork Free', 'Chickpea Free', 'Diabetic', 'Complicated Needs - Contact Me', 'Photo Consent', 'RSE Consent (12+ only)', 'Medical Details'].map(v => { return { userEnteredValue: { stringValue: v } } })
-                            }],
-                            fields: "userEnteredValue.stringValue"
-                        }
-                    },
-                    {
-                        repeatCell: {
-                            range: {
-                                "sheetId": 0,
-                                "startRowIndex": 1,
-                                "startColumnIndex": 1,
-                                "endColumnIndex": 2
-                            },
-                            cell: { dataValidation: { condition: { type: "TEXT_IS_EMAIL" } } },
-                            fields: "dataValidation"
-                        }
-                    },
-                    {
-                        repeatCell: {
-                            range: {
-                                "sheetId": 0,
-                                "startRowIndex": 1,
-                                "startColumnIndex": 2,
-                                "endColumnIndex": 3
-                            },
-                            cell: { userEnteredFormat: { numberFormat: { type: "DATE", pattern: "yyyy-mm-dd" } }, dataValidation: { condition: { type: "DATE_IS_VALID" } } },
-                            fields: "userEnteredFormat.numberFormat,dataValidation"
-                        }
-                    },
-                    {
-                        repeatCell: {
-                            range: {
-                                "sheetId": 0,
-                                "startRowIndex": 1,
-                                "startColumnIndex": 3,
-                                "endColumnIndex": 4
-                            },
-                            cell: { dataValidation: { condition: { type: "ONE_OF_LIST", values: event.attendanceData?.options?.map(o => { return { userEnteredValue: o } }) }, showCustomUi: true } },
-                            fields: "dataValidation"
-                        }
-                    },
-                    {
-                        repeatCell: {
-                            range: {
-                                "sheetId": 0,
-                                "startRowIndex": 1,
-                                "startColumnIndex": 4,
-                                "endColumnIndex": 5
-                            },
-                            cell: { dataValidation: { condition: { type: "ONE_OF_LIST", values: KpStructure.dietOptions.map(d => { return { userEnteredValue: d } }) }, showCustomUi: true } },
-                            fields: "dataValidation"
-                        }
-                    },
-                    {
-                        repeatCell: {
-                            range: {
-                                "sheetId": 0,
-                                "startRowIndex": 1,
-                                "startColumnIndex": 7,
-                                "endColumnIndex": 16
-                            },
-                            cell: { dataValidation: { condition: { type: "BOOLEAN", values: [{ userEnteredValue: "Yes" }, { userEnteredValue: "No" }] }, showCustomUi: true } },
-                            fields: "dataValidation"
+                requests: [{
+                    updateCells: {
+                        start: {
+                            "sheetId": 0,
+                            "rowIndex": 0,
+                            "columnIndex": 0
                         },
-
-                    },
-                    {
-                        repeatCell: {
-                            range: {
-                                "sheetId": 0,
-                                "startRowIndex": 1,
-                                "startColumnIndex": 16,
-                                "endColumnIndex": 18
-                            },
-                            cell: { dataValidation: { condition: { type: "ONE_OF_LIST", values: [{ userEnteredValue: "Yes" }, { userEnteredValue: "No" }] }, showCustomUi: true } },
-                            fields: "dataValidation"
-                        },
+                        rows: [{
+                            values: ['Name', 'Email', 'Date of Birth', 'Attendance', 'Dietary Requirements', 'Dietary Details', 'Dietary Preferences', 'Nut Free', 'Gluten Free', 'Soya Free', 'Dairy Free', 'Egg Free', 'Pork Free', 'Chickpea Free', 'Diabetic', 'Complicated Needs - Contact Me', 'Photo Consent', 'RSE Consent (12+ only)', 'Medical Details'].map(v => { return { userEnteredValue: { stringValue: v } } })
+                        }],
+                        fields: "userEnteredValue.stringValue"
                     }
+                },
+                {
+                    repeatCell: {
+                        range: {
+                            "sheetId": 0,
+                            "startRowIndex": 1,
+                            "startColumnIndex": 1,
+                            "endColumnIndex": 2
+                        },
+                        cell: { dataValidation: { condition: { type: "TEXT_IS_EMAIL" } } },
+                        fields: "dataValidation"
+                    }
+                },
+                {
+                    repeatCell: {
+                        range: {
+                            "sheetId": 0,
+                            "startRowIndex": 1,
+                            "startColumnIndex": 2,
+                            "endColumnIndex": 3
+                        },
+                        cell: { dataValidation: { condition: { type: "DATE_IS_VALID" } } },
+                        fields: "dataValidation"
+                    }
+                },
+                {
+                    repeatCell: {
+                        range: {
+                            "sheetId": 0,
+                            "startRowIndex": 1,
+                            "startColumnIndex": 3,
+                            "endColumnIndex": 4
+                        },
+                        cell: { dataValidation: { condition: { type: "ONE_OF_LIST", values: event.attendanceData?.options?.map(o => { return { userEnteredValue: o } }) }, showCustomUi: true } },
+                        fields: "dataValidation"
+                    }
+                },
+                {
+                    repeatCell: {
+                        range: {
+                            "sheetId": 0,
+                            "startRowIndex": 1,
+                            "startColumnIndex": 4,
+                            "endColumnIndex": 5
+                        },
+                        cell: { dataValidation: { condition: { type: "ONE_OF_LIST", values: KpStructure.dietOptions.map(d => { return { userEnteredValue: d } }) }, showCustomUi: true } },
+                        fields: "dataValidation"
+                    }
+                },
+                {
+                    repeatCell: {
+                        range: {
+                            "sheetId": 0,
+                            "startRowIndex": 1,
+                            "startColumnIndex": 7,
+                            "endColumnIndex": 16
+                        },
+                        cell: { dataValidation: { condition: { type: "BOOLEAN", values: [{ userEnteredValue: "Yes" }, { userEnteredValue: "No" }] }, showCustomUi: true } },
+                        fields: "dataValidation"
+                    },
+
+                },
+                {
+                    repeatCell: {
+                        range: {
+                            "sheetId": 0,
+                            "startRowIndex": 1,
+                            "startColumnIndex": 16,
+                            "endColumnIndex": 18
+                        },
+                        cell: { dataValidation: { condition: { type: "ONE_OF_LIST", values: [{ userEnteredValue: "Yes" }, { userEnteredValue: "No" }] }, showCustomUi: true } },
+                        fields: "dataValidation"
+                    },
+                },
+                {
+                    addProtectedRange: {
+                        protectedRange: {
+                            range: {
+                                "sheetId": 0,
+                                "startRowIndex": 0,
+                                "endRowIndex": 1,
+                                "startColumnIndex": 0,
+                            },
+                            description: "Protect all except the first row",
+                            warningOnly: false,
+                            requestingUserCanEdit: false,
+                            editors: {
+                                users: [config.EMAIL_FROM]
+                            }
+                        }
+                    }
+                }
                 ],
             }
         })
+
+        for (let locale of locales) {
+            try {
+                //@ts-ignore
+                await sheets_instance.spreadsheets.batchUpdate({
+                    spreadsheetId: newSheet.data.id!,
+                    requestBody: {
+                        requests: [{
+                            updateSpreadsheetProperties: {
+                                properties: {
+                                    "locale": locale.replaceAll("-", "_"),
+                                },
+                                fields: "locale"
+                            }
+                        }]
+                    }
+                })
+                break
+            } catch (e) {
+                console.log(e)
+            }
+        }
 
         await drive_instance.permissions.create({
             fileId: newSheet.data.id!,
@@ -265,7 +305,8 @@ export async function getParticipantsFromSheet(config, event: OnetableEventType,
 
     const response = await sheets_instance.spreadsheets.values.get({
         spreadsheetId: sheet.id!,
-        range: 'Sheet1'
+        range: 'Sheet1',
+        valueRenderOption: 'UNFORMATTED_VALUE',
     })
 
     if (!response.data.values) throw new Error("No data found")
@@ -283,7 +324,9 @@ function getParticipantFromRow(row: NonNullable<sheets_v4.Schema$ValueRange["val
 
     let dob: string = ""
     try {
-        dob = toUtcDate(parse(row[2], 'yyyy-MM-dd', new Date(2000, 0, 1, 0, 0, 0, 0)))!.toISOString()
+        if(typeof row[2] !== "number") throw("Invalid date")
+        else
+        dob = toUtcDate(ValueToDate(row[2]))!.toISOString()
     } catch (e) { }
 
     const result: Partial<JsonParticipantType> = {
@@ -301,9 +344,9 @@ function getParticipantFromRow(row: NonNullable<sheets_v4.Schema$ValueRange["val
             nuts: row[7] === "Yes",
             gluten: row[8] === "Yes",
             soya: row[9] === "Yes",
-            dairy: row[10] === "Yes",
-            egg: row[11] === "Yes",
-            pork: row[12] === "Yes",
+            dairy: row[10] === "Yes" || row[4] === "vegan",
+            egg: row[11] === "Yes" || row[4] === "vegan",
+            pork: row[12] === "Yes" || row[4] !== "omnivore",
             chickpea: row[13] === "Yes",
             diabetic: row[14] === "Yes",
             contactMe: row[15] === "Yes",
@@ -331,3 +374,7 @@ export function toUtcDate(date: Date | string | undefined): Date | null {
 
     return new Date(localDate.getTime() - localDate.getTimezoneOffset() * 60000)
 }
+
+function ValueToDate(GoogleDateValue) {
+    return new Date(new Date(1899,11,30+Math.floor(GoogleDateValue),0,0,0,0).getTime()+(GoogleDateValue%1)*86400000) ;
+  }

@@ -4,6 +4,7 @@ import { BookingType, OnetableEventType, table } from '../../lambda-common/oneta
 import { CanBookIntoEvent } from '../../shared/permissions.js';
 import { createSheetForBooking, getHasSheet } from '../../lambda-common/sheets_input.js';
 import { user } from '../../lambda-common/index.js';
+import { parseAcceptLanguage } from 'intl-parse-accept-language';
 
 /**
  *
@@ -25,7 +26,13 @@ export const lambdaHandler = lambda_wrapper_json(
         if (event == null) throw new Error("Event not found")
         CanBookIntoEvent.throw({ user: current_user, event: event })
         const basicData = lambda_event.body as BookingType["basic"]
-        const sheet = await createSheetForBooking(config, event, current_user, basicData)
+
+        const locales = parseAcceptLanguage(lambda_event.headers["accept-language"], {
+            validate: Intl.DateTimeFormat.supportedLocalesOf,
+          });
+
+
+        const sheet = await createSheetForBooking(config, event, current_user, basicData, locales)
         return { sheet: sheet }
     }
 )
