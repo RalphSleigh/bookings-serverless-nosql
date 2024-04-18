@@ -77,7 +77,7 @@ export class Large implements KpStructure {
                 onChange={updateField('details')} />
             </Grid>
             <Grid item xs={12}>
-                <FormControlLabel checked={data.contactMe} onChange={updateSwitch('contactMe')} control={<Checkbox />} label=" My allergies or dietary needs are complicated and I would like to be contacted by the camp team" />
+                <FormControlLabel checked={data.contactMe || false} onChange={updateSwitch('contactMe')} control={<Checkbox />} label=" My allergies or dietary needs are complicated and I would like to be contacted by the camp team" />
             </Grid>
             <Grid item xs={12}>
                 <TextField

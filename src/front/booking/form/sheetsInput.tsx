@@ -32,7 +32,13 @@ const SheetExistsState: React.FC<{ event: JsonEventType, sheet: drive_v3.Schema$
         if (getParticipantsDataMutation.isSuccess) {
             update("participants")(p => {
                 console.log(p)
-                return getParticipantsDataMutation.data.participants
+                const newParticipants = getParticipantsDataMutation.data.participants.map((n, i) => {
+                    n.created = p[i]?.created
+                    n.updated = p[i]?.updated
+                    return n
+                })
+
+                return newParticipants
             })
         }
     }, [getParticipantsDataMutation.isSuccess])

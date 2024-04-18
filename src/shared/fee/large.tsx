@@ -71,9 +71,9 @@ export class Large extends FeeStructure {
 
             const filterParticipants: (any) => any = p => p.basic && p.basic.name && p.basic.dob && p.attendance && typeof p.attendance.option == "number"
             const validateParticipant: (any) => ParticipantType = p => {
-                p.created = p.created ? parseDate(p.created) : new Date()
-                p.basic.dob = parseDate(p.basic!.dob)
-                return p
+                const newP = {...p, created: p.created ? parseDate(p.created) : new Date() }
+                newP.basic.dob = parseDate(newP.basic!.dob)
+                return newP
             }
 
             const computedBands = feeData.largeCampBands.map(band => {
