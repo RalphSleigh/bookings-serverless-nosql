@@ -4,7 +4,7 @@ import { format } from 'date-fns'
 await esbuild.build({
   entryPoints: ['src/front/index.tsx'],
   bundle: true,
-  minify: false,
+  minify: true,
   sourcemap: false,
   splitting: true,
   format: 'esm',

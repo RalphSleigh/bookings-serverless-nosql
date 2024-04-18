@@ -28,7 +28,7 @@ function QuickListElement({ participants, event }: { participants: PartialDeep<J
 
     return (<Grid sm={3} xs={12} item>
         <Box sx={{ position: "sticky", top: 8, p:1 }}>
-            <Paper elevation={3} sx={{p:2, overflow: 'scroll', height: 'calc(100vh - 32px)'}}>
+            <Paper elevation={3} sx={{p:2, overflow: 'scroll', maxHeight: 'calc(100vh - 32px)'}}>
                 {lists}
             </Paper >
         </Box>
