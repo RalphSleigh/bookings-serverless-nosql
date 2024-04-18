@@ -33,8 +33,8 @@ const SheetExistsState: React.FC<{ event: JsonEventType, sheet: drive_v3.Schema$
             update("participants")(p => {
                 console.log(p)
                 const newParticipants = getParticipantsDataMutation.data.participants.map((n, i) => {
-                    n.created = p[i]?.created
-                    n.updated = p[i]?.updated
+                    n.created = p?.[i]?.created
+                    n.updated = p?.[i]?.updated
                     return n
                 })
 
