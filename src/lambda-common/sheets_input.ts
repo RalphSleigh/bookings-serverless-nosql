@@ -346,7 +346,7 @@ function getParticipantFromRow(row: NonNullable<sheets_v4.Schema$ValueRange["val
             soya: row[9] === "Yes",
             dairy: row[10] === "Yes" || row[4] === "vegan",
             egg: row[11] === "Yes" || row[4] === "vegan",
-            pork: row[12] === "Yes" || row[4] !== "omnivore",
+            pork: row[12] === "Yes" || (typeof row[4] == "string" && row[4] !== "omnivore" && row[4] !== ""), 
             chickpea: row[13] === "Yes",
             diabetic: row[14] === "Yes",
             contactMe: row[15] === "Yes",
