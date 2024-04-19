@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { JsonBookingType, JsonEventType, JsonParticipantType } from "../../../lambda-common/onetable.js";
 import { useCreateSheet, useGetParticipantsFromSheet, useHasSheet } from "../../queries.js";
-import { Alert, AlertTitle, Box, Paper, Typography } from "@mui/material";
+import { Alert, AlertTitle, Box, LinearProgress, Paper, Typography } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { PostAdd, ListAlt, Download } from "@mui/icons-material";
 import { HasSheetType } from "../../../lambda-common/sheets_input.js";
@@ -37,7 +37,7 @@ const SheetExistsState: React.FC<{ event: JsonEventType, sheet: drive_v3.Schema$
 
     const updateParticipantsEffect = useEffect(() => {
         if (getParticipantsDataMutation.isSuccess) {
-            const groups: Array<Array<JsonParticipantType>> = chunk(getParticipantsDataMutation.data.participants, 10)
+            const groups: Array<Array<JsonParticipantType>> = chunk(getParticipantsDataMutation.data.participants, 5)
             let oldParticipants
             update("participants")(p => {
                 oldParticipants = p
@@ -47,17 +47,17 @@ const SheetExistsState: React.FC<{ event: JsonEventType, sheet: drive_v3.Schema$
             const handles = groups.map((g, i) => {
                 return setTimeout((i => () => {
                     update("participants")(p => {
-                        console.log(p)
+
                         const newParticipants = g.map((n, j) => {
                             n.created = oldParticipants?.[(i * 10) + j]?.created
                             n.updated = oldParticipants?.[(i * 10) + j]?.updated
                             return n
                         })
 
-                        return [ ...p, ...newParticipants]
+                        return [...p, ...newParticipants]
                     })
                     setImportProgress((i + 1) / groups.length * 100)
-                })(i), i * 1000)
+                })(i), i * 500)
             })
 
             return () => {
@@ -69,14 +69,15 @@ const SheetExistsState: React.FC<{ event: JsonEventType, sheet: drive_v3.Schema$
     return <Alert severity="success" sx={{ mt: 2 }} icon={<ListAlt />}>
         <AlertTitle>Spreadsheet Input</AlertTitle>
         Your sheet has been created and shared with your account. You can access it <a href={sheet.webViewLink!} target="_blank">here</a>. Once you have filled it in, click the button below to import your data.
-        {importProgress > 0 && importProgress < 100 && <><br /><br />Importing {importProgress}%</>}
         {importProgress == 100 && getParticipantsDataMutation.isSuccess && <><br /><br />Data Imported, please resolve any validation errors and then submit the form.</>}
         <Box
             mt={1}
             //margin
             display="flex"
-            justifyContent="flex-end"
-            alignItems="flex-end">
+            alignItems="center">
+            <Box sx={{ flexGrow: 1, pr: 2, }}>
+                {importProgress > 0 && importProgress < 100 && <LinearProgress variant="determinate" value={importProgress} />}
+            </Box>
             <LoadingButton
                 sx={{ mt: 1 }}
                 onClick={importFunction}
