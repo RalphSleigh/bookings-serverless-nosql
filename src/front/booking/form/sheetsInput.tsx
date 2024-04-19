@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { JsonBookingType, JsonEventType, JsonParticipantType } from "../../../lambda-common/onetable.js";
 import { useCreateSheet, useGetParticipantsFromSheet, useHasSheet } from "../../queries.js";
-import { Alert, AlertTitle, Box, LinearProgress, Paper, Typography } from "@mui/material";
+import { Alert, AlertTitle, Box, LinearProgress, Paper, Typography, styled } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { PostAdd, ListAlt, Download } from "@mui/icons-material";
 import { HasSheetType } from "../../../lambda-common/sheets_input.js";
@@ -34,6 +34,13 @@ const SheetExistsState: React.FC<{ event: JsonEventType, sheet: drive_v3.Schema$
         }
         e.preventDefault()
     }
+
+    const SlowLinearProgress = styled(LinearProgress)({
+        "& .MuiLinearProgress-bar": {
+          // apply a new animation-duration to the `.bar` class
+          animationDuration: "0.5s"
+        }
+      });
 
     const updateParticipantsEffect = useEffect(() => {
         if (getParticipantsDataMutation.isSuccess) {
@@ -76,7 +83,7 @@ const SheetExistsState: React.FC<{ event: JsonEventType, sheet: drive_v3.Schema$
             display="flex"
             alignItems="center">
             <Box sx={{ flexGrow: 1, pr: 2, }}>
-                {importProgress > 0 && importProgress < 100 && <LinearProgress variant="determinate" value={importProgress} />}
+                {importProgress > 0 && importProgress < 100 && <SlowLinearProgress variant="determinate" value={importProgress} />}
             </Box>
             <LoadingButton
                 sx={{ mt: 1 }}
