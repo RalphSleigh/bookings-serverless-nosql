@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { JsonBookingType, JsonEventType } from "../../../lambda-common/onetable.js";
+import React, { useEffect, useState } from "react";
+import { JsonBookingType, JsonEventType, JsonParticipantType } from "../../../lambda-common/onetable.js";
 import { useCreateSheet, useGetParticipantsFromSheet, useHasSheet } from "../../queries.js";
 import { Alert, AlertTitle, Box, Paper, Typography } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
@@ -17,36 +17,60 @@ export const SheetsWidget: React.FC<{ event: JsonEventType, basic: JsonBookingTy
     return <SheetExistsState event={event} sheet={sheet.sheet as drive_v3.Schema$File} update={update} />
 }
 
+const chunk = (arr: any[], size: number) =>
+    Array.from({ length: Math.ceil(arr.length / size) }, (_: any, i: number) =>
+        arr.slice(i * size, i * size + size)
+    );
+
 const SheetExistsState: React.FC<{ event: JsonEventType, sheet: drive_v3.Schema$File, update: any }> = ({ event, sheet, update }) => {
 
     const getParticipantsDataMutation = useGetParticipantsFromSheet(event.id)
+    const [importProgress, setImportProgress] = useState(0)
 
     const importFunction = e => {
         if (confirm("This will overwrite your current campers with data from the sheet, are you sure?")) {
             getParticipantsDataMutation.mutate()
+            setImportProgress(1)
         }
         e.preventDefault()
     }
 
     const updateParticipantsEffect = useEffect(() => {
         if (getParticipantsDataMutation.isSuccess) {
+            const groups: Array<Array<JsonParticipantType>> = chunk(getParticipantsDataMutation.data.participants, 10)
+            let oldParticipants
             update("participants")(p => {
-                console.log(p)
-                const newParticipants = getParticipantsDataMutation.data.participants.map((n, i) => {
-                    n.created = p?.[i]?.created
-                    n.updated = p?.[i]?.updated
-                    return n
-                })
-
-                return newParticipants
+                oldParticipants = p
+                return []
             })
+
+            const handles = groups.map((g, i) => {
+                return setTimeout((i => () => {
+                    update("participants")(p => {
+                        console.log(p)
+                        const newParticipants = g.map((n, j) => {
+                            n.created = oldParticipants?.[(i * 10) + j]?.created
+                            n.updated = oldParticipants?.[(i * 10) + j]?.updated
+                            return n
+                        })
+
+                        return [ ...p, ...newParticipants]
+                    })
+                    setImportProgress((i + 1) / groups.length * 100)
+                })(i), i * 1000)
+            })
+
+            return () => {
+                handles.forEach(h => clearTimeout(h))
+            }
         }
     }, [getParticipantsDataMutation.isSuccess])
 
     return <Alert severity="success" sx={{ mt: 2 }} icon={<ListAlt />}>
         <AlertTitle>Spreadsheet Input</AlertTitle>
         Your sheet has been created and shared with your account. You can access it <a href={sheet.webViewLink!} target="_blank">here</a>. Once you have filled it in, click the button below to import your data.
-        {getParticipantsDataMutation.isSuccess && <><br /><br />Data Imported, please resolve any validation errors and then submit the form.</>}
+        {importProgress > 0 && importProgress < 100 && <><br /><br />Importing {importProgress}%</>}
+        {importProgress == 100 && getParticipantsDataMutation.isSuccess && <><br /><br />Data Imported, please resolve any validation errors and then submit the form.</>}
         <Box
             mt={1}
             //margin
@@ -57,7 +81,7 @@ const SheetExistsState: React.FC<{ event: JsonEventType, sheet: drive_v3.Schema$
                 sx={{ mt: 1 }}
                 onClick={importFunction}
                 endIcon={<Download />}
-                loading={getParticipantsDataMutation.isPending}
+                loading={getParticipantsDataMutation.isPending || (importProgress < 100 && importProgress > 0)}
                 loadingPosition="end"
                 variant="outlined"
                 color="success">
