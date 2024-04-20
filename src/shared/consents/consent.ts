@@ -9,5 +9,5 @@ export const consent: Record<string, ConsentStructure> = {
 }
 
 export const getConsent = (event: JsonEventType): ConsentStructure => {
-    return consent[event.kpMode]
+    return consent[event.consentMode]
 }

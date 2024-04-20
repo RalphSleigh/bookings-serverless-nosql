@@ -7,5 +7,5 @@ export abstract class ConsentStructure {
     abstract consentName: String
     abstract ParticipantFormElement: React.FunctionComponent<{ data: PartialDeep<Required<JsonParticipantType>["consent"]>, basic: PartialDeep<Required<JsonParticipantType>["basic"]>, event: JsonEventType, update: any }>
 
-    public abstract validate(event: JsonEventType, data: Partial<JsonParticipantType>): ConsentValidationResults
+    public abstract validate(event: JsonEventType, data: PartialDeep<JsonParticipantType>): ConsentValidationResults
 }

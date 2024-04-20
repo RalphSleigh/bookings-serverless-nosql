@@ -1,8 +1,8 @@
-import { Grid, Paper, TextField, Typography, Box, Button, FormControlLabel, Switch, IconButton, CardMedia, Divider, InputAdornment, Tooltip } from "@mui/material";
+import { Grid, Paper, TextField, Typography, Box, Button, FormControlLabel, Switch, IconButton, CardMedia, Divider, InputAdornment, Tooltip, Stack } from "@mui/material";
 import React, { useState } from "react";
 //import { validate } from "./validate.js";
 import { BookingType, JsonBookingType, JsonEventType, JsonParticipantType, UserType } from "../../../lambda-common/onetable.js";
-import { Lock, LockOpen, Close, HelpOutline } from '@mui/icons-material';
+import { Lock, LockOpen, Close, HelpOutline, ExpandMore, ExpandLess, CheckCircleOutline, WarningAmber } from '@mui/icons-material';
 import { KpStructure } from "../../../shared/kp/kp_class.js";
 import { PartialDeep } from "type-fest";
 import { UtcDatePicker } from "../../util.js";
@@ -13,8 +13,12 @@ import { differenceInYears } from "date-fns";
 import { ConsentStructure } from "../../../shared/consents/consents_class.js";
 import { SheetsWidget } from "./sheetsInput.js";
 import { SuspenseElement } from "../../suspense.js";
+import { Valid } from "aws-sdk/clients/iot.js";
+import { Validation } from "./validation.js";
 
-export function ParticipantsForm({ event, attendanceConfig, basic, participants, update, kp, consent }: { event: JsonEventType, attendanceConfig: AttendanceStructure, basic:JsonBookingType["basic"], participants: Array<PartialDeep<JsonParticipantType>>, update: any, kp: KpStructure, consent: ConsentStructure }) {
+const COLLAPSE_DEFAULT_THRESHOLD = 20
+
+export function ParticipantsForm({ event, attendanceConfig, basic, participants, update, kp, consent, validation }: { event: JsonEventType, attendanceConfig: AttendanceStructure, basic: JsonBookingType["basic"], participants: Array<PartialDeep<JsonParticipantType>>, update: any, kp: KpStructure, consent: ConsentStructure, validation: Validation }) {
 
     const { addEmptyObjectToArray, updateArrayItem, deleteArrayItem } = getMemoUpdateFunctions(update('participants'))
 
@@ -25,12 +29,15 @@ export function ParticipantsForm({ event, attendanceConfig, basic, participants,
         e.preventDefault()
     }, [])
 
-    const participantsList = participants.map((p, i) => (<MemoParticipantForm key={i} index={i} event={event} attendanceConfig={attendanceConfig} participant={p} kp={kp} consent={consent} updateArrayItem={updateArrayItem} deleteParticipant={deleteParticipant} />))
+    const [incomingParticipants, setIncomingParticipants] = useState(0)
+    const defaultCollapse = Math.max(participants.length, incomingParticipants) > COLLAPSE_DEFAULT_THRESHOLD
+
+    const participantsList = participants.map((p, i) => (<MemoParticipantForm key={i} index={i} event={event} attendanceConfig={attendanceConfig} participant={p} kp={kp} consent={consent} updateArrayItem={updateArrayItem} deleteParticipant={deleteParticipant} defaultCollapse={defaultCollapse} validation={validation} />))
 
     return <Grid container spacing={0} sx={{ mt: 2 }}>
         <Grid xs={12} p={0} item>
             <Typography variant="h6">Campers</Typography>
-            {event.bigCampMode ? <SuspenseElement><SheetsWidget event={event} update={update} basic={basic} /></SuspenseElement> : null}
+            {event.bigCampMode ? <SuspenseElement><SheetsWidget event={event} update={update} basic={basic} setIncomingParticipants={setIncomingParticipants} /></SuspenseElement> : null}
             {participantsList}
             <Button sx={{ mt: 2 }} variant="contained" onClick={addEmptyObjectToArray}>
                 Add person
@@ -39,12 +46,49 @@ export function ParticipantsForm({ event, attendanceConfig, basic, participants,
     </Grid>
 }
 
-function ParticipantForm({ index, event, attendanceConfig, participant, kp, consent, updateArrayItem, deleteParticipant }: { index: number, event: JsonEventType, attendanceConfig: AttendanceStructure, participant: PartialDeep<JsonParticipantType>, kp: KpStructure, consent: ConsentStructure, updateArrayItem: any, deleteParticipant: any }) {
+function ParticipantForm({ index,
+    event,
+    attendanceConfig,
+    participant,
+    kp,
+    consent,
+    updateArrayItem,
+    deleteParticipant,
+    defaultCollapse = false,
+    validation }:
+    {
+        index: number,
+        event: JsonEventType,
+        attendanceConfig: AttendanceStructure,
+        participant: PartialDeep<JsonParticipantType>,
+        kp: KpStructure,
+        consent: ConsentStructure,
+        updateArrayItem: any,
+        deleteParticipant: any,
+        defaultCollapse: boolean,
+        validation: Validation
+    }) {
 
     const { updateSubField } = getMemoUpdateFunctions(updateArrayItem(index))
     const basicUpdates = getMemoUpdateFunctions(updateSubField('basic'))
 
     const [deleteLock, setDeleteLock] = useState(true)
+    const [collapse, setCollapse] = useState(defaultCollapse)
+
+
+    if (collapse) {
+        const valid = validation.validateParticipant(participant, index).length == 0
+        return <Paper variant="outlined" sx={{ mt: 2, cursor: '' }} id={`P${index}`} onClick={e => setCollapse(false)}>
+            <Box p={2} display="flex"
+                alignItems="center">
+                <Stack direction="row" alignItems="center" gap={1} sx={{flexGrow: 1}}>
+                    {valid ? <CheckCircleOutline color="success" sx={{ verticalAlign: "middle" }} /> : <WarningAmber color="warning" sx={{ verticalAlign: "middle" }} />}
+                    <Typography variant="h6" sx={{ flexGrow: 1, pr: 2, }}>{participant.basic?.name}</Typography>
+                </Stack>
+                <IconButton><ExpandMore /></IconButton>
+            </Box>
+        </Paper>
+    }
 
     let emailAndOptionsAttendance
 
@@ -80,7 +124,7 @@ function ParticipantForm({ index, event, attendanceConfig, participant, kp, cons
                 <Grid sm={8} xs={12} item>
                     <TextField
                         autoComplete={`section-${index}-participant name`}
-                        inputProps={{'data-form-type': 'other'}} 
+                        inputProps={{ 'data-form-type': 'other' }}
                         fullWidth
                         required
                         name={`${index}-participant-name`}
@@ -115,6 +159,7 @@ function ParticipantForm({ index, event, attendanceConfig, participant, kp, cons
 </Grid>*/}
                 <Grid xs={12} item>
                     <Box display="flex" justifyContent="flex-end">
+                        <IconButton onClick={() => setCollapse(true)}><ExpandLess /></IconButton>
                         <IconButton color="warning" onClick={e => setDeleteLock(d => !d)}>{deleteLock ? <Lock /> : <LockOpen />}</IconButton>
                         <IconButton color="error" disabled={deleteLock} onClick={deleteParticipant(index, participant.basic?.name)}><Close /></IconButton>
                     </Box>
@@ -139,7 +184,7 @@ function ParicipantMedicalForm({ index, event, data, update }: { index: number, 
             minRows={2}
             name={`${index}-participant-medical`}
             id={`${index}-participant-medical`}
-            inputProps={{'data-form-type': 'other'}} 
+            inputProps={{ 'data-form-type': 'other' }}
             label="Additional medical information, medication taken or accessibility requirements:"
             value={data.details || ''}
             onChange={updateField('details')}
@@ -181,7 +226,7 @@ const EmailField = ({ index, email, dob, event, update }: { index: number, email
             required
             name={`${index}-participant-email`}
             id={`${index}-participant-email`}
-            inputProps={{'data-form-type': 'other'}} 
+            inputProps={{ 'data-form-type': 'other' }}
             type="email"
             label="Parent/Guardian email"
             value={email || ''}
@@ -194,7 +239,7 @@ const EmailField = ({ index, email, dob, event, update }: { index: number, email
             required
             name={`${index}-participant-email`}
             id={`${index}-participant-email`}
-            inputProps={{'data-form-type': 'other'}} 
+            inputProps={{ 'data-form-type': 'other' }}
             type="email"
             label="Email"
             value={email || ''}

@@ -9,7 +9,7 @@ import { MemoCustomQuestionFields } from "./custom.js";
 import { MemoBookingMoneySection } from "./money.js";
 import { getFee } from "../../../shared/fee/fee.js";
 import { MemoBookingPermissionSection } from "./permission.js";
-import { BookingValidationResults, validate } from "./validation.js";
+import { BookingValidationResults, Validation } from "./validation.js";
 import { Lock, LockOpen, Delete, Send } from '@mui/icons-material';
 import { getMemoUpdateFunctions } from "../../../shared/util.js";
 import { LoadingButton } from '@mui/lab'
@@ -39,8 +39,9 @@ export function BookingForm({ data, event, user, update, submit, mode, deleteBoo
     const kpConfig = React.useMemo(() => kp[event.kpMode] || kp.basic, [event]);
     const consentConfig = React.useMemo(() => consent[event.consentMode] || consent.none, [event]);
     const attendanceConfig = React.useMemo(() => getAttendance(event), [event]);
+    const validation = React.useMemo(() => new Validation(event), [event]);
 
-    const validationResults = validate(event, kpConfig, consentConfig, attendanceConfig, data, permission.permission)
+    const validationResults = validation.validate(data, permission.permission)
     return <Grid container spacing={2} p={2} justifyContent="center">
         <Grid xl={6} lg={7} md={8} sm={9} xs={12} item>
             <Box p={2}>
@@ -48,7 +49,7 @@ export function BookingForm({ data, event, user, update, submit, mode, deleteBoo
                     <Typography variant="h4">{`Booking for ${event.name}`}</Typography>
                     <BasicFields data={data.basic} update={updateSubField} />
                     {event.bigCampMode ? <MemoBookingExtraContactFields data={data.extraContacts} update={updateSubField} /> : null}
-                    <MemoParticipantsForm basic={data.basic as JsonBookingType["basic"]} event={event} attendanceConfig={attendanceConfig} participants={data.participants || [{}]} update={updateSubField} kp={kpConfig} consent={consentConfig} />
+                    <MemoParticipantsForm basic={data.basic as JsonBookingType["basic"]} event={event} attendanceConfig={attendanceConfig} participants={data.participants || [{}]} update={updateSubField} kp={kpConfig} consent={consentConfig} validation={validation}/>
                     <MemoCampingFields event={event} data={data.camping} update={updateSubField} />
                     <MemoEmergencyFields event={event} data={data.emergency} bookingType={data.basic?.bookingType || "individual"} update={updateSubField} />
                     <MemoCustomQuestionFields event={event} data={data.customQuestions} basic={data.basic} update={updateSubField} />

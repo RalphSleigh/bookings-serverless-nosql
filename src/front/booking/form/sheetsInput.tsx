@@ -8,13 +8,13 @@ import { HasSheetType } from "../../../lambda-common/sheets_input.js";
 import { drive_v3 } from "@googleapis/drive";
 import { getMemoUpdateFunctions } from "../../../shared/util.js";
 
-export const SheetsWidget: React.FC<{ event: JsonEventType, basic: JsonBookingType["basic"], update: any }> = ({ event, basic, update }) => {
+export const SheetsWidget: React.FC<{ event: JsonEventType, basic: JsonBookingType["basic"], update: any, setIncomingParticipants: any }> = ({ event, basic, update, setIncomingParticipants }) => {
 
     const sheet = useHasSheet(event.id).data
 
     if (sheet.sheet === false) return <CreateSheetState event={event} basic={basic} />
 
-    return <SheetExistsState event={event} sheet={sheet.sheet as drive_v3.Schema$File} update={update} />
+    return <SheetExistsState event={event} sheet={sheet.sheet as drive_v3.Schema$File} update={update} setIncomingParticipants={setIncomingParticipants} />
 }
 
 const chunk = (arr: any[], size: number) =>
@@ -22,7 +22,7 @@ const chunk = (arr: any[], size: number) =>
         arr.slice(i * size, i * size + size)
     );
 
-const SheetExistsState: React.FC<{ event: JsonEventType, sheet: drive_v3.Schema$File, update: any }> = ({ event, sheet, update }) => {
+const SheetExistsState: React.FC<{ event: JsonEventType, sheet: drive_v3.Schema$File, update: any, setIncomingParticipants: any }> = ({ event, sheet, update, setIncomingParticipants }) => {
 
     const getParticipantsDataMutation = useGetParticipantsFromSheet(event.id)
     const [importProgress, setImportProgress] = useState(0)
@@ -30,8 +30,8 @@ const SheetExistsState: React.FC<{ event: JsonEventType, sheet: drive_v3.Schema$
     const importFunction = e => {
         if (confirm("This will overwrite your current campers with data from the sheet, are you sure?")) {
             getParticipantsDataMutation.mutate()
-            setImportProgress(1)
         }
+        setImportProgress(0)
         e.preventDefault()
     }
 
@@ -44,6 +44,7 @@ const SheetExistsState: React.FC<{ event: JsonEventType, sheet: drive_v3.Schema$
 
     const updateParticipantsEffect = useEffect(() => {
         if (getParticipantsDataMutation.isSuccess) {
+            setIncomingParticipants(getParticipantsDataMutation.data.participants.length)
             const groups: Array<Array<JsonParticipantType>> = chunk(getParticipantsDataMutation.data.participants, 5)
             let oldParticipants
             update("participants")(p => {
@@ -83,13 +84,14 @@ const SheetExistsState: React.FC<{ event: JsonEventType, sheet: drive_v3.Schema$
             display="flex"
             alignItems="center">
             <Box sx={{ flexGrow: 1, pr: 2, }}>
-                {importProgress > 0 && importProgress < 100 && <SlowLinearProgress variant="determinate" value={importProgress} />}
+                {(getParticipantsDataMutation.isPending || getParticipantsDataMutation.isSuccess && importProgress == 0) && <LinearProgress variant="indeterminate" />}
+                {getParticipantsDataMutation.isSuccess && importProgress > 0 && importProgress < 100 && <SlowLinearProgress variant="determinate" value={importProgress} />}
             </Box>
             <LoadingButton
                 sx={{ mt: 1 }}
                 onClick={importFunction}
                 endIcon={<Download />}
-                loading={getParticipantsDataMutation.isPending || (importProgress < 100 && importProgress > 0)}
+                loading={getParticipantsDataMutation.isPending || (getParticipantsDataMutation.isSuccess && importProgress < 100)}
                 loadingPosition="end"
                 variant="outlined"
                 color="success">
