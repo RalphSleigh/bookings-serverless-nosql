@@ -1,7 +1,7 @@
 import React, { useContext, useMemo } from "react";
 import { Outlet, useOutletContext, useResolvedPath, useLocation } from "react-router-dom";
 import { manageLoaderContext } from "./manageLoader.js";
-import { Button, ButtonGroup, FormControlLabel, Grid, Link, Modal, Paper, Switch, Tab, Tabs, TextField, Typography } from "@mui/material";
+import { Box, Button, ButtonGroup, FormControlLabel, Grid, Link, Modal, Paper, Switch, Tab, Tabs, TextField, Typography } from "@mui/material";
 import { useDisableDriveSync, useEventBookings, useHistoricalEventBookings } from "../queries.js";
 import { JsonBookingType, JsonEventType, JsonUserResponseType } from "../../lambda-common/onetable.js";
 import { SuspenseWrapper } from "../suspense.js";
@@ -11,6 +11,8 @@ import { bookingsBookingSearch, bookingsParticipantSearch, useDebounceState, use
 import { JsonBookingWithExtraType } from "../../shared/computedDataTypes.js";
 import { ReactErrorBoundary } from "../app/errors.js";
 import { addComputedFieldsToBookingsQueryResult } from "../../shared/util.js";
+import Markdown from 'react-markdown'
+import { POLICY_MARKDPOWN } from "./policy.js"
 
 export function Component() {
     const { event, timeline } = useOutletContext<manageLoaderContext>()
@@ -25,7 +27,7 @@ export function Component() {
     const rolesPath = useResolvedPath('roles')
     const moneyPath = useResolvedPath('money')
 
-    const [acceptedPolicy, setAcceptedPolicy] = useStickyState<boolean>(false, "acceptedManagementPolicy")
+    const [acceptedPolicy, setAcceptedPolicy] = useStickyState<boolean>(false, "acceptedPolicy")
 
     const [displayAdvanced, setDisplayAdvanced] = React.useState<boolean>(false)
     const [displayDeleted, setDisplayDeleted] = React.useState<boolean>(false)
@@ -140,7 +142,13 @@ const UsagePolicyModal = ({ accepted, handleClose }: {accepted: boolean, handleC
         left: '50%',
         transform: 'translate(-50%, -50%)',
         p: 2,
-        outline: 'none'
+        outline: 'none',
+        width: 'calc(100vw - 20px)',
+        maxWidth: 'calc(100vw - 20px)',
+        maxHeight: 'calc(100vh - 20px)',
+        display: 'flex',
+        flexDirection: 'column',
+        alighItems: 'start',
     }
 
     if (accepted) return null
@@ -150,15 +158,9 @@ const UsagePolicyModal = ({ accepted, handleClose }: {accepted: boolean, handleC
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description">
         <Paper elevation={6} sx={style}>
-            <Typography id="modal-modal-title" variant="h6">
-                POLICY
-            </Typography>
-            <Grid container spacing={2}>
-                <Grid item xs={12} sm>
-                    <Typography variant="body1">This is the policy</Typography>
-                    <Button onClick={handleClose}>Accept</Button>
-                </Grid>
-            </Grid>
+            <Box sx={{flexGrow: 1, overflow: 'scroll'}}><Markdown>{POLICY_MARKDPOWN}</Markdown>
+            </Box>
+            <Button variant="contained" onClick={handleClose}>Accept</Button>
         </Paper>
     </Modal>)
 }
