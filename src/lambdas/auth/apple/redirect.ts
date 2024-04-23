@@ -1,6 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { lambda_wrapper_raw } from '../../../lambda-common/lambda_wrappers.js'
 import appleSignin from 'apple-signin-auth';
+import { warm } from '../../../lambda-common/warmer.js';
 
 /**
  *
@@ -13,8 +14,9 @@ import appleSignin from 'apple-signin-auth';
  */
 
 export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => { //@ts-ignore
-    return lambda_wrapper_raw(async (config) => {
+    return lambda_wrapper_raw(event, async (config) => {
 
+        await warm(["function_auth_apple_callback"])
 
 
         // OR const appleSignin = require('apple-signin-auth');

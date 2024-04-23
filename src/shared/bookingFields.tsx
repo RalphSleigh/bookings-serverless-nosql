@@ -9,7 +9,10 @@ abstract class Field {
     fieldName: string = ""
     roles: string[] = ["Owner", "Manage", "View", "Money", "KP"]
     defaultValue: string = "N/A"
+   
     enabledCSV: boolean = true
+    visbileMobile: boolean = true
+    visibleDesktop: boolean = true
 
     constructor(event: JsonEventType | OnetableEventType) {
         this.event = event
@@ -50,6 +53,16 @@ abstract class Field {
     abstract value(booking: JsonBookingType | BookingType): any | undefined
 }
 
+class BookingOrganisationField extends Field {
+    fieldName = "Organisation"
+    enabled(): boolean {
+        return this.event.bigCampMode
+    }
+    value(booking: JsonBookingType) {
+        return booking.basic.organisation
+    }
+}
+
 class BookingDistrictField extends Field {
     fieldName = "District"
     enabled(): boolean {
@@ -71,6 +84,16 @@ class BookingContactEmail extends Field {
     fieldName = "Contact Email"
     value(booking: JsonBookingType) {
         return booking.basic.contactEmail
+    }
+}
+
+class BookingHowDidYouHear extends Field {
+    fieldName = "How did you hear about us?"
+    enabled(): boolean {
+        return this.event.howDidYouHear
+    }
+    value(booking: JsonBookingType) {
+        return booking.basic.howDidYouHear
     }
 }
 
@@ -105,6 +128,36 @@ class EmergencyContactPhone extends Field {
     }
 }
 
+class CampWith extends Field {
+    fieldName = "Camp With"
+    enabled(): boolean {
+        return this.event.bigCampMode
+    }
+    value(booking: JsonBookingType) {
+        return booking.camping?.campWith
+    }
+}
+
+class CanBringEquipemnt extends Field {
+    fieldName = "Can Bring Equipment"
+    enabled(): boolean {
+        return this.event.bigCampMode
+    }
+    value(booking: BookingType | JsonBookingType) {
+        return booking.camping?.canBringEquipment
+    }
+}
+
+class CampingAccessibilityNeeds extends Field {
+    fieldName = "Accessibility Needs"
+    enabled(): boolean {
+        return this.event.bigCampMode
+    }
+    value(booking: BookingType | JsonBookingType) {
+        return booking.camping?.accessibilityNeeds
+    }
+}
+
 class EditLink extends Field {
     fieldName = "Edit"
     roles = ["Owner", "Manage"]
@@ -117,6 +170,15 @@ class EditLink extends Field {
         if (value === undefined) return this.defaultValue
         return <Link to={`/event/${this.event.id}/edit-booking/${value}`}>Edit</Link>
     }
+}
+
+class Deleted extends Field {
+    fieldName = "Deleted"
+    enabledCSV = false
+    value(booking: JsonBookingType) {
+        return booking.deleted
+    }
+
 }
 
 class CustomQuestionText extends Field {
@@ -139,6 +201,7 @@ export class BookingFields {
         this.event = event
 
         this.fields = [
+            new BookingOrganisationField(event),
             new BookingDistrictField(event),
             new BookingContactName(event),
             new BookingContactEmail(event),
@@ -146,13 +209,18 @@ export class BookingFields {
             new NumberOfParticipants(event),
             new EmergencyContactName(event),
             new EmergencyContactPhone(event),
+            new BookingHowDidYouHear(event),
+            new CampWith(event),
+            new CanBringEquipemnt(event),
+            new CampingAccessibilityNeeds(event)
         ]
 
         event.customQuestions?.forEach((q, i) => {
             this.fields.push(new CustomQuestionText(q, i, event))
         })
-
+        
         this.fields.push(new EditLink(event))
+        this.fields.push(new Deleted(event))
     }
 
     getColumnDefs(user) {

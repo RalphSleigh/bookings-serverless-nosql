@@ -63,3 +63,16 @@ export function bookingsBookingSearch(bookings: JsonBookingWithExtraType[], sear
         return b.basic.contactName.toLowerCase().includes(search.toLowerCase()) || b.basic.contactEmail.toLowerCase().includes(search.toLowerCase()) || b.basic.district?.toLowerCase().includes(search.toLowerCase())
     })
 }
+
+export function useStickyState<T>(defaultValue: T, key: string): [T, React.Dispatch<React.SetStateAction<T>>] {
+    const [value, setValue] = React.useState<T>(() => {
+        const stickyValue = window.localStorage && window.localStorage.getItem(key);
+        return stickyValue !== null
+            ? JSON.parse(stickyValue)
+            : defaultValue;
+    });
+    React.useEffect(() => {
+        if (window.localStorage) window.localStorage.setItem(key, JSON.stringify(value));
+    }, [key, value]);
+    return [value, setValue];
+}

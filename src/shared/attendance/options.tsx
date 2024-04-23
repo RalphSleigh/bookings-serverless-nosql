@@ -31,9 +31,9 @@ export class OptionsAttendance extends AttendanceStructure {
         </Paper>
     }
 
-    public ParticipantElement = ({ configuration, data, update }: { configuration: JsonEventType["attendanceData"], data: ParticipantAttendanceType | undefined, update: any }) => {
+    ParticipantElementNonMemo = ({ configuration, data, update }: { configuration: JsonEventType["attendanceData"], data: ParticipantAttendanceType | undefined, update: any }) => {
 
-        const { updateField } = getMemoUpdateFunctions(update)
+        const { updateField } = getMemoUpdateFunctions(update("attendance"))
 
         const attendanceOptions = configuration!.options!.map((d, i) => <MenuItem key={i} value={i}>{d}
         </MenuItem>)
@@ -48,6 +48,8 @@ export class OptionsAttendance extends AttendanceStructure {
         </FormControl>
 
     }
+
+    public ParticipantElement = React.memo(this.ParticipantElementNonMemo)
 
     public validate(participant: Partial<JsonParticipantType>): attendanceValidationResults {
         const results: attendanceValidationResults = []

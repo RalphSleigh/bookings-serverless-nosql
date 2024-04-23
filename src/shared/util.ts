@@ -15,7 +15,7 @@ const addComputedFieldToParticipant = (booking, startDate) => (p: JsonParticipan
     return {...p, age, ageGroup: getAgeGroup(age), booking}
 }
 
-export function addComputedFieldsToBookingsQueryResult(bookings: [JsonBookingType], event: JsonEventType): JsonBookingWithExtraType[] {
+export function addComputedFieldsToBookingsQueryResult(bookings: JsonBookingType[], event: JsonEventType): JsonBookingWithExtraType[] {
     const startDate = parseDate(event.startDate)!
     return bookings.map(b => {
         return {...b, participants: b.participants.map(addComputedFieldToParticipant(b, startDate))}

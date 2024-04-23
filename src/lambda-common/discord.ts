@@ -9,7 +9,9 @@ export async function postToDiscord(config, message) {
         const sqsClient = new SQSClient({});
         const command = new SendMessageCommand({
             QueueUrl: process.env.DISCORD_QUEUE_URL,
-            MessageBody: JSON.stringify({ message: message })
+            MessageBody: JSON.stringify({ message: message }),
+            MessageGroupId: "discord",
+            MessageDeduplicationId: "discord" + Date.now()
         });
 
         await sqsClient.send(command);

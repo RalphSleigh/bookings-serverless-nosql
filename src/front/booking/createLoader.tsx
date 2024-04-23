@@ -14,10 +14,13 @@ export function CreateBookingLoader({ }) {
 
     const event = eventsData.events.find(e => e.id === eventId)
 
+
     if (!event) return <Navigate to='/' />
 
+    const application = user.applications.find(a => a.eventId === event.id)
+
     return <EnsureHasPermission permission={CanBookIntoEvent} event={event} user={user}>
-        <CreateBookingPage event={event} user={user} />
+        <CreateBookingPage event={event} user={user} application={application} />
     </EnsureHasPermission>
 }
 

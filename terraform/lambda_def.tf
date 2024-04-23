@@ -352,6 +352,30 @@ variable "lambda_definitions" {
       code   = "error/reportError"
       path   = "error"
       method = "post"
+    },
+    discord_slashcommands = {
+      name   = "discord_slashcommands"
+      code   = "discord/slashcommands"
+      path   = "discord/slashcommands"
+      method = "post"
+    },
+    get_booking_has_sheet = {
+      name   = "get_booking_has_sheet"
+      code   = "bookings/getBookingHasSheet"
+      path   = "event/{id}/sheet"
+      method = "get"
+    },
+    create_sheet_for_booking = {
+      name   = "create_sheet_for_booking"
+      code   = "bookings/createSheetForBooking"
+      path   = "event/{id}/createSheet"
+      method = "post"
+    },
+    get_participants_from_sheet = {
+      name   = "get_participants_from_sheet"
+      code   = "bookings/getParticipantsFromSheet"
+      path   = "event/{id}/getParticipantsFromSheet"
+      method = "get"
     }
   }
 }

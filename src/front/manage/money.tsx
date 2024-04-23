@@ -58,6 +58,7 @@ const MoneyTable = ({ event, bookings, onRowClick }: { event: JsonEventType, boo
         const paidUp = paid >= rows[0]
 
         return <TableRow key={i} onClick={() => onRowClick(i)} hover>
+            {fees.hasPaymentReference ? <TableCell>{fees.getPaymentReference(b)}</TableCell> : null}
             <TableCell>{event.bigCampMode ? b.basic.district : b.basic.contactName}</TableCell>
             {rows.map((v, i) => <TableCell key={i}>{currency(v)}</TableCell>)}
             <TableCell>{currency(paid)} {paidUp ? '✅' : ''}</TableCell>
@@ -71,6 +72,7 @@ const MoneyTable = ({ event, bookings, onRowClick }: { event: JsonEventType, boo
         <Table size="small">
             <TableHead>
                 <TableRow>
+                    {fees.hasPaymentReference ? <TableCell><strong>Reference</strong></TableCell> : null}
                     <TableCell><strong>Booking</strong></TableCell>
                     {valueHeaders}
                     <TableCell><strong>Paid</strong></TableCell>
@@ -80,6 +82,7 @@ const MoneyTable = ({ event, bookings, onRowClick }: { event: JsonEventType, boo
                 {rows}
                 <TableRow>
                     <TableCell><strong>Totals</strong></TableCell>
+                    {fees.hasPaymentReference ? <TableCell></TableCell> : null}
                     {totalsRow}
                     <TableCell><strong>{currency(totalPaid)}</strong></TableCell>
                 </TableRow>
@@ -230,10 +233,10 @@ const MoneyModal = ({ selectedBooking, booking, event, users, handleClose }: { s
             </Grid>
             <Grid container spacing={2}>
                 <Grid item xs={12} sm={3}>
-                    <TextField fullWidth sx={{ mt: 2 }} error={!numberValid} required id="outlined-required" label="Value" type="text" inputProps={{ inputMode: "numeric" }} InputProps={{ startAdornment: <InputAdornment position="start">£</InputAdornment> }} value={feeItem.value} onChange={updateField('value')} />
+                    <TextField autoComplete="off" fullWidth sx={{ mt: 2 }} error={!numberValid} required id="outlined-required" label="Value" type="text" inputProps={{ inputMode: "numeric" }} InputProps={{ startAdornment: <InputAdornment position="start">£</InputAdornment> }} value={feeItem.value} onChange={updateField('value')} />
                 </Grid>
                 <Grid item xs={12} sm={9}>
-                    <TextField fullWidth sx={{ mt: 2 }} required id="outlined-required" label="Description" type="text" value={feeItem.description} onChange={updateField('description')} />
+                    <TextField autoComplete="off" fullWidth sx={{ mt: 2 }} required id="outlined-required" label="Description" type="text" value={feeItem.description} onChange={updateField('description')} />
                 </Grid>
                 <Grid item xs={12}>
                     <Button variant="contained" color="success" disabled={!numberValid || feeMutation.isPending || feeItem.description == ""} onClick={submitPayment}>Add Payment</Button>

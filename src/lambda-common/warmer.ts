@@ -1,6 +1,6 @@
-import { Lambda } from "aws-sdk"
-import am_in_lambda from "./am_in_lambda"
-import { log } from "./logging"
+import { Lambda } from "@aws-sdk/client-lambda"
+import am_in_lambda from "./am_in_lambda.js"
+import { log } from "./logging.js"
 
 export function is_warmer_event(event) {
     return event.source === "warmer"
@@ -10,7 +10,7 @@ export function warm(functions: string[]) {
 
     if (!am_in_lambda()) return
 
-    log(`warming functions`)
+    console.log(`warming functions`)
 
     const lambda = new Lambda({})
 

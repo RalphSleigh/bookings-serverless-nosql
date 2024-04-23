@@ -6,7 +6,7 @@ import { flush_logs, log } from "../../lambda-common/logging.js"
 import { Client, GatewayIntentBits } from "discord.js";
 
 
-const discordChannel = (async () => {
+/* const discordChannel = (async () => {
     const config = await get_config()
     const client = new Client({ intents: [GatewayIntentBits.Guilds] })
     await client.login(config.DISCORD_BOT_TOKEN)
@@ -14,7 +14,7 @@ const discordChannel = (async () => {
     const channel = await guild.channels.fetch(config.DISCORD_CHANNEL_ID)
     return channel
 })()
-
+ */
 export const lambdaHandler = async (event: SQSEvent): Promise<any> => {
     const config = await get_config()
     const client = new SQSClient({});
@@ -23,9 +23,16 @@ export const lambdaHandler = async (event: SQSEvent): Promise<any> => {
         const data = JSON.parse(record.body)
         try {
             console.log("posting to discord")
-            const channel = await discordChannel
+            //const channel = await discordChannel
             //@ts-ignore
-            await channel!.send(data.message);
+            //await channel!.send(data.message);
+            await fetch(config.DISCORD_WEBHOOK_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ content: data.message })
+            })
         } catch (error) {
             log("Error sending discord message:")
             log(error)

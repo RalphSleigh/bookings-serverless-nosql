@@ -9,11 +9,12 @@ import { getAgeGroup } from "./woodcraft.js";
 import { useMediaQuery, useTheme } from "@mui/material";
 
 abstract class Field {
-    event: any;
+    event: JsonEventType | OnetableEventType;
     abstract fieldName: string
     roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "Money", "KP"]
     defaultValue: string = "N/A"
 
+    enabledCSV: boolean = true
     visbileMobile: boolean = true
     visibleDesktop: boolean = true
 
@@ -32,19 +33,19 @@ abstract class Field {
     }
 
     dataGridColumnDef(): GridColDef {
-        return { field: this.fieldName, headerName: this.fieldName, renderCell: this.dataGridCellRenderer.bind(this), valueGetter: params => params.row.participant, sortComparator: this.sortComparator.bind(this), flex: 1 }
+        return { field: this.fieldName, headerName: this.fieldName, renderCell: this.dataGridCellRenderer.bind(this), valueGetter: params => this.value.bind(this)(params.row.participant), sortComparator: this.sortComparator.bind(this), flex: 1 }
     }
 
     dataGridCellRenderer(params): ReactNode {
-        const value = this.value(params.value)
-        if(value === undefined) return this.defaultValue
-        return <>{value.toString()}</>
+        //const value = this.value(params.value)
+        if(params.value === undefined) return this.defaultValue
+        return <>{params.value.toString()}</>
     }
 
-    sortComparator(a: JsonParticipantWithExtraType | ParticipantType, b: JsonParticipantWithExtraType | ParticipantType) {
-        if(this.value(a) === undefined) return 1
-        if(this.value(b) === undefined) return -1
-        return this.value(a).toString().localeCompare(this.value(b).toString())
+    sortComparator(a: any, b: any) {
+        if(a === undefined) return 1
+        if(b === undefined) return -1
+        return a.toString().localeCompare(b.toString())
     }
 
     csvCellValue(participant: JsonParticipantWithExtraType | ParticipantType) {
@@ -63,6 +64,17 @@ class Name extends Field {
     }
 }
 
+class Email extends Field {
+    fieldName = "Email"
+    visbileMobile = false
+    enabled(): boolean {
+        return this.event.allParticipantEmails
+    }
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.basic.email
+    }
+}
+
 class BookedBy extends Field {
     fieldName = "Booked By"
     value (participant: JsonParticipantWithExtraType) {
@@ -73,11 +85,21 @@ class BookedBy extends Field {
 class Age extends Field {
     fieldName = "Age"
     value (participant: JsonParticipantWithExtraType | ParticipantType) {
-        if('age' in participant) return participant.ageGroup.displayAgeGroup(participant.age)
+        return participant
+        
+    }
+
+    dataGridCellRenderer(params): ReactNode {
+        if('age' in params.value) return params.value.ageGroup.displayAgeGroup(params.value.age)
         const startDate = parseDate(this.event.startDate)!
-        const age = differenceInYears(startDate, parseDate(participant.basic.dob)!)
+        const age = differenceInYears(startDate, parseDate(params.value.basic.dob)!)
         return getAgeGroup(age).displayAgeGroup(age)
     }
+
+    csvCellValue(participant: JsonParticipantWithExtraType | ParticipantType) {
+        return participant.basic.dob
+    }
+
     sortComparator(a: JsonParticipantWithExtraType | ParticipantType, b: JsonParticipantWithExtraType | ParticipantType) {
         if('age' in a && 'age' in b) return a.age - b.age
         const startDate = parseDate(this.event.startDate)!
@@ -85,19 +107,32 @@ class Age extends Field {
     }
 }
 
+class AttendanceOption extends Field {
+    fieldName = "Attendance Option"
+    visbileMobile = false
+    enabled(): boolean {
+        return this.event.attendanceStructure == "options"
+    }
+    value (participant: JsonParticipantWithExtraType) {
+        return this.event.attendanceData?.options?.[participant.attendance.option!]
+    }
+}
+
 class Diet extends Field {
     fieldName = "Diet"
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
     value (participant: JsonParticipantWithExtraType | ParticipantType) {
         return participant.kp?.diet
     }
-    sortComparator(a: JsonParticipantWithExtraType | ParticipantType, b: JsonParticipantWithExtraType | ParticipantType) {
+    sortComparator(a: string, b: string) {
         const sortIndex = ["omnivore", "pescatarian", "vegetarian", "vegan"]
-        return sortIndex.indexOf(a.kp?.diet!) - sortIndex.indexOf(b.kp?.diet!)
+        return sortIndex.indexOf(a) - sortIndex.indexOf(b)
     }
 }
 
 class AddtionalDiet extends Field {
     fieldName = "Additional Diet"
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
     visbileMobile = false
     defaultValue = ""
     value (participant: JsonParticipantWithExtraType | ParticipantType) {
@@ -105,17 +140,225 @@ class AddtionalDiet extends Field {
     }
 }
 
-class Photo extends Field {
-    fieldName = "Photo"
+class DietPreferences extends Field {
+    fieldName = "Diet Preferences"
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
+    visbileMobile = false
+    defaultValue = ""
+    enabled(): boolean {
+        return this.event.kpMode == "large"
+    }
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.kp?.preferences
+    }
+}
+
+class DietNutAllergy extends Field {
+    fieldName = "Nut Allergy"
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
+    visbileMobile = false
+    enabled(): boolean {
+        return this.event.kpMode == "large"
+    }
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.kp?.nuts
+    }
+    dataGridCellRenderer(params): ReactNode {
+        //const value = this.value(params.value)
+        const value = params.value
+        if(value === true) return "❌"
+        if(value === false) return ""
+        return ""
+    }
+}
+
+class DietGlutenAllergy extends Field {
+    fieldName = "Gluten Allergy"
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
+    visbileMobile = false
+    enabled(): boolean {
+        return this.event.kpMode == "large"
+    }
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.kp?.gluten
+    }
+    dataGridCellRenderer(params): ReactNode {
+        //const value = this.value(params.value)
+        const value = params.value
+        if(value === true) return "❌"
+        if(value === false) return ""
+        return ""
+    }
+}
+
+class DietSoyaAllergy extends Field {
+    fieldName = "Soya Allergy"
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
+    visbileMobile = false
+    enabled(): boolean {
+        return this.event.kpMode == "large"
+    }
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.kp?.soya
+    }
+    dataGridCellRenderer(params): ReactNode {
+        //const value = this.value(params.value)
+        const value = params.value
+        if(value === true) return "❌"
+        if(value === false) return ""
+        return ""
+    }
+}
+
+class DietDairyAllergy extends Field {
+    fieldName = "Dairy Allergy"
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
+    visbileMobile = false
+    enabled(): boolean {
+        return this.event.kpMode == "large"
+    }
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.kp?.dairy
+    }
+    dataGridCellRenderer(params): ReactNode {
+       //const value = this.value(params.value)
+       const value = params.value
+        if(value === true) return "❌"
+        if(value === false) return ""
+        return ""
+    }
+}
+
+class DietEggAllergy extends Field {
+    fieldName = "Egg Allergy"
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
+    visbileMobile = false
+    enabled(): boolean {
+        return this.event.kpMode == "large"
+    }
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.kp?.egg
+    }
+    dataGridCellRenderer(params): ReactNode {
+        //const value = this.value(params.value)
+        const value = params.value
+        if(value === true) return "❌"
+        if(value === false) return ""
+        return ""
+    }
+}
+
+class DietPorkAllergy extends Field {
+    fieldName = "No Pork"
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
+    visbileMobile = false
+    enabled(): boolean {
+        return this.event.kpMode == "large"
+    }
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.kp?.pork
+    }
+    dataGridCellRenderer(params): ReactNode {
+        //const value = this.value(params.value)
+        const value = params.value
+        if(value === true) return "❌"
+        if(value === false) return ""
+        return ""
+    }
+}
+
+class DietChickpeaAllergy extends Field {
+    fieldName = "Chickpea Allergy"
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
+    visbileMobile = false
+    enabled(): boolean {
+        return this.event.kpMode == "large"
+    }
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.kp?.chickpea
+    }
+    dataGridCellRenderer(params): ReactNode {
+        //const value = this.value(params.value)
+        const value = params.value
+        if(value === true) return "❌"
+        if(value === false) return ""
+        return ""
+    }
+}
+
+class DietDiabetic extends Field {
+    fieldName = "Diabetic"
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
+    visbileMobile = false
+    enabled(): boolean {
+        return this.event.kpMode == "large"
+    }
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.kp?.diabetic
+    }
+    dataGridCellRenderer(params): ReactNode {
+        //const value = this.value(params.value)
+        const value = params.value
+        if(value === true) return "❌"
+        if(value === false) return ""
+        return ""
+    }
+}
+
+class DietContactMe extends Field {
+    fieldName = "Contact Me"
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
+    visbileMobile = false
+    enabled(): boolean {
+        return this.event.kpMode == "large"
+    }
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.kp?.contactMe
+    }
+    dataGridCellRenderer(params): ReactNode {
+        //const value = this.value(params.value)
+        const value = params.value
+        if(value === true) return "❌"
+        if(value === false) return ""
+        return ""
+    }
+}
+
+class PhotoConsent extends Field {
+    fieldName = "Photo Consent"
     visbileMobile = false
     roles: Array<RoleType["role"]> = ["Owner", "Manage", "View"]
+    enabled(): boolean {
+        return this.event.consentMode == "camp100"
+    }
     value (participant: JsonParticipantWithExtraType) {
         return participant.consent?.photo
     }
+    dataGridCellRenderer(params): ReactNode {
+        //const value = this.value(params.value)
+        const value = params.value
+        if(value === true) return "✔️"
+        if(value === false) return "❌"
+        return ""
+    }
+}
 
+class RSEConsent extends Field {
+    fieldName = "RSE Consent"
+    visbileMobile = false
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View"]
     enabled(): boolean {
-        //return this.event.bigCampMode
-        return false
+        return this.event.consentMode == "camp100"
+    }
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.consent?.sre
+    }
+    dataGridCellRenderer(params): ReactNode {
+        //const value = this.value(params.value)
+        const value = params.value
+        if(value === true) return "✔️"
+        if(value === false) return "❌"
+        return ""
     }
 }
 
@@ -137,7 +380,8 @@ class Created extends Field {
     }
 
     dataGridCellRenderer(params: any): ReactNode {
-        const value = this.value(params.value)
+        //const value = this.value(params.value)
+        const value = params.value
         return <>{formatDistanceToNow(value)} ago</>
     }
 }
@@ -150,7 +394,8 @@ class Updated extends Field {
     }
 
     dataGridCellRenderer(params: any): ReactNode {
-        const value = this.value(params.value)
+        //const value = this.value(params.value)
+        const value = params.value
         return <>{formatDistanceToNow(value)} ago</>
     }
 }
@@ -173,11 +418,24 @@ export class ParticipantFields {
         this.fields = [
             new Name(event),
             new Age(event),
+            new Email(event),
+            new AttendanceOption(event),
             new BookedBy(event),
             new Diet(event),
             new AddtionalDiet(event),
+            new DietPreferences(event),
+            new DietNutAllergy(event),
+            new DietGlutenAllergy(event),
+            new DietSoyaAllergy(event),
+            new DietDairyAllergy(event),
+            new DietEggAllergy(event),
+            new DietPorkAllergy(event),
+            new DietChickpeaAllergy(event),
+            new DietDiabetic(event),
+            new DietContactMe(event),
             new Medical(event),
-            new Photo(event),
+            new PhotoConsent(event),
+            new RSEConsent(event),
             new Created(event),
             new Updated(event),
         ]    
@@ -188,11 +446,11 @@ export class ParticipantFields {
     }
 
     getCSVHeaders(user) {
-        return this.fields.filter(f => f.enabled() && f.permission(user)).map(f => f.fieldName)
+        return this.fields.filter(f => f.enabledCSV && f.enabled() && f.permission(user)).map(f => f.fieldName)
     }
 
     getCSVValues(participant: JsonParticipantWithExtraType | ParticipantType, user) {
-        return this.fields.filter(f => f.enabled() && f.permission(user)).map(f => f.csvCellValue(participant))
+        return this.fields.filter(f => f.enabledCSV && f.enabled() && f.permission(user)).map(f => f.csvCellValue(participant))
     }
 
     getDefaultColumnVisibility(user: JsonUserType | UserResponseType): GridColumnVisibilityModel {

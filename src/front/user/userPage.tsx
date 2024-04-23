@@ -30,8 +30,8 @@ export function UserPage(props) {
                     <Typography variant="body1">You are logged in via {user?.source}{user.isWoodcraft ? ' with a Woodcraft Folk account' : ''}</Typography>
                     {user.isWoodcraft ? <Typography variant="body1">You can't edit these as they are set by the Woodcraft Folk directory, so you probably want to go <Link to="/">Home</Link></Typography> : <Typography variant="body1">You can update your details here:</Typography>}
                     <form>
-                        <TextField fullWidth disabled={user.isWoodcraft} sx={{ mt: 2 }} id="outlined" label="Display Name" value={userDetails.userName} onChange={updateField("userName")} />
-                        <TextField fullWidth disabled={user.isWoodcraft} sx={{ mt: 2 }} id="outlined" label="Email" value={userDetails.email} onChange={updateField("email")} />
+                        <TextField autoComplete="name" name="name"fullWidth disabled={user.isWoodcraft} sx={{ mt: 2 }} id="outlined" label="Display Name" value={userDetails.userName} onChange={updateField("userName")} />
+                        <TextField autoComplete="email" name="email" fullWidth disabled={user.isWoodcraft} sx={{ mt: 2 }} id="outlined" label="Email" value={userDetails.email} onChange={updateField("email")} />
                         <Button disabled={user.isWoodcraft} sx={{ mt: 2 }} variant="contained" onClick={saveUser}>Save</Button>
                     </form>
                 </Box>

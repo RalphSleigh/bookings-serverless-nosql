@@ -6,6 +6,8 @@ import { auth, plus } from '@googleapis/plus'
 import jwt from 'jsonwebtoken'
 import cookie from 'cookie'
 import fetch, { Headers } from 'node-fetch'
+import { PublishCommand, SNSClient } from '@aws-sdk/client-sns';
+import am_in_lambda from '../../../lambda-common/am_in_lambda.js';
 
 /**
  *
@@ -18,7 +20,7 @@ import fetch, { Headers } from 'node-fetch'
  */
 
 export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {//@ts-ignore
-    return lambda_wrapper_raw(async (config) => {
+    return lambda_wrapper_raw(event, async (config) => {
 
         const oauth2Client = new auth.OAuth2(
             config.GOOGLE_CLIENT_ID,
@@ -60,7 +62,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
                 }
             }
 
-            const jwt_token = jwt.sign({ remoteId: user_instance.remoteId }, config.JWT_SECRET, { expiresIn: 60 * 60 * config.COOKIE_EXPIRY})
+            const jwt_token = jwt.sign({ remoteId: user_instance.remoteId }, config.JWT_SECRET, { expiresIn: 60 * 60 * config.COOKIE_EXPIRY })
             const cookie_string = cookie.serialize("jwt", jwt_token, { maxAge: 60 * 60, httpOnly: true, sameSite: true, path: '/' })
 
             log(`User Login from ${user_instance.source} ${user_instance.userName} from ${event.headers['X-Forwarded-For']} using ${event.headers['User-Agent']}`)
@@ -78,8 +80,22 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
         } catch (e) {
             console.log("Error getting user from login")
             console.log(e)
-            throw e
-
+            if (am_in_lambda()) {
+                const client = new SNSClient({})
+                const input = { // PublishInput
+                    TopicArn: process.env.SNS_QUEUE_ARN,
+                    Message: JSON.stringify(e), // required  
+                }
+                const command = new PublishCommand(input)
+                const response = await client.send(command)
+            }
+            return {
+                statusCode: 301,
+                headers: {
+                    Location: "/login?error=true",
+                },
+                body: ''
+            } as APIGatewayProxyResult
         }
     })
 

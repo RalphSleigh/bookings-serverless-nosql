@@ -7,7 +7,7 @@ import { CanBookIntoEvent } from "../../shared/permissions.js";
 import { BookingType, JsonApplicationType, JsonBookingType, JsonEventType, JsonUserResponseType, UserResponseType } from "../../lambda-common/onetable.js";
 import { SnackBarContext, SnackbarDataType } from "../app/toasts.js";
 import { PartialDeep } from "type-fest";
-import { Box, Button, Card, CardContent, Grid, Skeleton, TextField, Typography, useTheme } from "@mui/material";
+import { Box, Button, Card, CardContent, Checkbox, Grid, Skeleton, TextField, Typography, useTheme } from "@mui/material";
 import { getMemoUpdateFunctions } from "../../shared/util.js";
 import { BorderColor, Send } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
@@ -45,6 +45,7 @@ export function CreateApplicationPage({ event, user }: { event: JsonEventType, u
                     <Grid xs={6} item>
                         <Card variant="outlined" sx={{ display: 'flex', flexDirection: 'column', height: '100%', ...groupStyle }} onClick={() => setApplicationData(data => { return { ...data, bookingType: 'group' } })}>
                             <CardContent>
+                                <Checkbox checked={applicationData?.bookingType == "group"} sx={{ float: 'right', mt: -1, mr: -1 }} />
                                 <Typography variant="h5">Group Booking</Typography>
                                 <Typography variant="body1">If you are booking for a Woodcraft Folk District, Group, or other large booking, please select this option.</Typography>
                             </CardContent>
@@ -53,6 +54,7 @@ export function CreateApplicationPage({ event, user }: { event: JsonEventType, u
                     <Grid xs={6} item>
                         <Card variant="outlined" sx={{ display: 'flex', flexDirection: 'column', height: '100%', ...individualStyle }} onClick={() => setApplicationData(data => { return { ...data, bookingType: 'individual' } })}>
                             <CardContent>
+                                <Checkbox checked={applicationData?.bookingType == "individual"} sx={{ float: 'right', mt: -1, mr: -1 }} />
                                 <Typography variant="h5">Individual Booking</Typography>
                                 <Typography variant="body1">If you are booking just yourself or your family members, please select this option.</Typography>
                             </CardContent>
@@ -60,12 +62,12 @@ export function CreateApplicationPage({ event, user }: { event: JsonEventType, u
                     </Grid>
                     <Grid xs={12} item>
                         <form>
-                            <TextField fullWidth sx={{ mt: 2 }} required id="outlined-required" label="Name" value={applicationData.name || ''} onChange={updateField('name')} />
-                            <TextField fullWidth sx={{ mt: 2 }} required id="outlined-required" label="Email" value={applicationData.email || ''} onChange={updateField('email')} />
-                            <TextField fullWidth sx={{ mt: 2 }} disabled={applicationData.bookingType == "individual"} required id="outlined-required" label="Group/District" value={applicationData.district || ''} onChange={updateField('district')} />
-                            <TextField fullWidth inputProps={{ inputMode: "numeric" }} sx={{ mt: 2 }} required id="outlined-required" label="Predicted Number of Campers" value={applicationData.predictedParticipants || ''} onChange={updateNumber('predictedParticipants')} />
+                            <TextField autoComplete="name" name="name" id="name" inputProps={{'data-form-type': 'name'}} fullWidth sx={{ mt: 2 }} label="Name" value={applicationData.name || ''} onChange={updateField('name')} />
+                            <TextField autoComplete="email" name="email" id="email" inputProps={{'data-form-type': 'phone'}} fullWidth sx={{ mt: 2 }} required label="Email" value={applicationData.email || ''} onChange={updateField('email')} />
+                            <TextField autoComplete="group" name="group" id="group" inputProps={{'data-form-type': 'other'}} fullWidth sx={{ mt: 2 }} disabled={applicationData.bookingType == "individual"} required label="Group/District" value={applicationData.district || ''} onChange={updateField('district')} />
+                            <TextField autoComplete="predicted" name="predicted" id="predicted" fullWidth inputProps={{ inputMode: "numeric", "data-form-type": "other" }} sx={{ mt: 2 }} required label="Predicted Number of Campers" value={applicationData.predictedParticipants || ''} onChange={updateNumber('predictedParticipants')} />
                             <LoadingButton
-                                sx={{mt:2}}
+                                sx={{ mt: 2 }}
                                 onClick={submit}
                                 endIcon={<Send />}
                                 loading={createApplication.isPending}

@@ -58,9 +58,12 @@ const schema = {
             endDate: { type: Date, required: true },
             bookingDeadline: { type: Date, required: true },
             replyTo: { type: String, required: true },
-            kpMode: { type: String, required: true, enum: ['basic', 'vcamp'] },
+            kpMode: { type: String, required: true, enum: ['basic', 'large'] },
+            consentMode: { type: String, required: true, enum: ['none', 'camp100'] },
             bigCampMode: { type: Boolean, required: true, default: false },
             applicationsRequired: { type: Boolean, required: true, default: false },
+            allParticipantEmails: { type: Boolean, required: true, default: false },
+            howDidYouHear: { type: Boolean, required: true, default: false },
             emailSubjectTag: { type: String, required: true },
             attendanceStructure: { type: String, required: true, enum: ['whole', 'options'] },
             attendanceData: {
@@ -92,6 +95,9 @@ const schema = {
                                 fees: { type: Array, required: true, items: { type: Number, required: true } }
                             }
                         }
+                    },
+                    regionalPrices: {
+                        type: Object,
                     }
                 }
             },
@@ -122,7 +128,20 @@ const schema = {
                     contactName: { type: String, required: true },
                     contactEmail: { type: String, required: true },
                     contactPhone: { type: String, required: true },
+                    bookingType: { type: String, enum: ['individual', 'group'] },
                     district: { type: String },
+                    organisation: { type: String },
+                    howDidYouHear: { type: String },
+                }
+            },
+            extraContacts: {
+                type: Array,
+                items: {
+                    type: Object,
+                    schema: {
+                        name: { type: String, required: true },
+                        email: { type: String, required: true },
+                    }
                 }
             },
             participants: {
@@ -141,7 +160,7 @@ const schema = {
                             type: Object,
                             //Currently unsupported
                             //schema: {
-                            //    name: { type: String, required: true }
+                            //    option: { type: String, required: true }
                             //},
                         },
                         kp: {
@@ -197,6 +216,14 @@ const schema = {
                     }
                 }
             },
+            camping: {
+                type: Object,
+                schema: {
+                    campWith: { type: String },
+                    canBringEquipment: { type: String },
+                    accessibilityNeeds: { type: String },
+                }
+            },
             created: { type: Date, required: true },
             updated: { type: Date, required: true },
         },
@@ -239,7 +266,7 @@ const schema = {
 }
 
 export interface ParticipantAttendanceType {
-    option?: string
+    option?: number
 }
 
 interface ParticipantFields {
@@ -251,14 +278,25 @@ interface ParticipantFields {
 interface ParticipantBasicType {
     basic: {
         name: string,
-        dob: Date
+        dob: Date,
+        email?: string,
     }
 }
 
 interface ParticipantKpType {
     kp: {
         diet: "omnivore" | "pescatarian" | "vegetarian" | "vegan",
-        details: string
+        details: string,
+        nuts: boolean,
+        gluten: boolean,
+        soya: boolean,
+        dairy: boolean,
+        egg: boolean,
+        pork: boolean,
+        chickpea: boolean,
+        diabetic: boolean,
+        preferences: string,
+        contactMe: boolean
     }
 }
 
@@ -271,6 +309,7 @@ interface ParticipantMedicalType {
 interface ParticipantConsentType {
     consent: {
         photo?: Boolean
+        sre?: Boolean
     }
 }
 
@@ -295,6 +334,7 @@ export interface LargeFeeEventType {
             description: string
             fees: number[]
         }>
+        regionalPrices: Record<string, number>
     }
 }
 

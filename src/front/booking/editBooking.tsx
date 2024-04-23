@@ -4,15 +4,17 @@ import { Navigate } from "react-router-dom";
 import { BookingForm } from "./form/form.js";
 import { JsonBookingType } from "../../lambda-common/onetable.js";
 import { SnackBarContext, SnackbarDataType } from "../app/toasts.js";
+import { PartialDeep } from "type-fest";
 
 export function EditBookingPage({ event, booking, user }) {
     const editBooking = useEditBooking(user, event)
     const deleteBooking = useDeleteBooking()
-    const [bookingData, setBookingData] = useState<Partial<JsonBookingType>>(booking)
+    const [bookingData, setBookingData] = useState<PartialDeep<JsonBookingType>>(booking)
     const setSnackbar = useContext(SnackBarContext)
 
     const submit = useCallback(() => {
         setBookingData(data => {
+            data.extraContacts = data.extraContacts?.filter(c => c.name && c.email)
             console.log(data)
             editBooking.mutate(data as JsonBookingType)
             return data

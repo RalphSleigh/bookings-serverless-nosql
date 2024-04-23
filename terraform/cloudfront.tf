@@ -127,9 +127,9 @@ resource "aws_cloudfront_origin_request_policy" "api_policy" {
     cookie_behavior = "all"
   }
   headers_config {
-    header_behavior = "whitelist"
+    header_behavior = "allExcept"
     headers {
-      items = ["User-Agent"]
+      items = ["Host"]
     }
   }
 

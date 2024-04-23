@@ -1,5 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { lambda_wrapper_raw } from '../../../lambda-common/lambda_wrappers.js'
+import { warm } from '../../../lambda-common/warmer.js';
 
 /**
  *
@@ -12,7 +13,9 @@ import { lambda_wrapper_raw } from '../../../lambda-common/lambda_wrappers.js'
  */
 
 export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => { //@ts-ignore
-    return lambda_wrapper_raw(async (config) => {
+    return lambda_wrapper_raw(event, async (config) => {
+
+        await warm(["function_auth_yahoo_callback"])
 
         const url = `https://api.login.yahoo.com/oauth2/request_auth?client_id=${config.YAHOO_CLIENT_ID}&redirect_uri=${config.BASE_URL}api/auth/yahoo/callback&response_type=code`
         return {
