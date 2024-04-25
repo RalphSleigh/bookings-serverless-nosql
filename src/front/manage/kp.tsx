@@ -34,7 +34,7 @@ export function Component() {
             KP = BasicKP
     }
 
-    return <KP event={event} bookings={bookings as RequiredDeep<JsonBookingWithExtraType[]>} />
+    return <KP event={event} bookings={bookings.filter(b => !b.deleted || displayDeleted) as RequiredDeep<JsonBookingWithExtraType[]>}/>
 }
 
 const BasicKP = ({ event, bookings }: { event: JsonEventType, bookings: JsonBookingWithExtraType[] }) => {

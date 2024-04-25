@@ -3,6 +3,7 @@ import { AgeGroup } from "./woodcraft.js";
 
 
 export type JsonParticipantWithExtraType = JsonParticipantType & {
+    dob: Date,
     age: number;
     ageGroup: AgeGroup;
     booking: JsonBookingWithExtraType

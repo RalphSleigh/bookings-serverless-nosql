@@ -45,6 +45,7 @@ abstract class Field {
     sortComparator(a: any, b: any) {
         if(a === undefined) return 1
         if(b === undefined) return -1
+        if(a instanceof Date && b instanceof Date) return b.getTime() - a.getTime()
         return a.toString().localeCompare(b.toString())
     }
 
@@ -101,9 +102,8 @@ class Age extends Field {
     }
 
     sortComparator(a: JsonParticipantWithExtraType | ParticipantType, b: JsonParticipantWithExtraType | ParticipantType) {
-        if('age' in a && 'age' in b) return a.age - b.age
-        const startDate = parseDate(this.event.startDate)!
-        return differenceInYears(startDate, parseDate(a.basic.dob)!)-differenceInYears(startDate, parseDate(b.basic.dob)!)
+        if('dob' in a && 'dob' in b) return b.dob.getTime() - a.dob.getTime()
+        return parseDate(b.basic.dob)!.getTime() - parseDate(a.basic.dob)!.getTime()
     }
 }
 
