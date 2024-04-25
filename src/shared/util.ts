@@ -11,8 +11,9 @@ export function parseDate(date: Date | string | undefined): Date | null {
 }
 
 const addComputedFieldToParticipant = (booking, startDate) => (p: JsonParticipantType): JsonParticipantWithExtraType => {
-    const age = differenceInYears(startDate, parseDate(p.basic.dob)!)
-    return {...p, age, ageGroup: getAgeGroup(age), booking}
+    const dateOfBirth = parseDate(p.basic.dob)
+    const age = differenceInYears(startDate, dateOfBirth!)
+    return {...p, dob: dateOfBirth!, age, ageGroup: getAgeGroup(age), booking}
 }
 
 export function addComputedFieldsToBookingsQueryResult(bookings: JsonBookingType[], event: JsonEventType): JsonBookingWithExtraType[] {

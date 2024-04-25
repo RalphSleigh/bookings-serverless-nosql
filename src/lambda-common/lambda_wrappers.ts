@@ -123,7 +123,7 @@ export async function lambda_wrapper_raw(lambda_event, handler: (config: ConfigT
         const client = new SNSClient({});
         const input = { // PublishInput
             TopicArn: process.env.SNS_QUEUE_ARN,
-            Message: JSON.stringify(e), // required  
+            Message: JSON.stringify(serializeError(e)), // required  
         }
         const command = new PublishCommand(input);
         const response = await client.send(command);
