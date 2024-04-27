@@ -1,4 +1,4 @@
-import { GridColDef } from "@mui/x-data-grid";
+import { GridColDef, GridColumnVisibilityModel } from "@mui/x-data-grid";
 import { BookingType, JsonBookingType, JsonEventType, JsonUserResponseType, OnetableEventType, UserWithRoles } from "../lambda-common/onetable.js";
 import { ReactNode } from 'react';
 import React from "react";
@@ -9,7 +9,7 @@ abstract class Field {
     fieldName: string = ""
     roles: string[] = ["Owner", "Manage", "View", "Money", "KP"]
     defaultValue: string = "N/A"
-   
+
     enabledCSV: boolean = true
     visbileMobile: boolean = true
     visibleDesktop: boolean = true
@@ -218,7 +218,7 @@ export class BookingFields {
         event.customQuestions?.forEach((q, i) => {
             this.fields.push(new CustomQuestionText(q, i, event))
         })
-        
+
         this.fields.push(new EditLink(event))
         this.fields.push(new Deleted(event))
     }
@@ -233,5 +233,12 @@ export class BookingFields {
 
     getCSVValues(booking: JsonBookingType | BookingType, user) {
         return this.fields.filter(f => f.enabledCSV && f.enabled() && f.permission(user)).map(f => f.csvCellValue(booking))
+    }
+
+    getDefaultColumnVisibility(): GridColumnVisibilityModel {
+        return this.fields.reduce((acc, f) => {
+            acc[f.fieldName] = true
+            return acc
+        }, {})
     }
 }

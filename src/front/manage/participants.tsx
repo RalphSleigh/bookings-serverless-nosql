@@ -11,6 +11,7 @@ import { format } from "date-fns";
 import { stringify } from 'csv-stringify/browser/esm/sync';
 import save from 'save-file'
 import { parseDate } from "../../shared/util.js";
+import { useStickyState } from "../util.js";
 
 export function Component() {
     const { event, bookings, displayDeleted } = useOutletContext<managePageContext>()
@@ -27,7 +28,7 @@ export function Component() {
     const columns = fields.getColumnDefs(user)
 
     const [columnVisibilityModel, setColumnVisibilityModel] =
-        React.useState<GridColumnVisibilityModel>(fields.getDefaultColumnVisibility(user));
+        useStickyState<GridColumnVisibilityModel>(fields.getDefaultColumnVisibility(user), `paricipant-columns-${event.id}`);
 
     const rows = useMemo(() => participants.map((p, i) => {
         return { participant: p, id: i }

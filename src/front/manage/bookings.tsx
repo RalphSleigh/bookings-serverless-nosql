@@ -4,20 +4,26 @@ import { JsonEventType, JsonParticipantType, JsonUserResponseType } from "../../
 import { managePageContext } from "./managePage.js";
 import { Button, Grid, MenuItem, Modal, Paper, Typography } from "@mui/material";
 import { ParticipantFields } from "../../shared/participantFields.js";
-import { DataGrid, GridCallbackDetails, GridExportMenuItemProps, GridPrintExportMenuItem, GridRowParams, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarDensitySelector, GridToolbarExportContainer, GridToolbarFilterButton, MuiEvent } from "@mui/x-data-grid";
+import { DataGrid, GridCallbackDetails, GridColumnVisibilityModel, GridExportMenuItemProps, GridPrintExportMenuItem, GridRowParams, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarDensitySelector, GridToolbarExportContainer, GridToolbarFilterButton, MuiEvent } from "@mui/x-data-grid";
 import { JsonBookingWithExtraType, JsonParticipantWithExtraType } from "../../shared/computedDataTypes.js";
 import { UserContext } from "../user/userContext.js";
 import { BookingFields } from "../../shared/bookingFields.js";
 import { stringify } from 'csv-stringify/browser/esm/sync';
 import save from "save-file";
 import format from "date-fns/format";
+import { useStickyState } from "../util.js";
 
 export function Component() {
     const { event, bookings, displayDeleted } = useOutletContext<managePageContext>()
     const user = useContext(UserContext)!
     const [selectedBooking, setSelectedBooking] = React.useState<number | undefined>(undefined)
 
-    const columns = new BookingFields(event).getColumnDefs(user)
+    const fields = new BookingFields(event)
+
+    const columns = fields.getColumnDefs(user)
+
+    const [columnVisibilityModel, setColumnVisibilityModel] =
+    useStickyState<GridColumnVisibilityModel>(fields.getDefaultColumnVisibility(), `bookings-columns-${event.id}`);
 
     const rows = useMemo(() => bookings.filter(b => !b.deleted || displayDeleted).map((b, i) => {
         return { booking: b, id: i }
@@ -34,6 +40,9 @@ export function Component() {
             rows={rows}
             columns={columns}
             onRowClick={onRowClick}
+            columnVisibilityModel={columnVisibilityModel}
+                onColumnVisibilityModelChange={(newModel) =>
+                    setColumnVisibilityModel(newModel)}
             getRowClassName={(params) => `participant-row-deleted-${params.row.booking.deleted}`}
             slots={{ toolbar: CustomToolbar(() => saveCSV(event, user, bookings)) }} />
     </Grid>
