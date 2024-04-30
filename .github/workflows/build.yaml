@@ -6,6 +6,7 @@ on:
       - main
       - vcamp
       - ealing
+      - camp100
       
   workflow_dispatch:    
 
