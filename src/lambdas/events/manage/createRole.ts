@@ -15,8 +15,12 @@ export const lambdaHandler = lambda_wrapper_json(
         if (current_user && event) {
             CanCreateRole.throw({ user: current_user, event: event, role: lambda_event.body.role })
 
+            const targetUser = (await UserModel.scan()).find(u => u.id === lambda_event.body.role.userId)
+
+            if(!targetUser) throw new Error("Can't find user")
+
             if (event.bigCampMode) {
-                const targetUser = (await UserModel.scan()).find(u => u.id === lambda_event.body.role.userId)
+
                 if (!targetUser) throw new Error("Can't find user")
                 if (targetUser.source !== "google") throw new Error("User is not a Woodcraft GSuite account")
                 const auth_client = new auth.JWT(
@@ -45,7 +49,7 @@ export const lambdaHandler = lambda_wrapper_json(
             if(role.role !== "Book") {
                 await queueEmail({
                     template: "managerDataAccess",
-                    recipient: current_user,
+                    recipient: targetUser,
                     event: event as EventType,
                 }, config)
             }
