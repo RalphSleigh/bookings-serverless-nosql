@@ -4,6 +4,7 @@ import { EventType, RoleType, UserType, table } from '../../../lambda-common/one
 import { CanCreateRole } from '../../../shared/permissions.js';
 import { admin, auth } from '@googleapis/admin';
 import { queueEmail } from '../../../lambda-common/email.js';
+import { postToDiscord } from '../../../lambda-common/discord.js';
 
 const EventModel = table.getModel<EventType>('Event')
 const RoleModel: Model<RoleType> = table.getModel<RoleType>('Role')
@@ -52,6 +53,8 @@ export const lambdaHandler = lambda_wrapper_json(
                     recipient: targetUser,
                     event: event as EventType,
                 }, config)
+
+                await postToDiscord(config, `${current_user.userName} granted ${targetUser.userName} role ${role.role} for ${event.name}`)
             }
 
             return {}
