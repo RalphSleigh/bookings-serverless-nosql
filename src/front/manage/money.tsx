@@ -16,7 +16,8 @@ import { useBookingOperation, useAllUsersQuery } from "../queries.js";
 import { Close } from "@mui/icons-material";
 
 export function Component() {
-    const { event, bookings, displayDeleted } = useOutletContext<managePageContext>()
+    const { event, bookings: rawBookings, displayDeleted } = useOutletContext<managePageContext>()
+    const bookings = rawBookings.filter(b => !b.deleted)
     const allUsers = useAllUsersQuery(event.id).data.users
     const user = useContext(UserContext)!
     const [selectedBooking, setSelectedBooking] = React.useState<number | undefined>(undefined)

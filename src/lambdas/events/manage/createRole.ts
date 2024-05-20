@@ -4,6 +4,7 @@ import { EventType, RoleType, UserType, table } from '../../../lambda-common/one
 import { CanCreateRole } from '../../../shared/permissions.js';
 import { admin, auth } from '@googleapis/admin';
 import { queueEmail } from '../../../lambda-common/email.js';
+import { postToDiscord } from '../../../lambda-common/discord.js';
 
 const EventModel = table.getModel<EventType>('Event')
 const RoleModel: Model<RoleType> = table.getModel<RoleType>('Role')
@@ -15,8 +16,12 @@ export const lambdaHandler = lambda_wrapper_json(
         if (current_user && event) {
             CanCreateRole.throw({ user: current_user, event: event, role: lambda_event.body.role })
 
+            const targetUser = (await UserModel.scan()).find(u => u.id === lambda_event.body.role.userId)
+
+            if(!targetUser) throw new Error("Can't find user")
+
             if (event.bigCampMode) {
-                const targetUser = (await UserModel.scan()).find(u => u.id === lambda_event.body.role.userId)
+
                 if (!targetUser) throw new Error("Can't find user")
                 if (targetUser.source !== "google") throw new Error("User is not a Woodcraft GSuite account")
                 const auth_client = new auth.JWT(
@@ -45,9 +50,11 @@ export const lambdaHandler = lambda_wrapper_json(
             if(role.role !== "Book") {
                 await queueEmail({
                     template: "managerDataAccess",
-                    recipient: current_user,
+                    recipient: targetUser,
                     event: event as EventType,
                 }, config)
+
+                await postToDiscord(config, `${current_user.userName} granted ${targetUser.userName} role ${role.role} for ${event.name}`)
             }
 
             return {}
