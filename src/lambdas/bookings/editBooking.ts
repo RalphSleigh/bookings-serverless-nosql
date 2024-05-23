@@ -24,7 +24,7 @@ export const lambdaHandler = lambda_wrapper_json(
             const isOwnBooking = existingLatestBooking.userId === current_user.id
             const permissionData = { user: current_user, event: event, booking: existingLatestBooking }
             if (CanEditBooking.if(permissionData) || CanEditOwnBooking.if(permissionData)) {
-
+                console.log("BEGINNING EDIT BOOKING")
                 updateParticipantsDates(existingLatestBooking.participants, newData.participants)
                 delete newData.fees
 
@@ -38,6 +38,7 @@ export const lambdaHandler = lambda_wrapper_json(
 
                 console.log(`Edited booking ${newData.eventId}-${newData.userId}`);
                 if (isOwnBooking) {
+                    console.log("BEGINNING EMAIL")
                     await queueEmail({
                         template: "edited",
                         recipient: current_user,
@@ -45,6 +46,7 @@ export const lambdaHandler = lambda_wrapper_json(
                         booking: newLatest as BookingType,
                         bookingOwner: current_user,
                     }, config)
+                    console.log("END INDIVIUAL EMAIL BEGIN MANAGERS")
                     await queueManagerEmails({
                         template: "managerBookingUpdated",
                         recipient: current_user,
@@ -53,6 +55,7 @@ export const lambdaHandler = lambda_wrapper_json(
                         bookingOwner: current_user,
                     }, config)
 
+                    console.log("END EMAIL BEGIN DISCORD")
                     const existingLatestBookingDiscord = {...existingLatestBooking, participants: existingLatestBooking.participants.map(p => ({...p, name: p.basic.name}))}
                     //@ts-ignore
                     const newLatestBookingDiscord = {...newVersion, participants: newVersion.participants.map(p => ({...p, name: p.basic.name}))}
@@ -68,9 +71,12 @@ export const lambdaHandler = lambda_wrapper_json(
 
                     await postToDiscord(config, `${newVersion.basic.contactName} (${newVersion.basic.district}) edited their booking for event ${event.name}, they have booked ${newVersion.participants.length} people (previously ${existingLatestBooking.participants.length})`)
                     if (newVersion.participants.length === existingLatestBooking.participants.length) await postToDiscord(config, "```" + diffOutput + "```")
+                    console.log("END DISCORD")    
                 }
-
+                console.log("BEGINNING DRIVE SYNC")
                 await queueDriveSync(event.id, config)
+                console.log("END DRIVE SYNC")
+                console.log("END EDIT BOOKING")
                 return {};
             } else {
                 throw new PermissionError("User can't edit booking")
