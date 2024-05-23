@@ -36,7 +36,7 @@ export function EventList(props) {
         <Grid item xs={12} lg={10} xl={8}>
         <Grid container spacing={2} p={2}>
             {cards}
-            {manageCards.length > 0 ? <Typography variant="h5">Past Events</Typography> : null}
+            {manageCards.length > 0 ? <Typography sx={{mt: 2, ml: 2}}variant="h5">Past Events</Typography> : null}
             {manageCards}
         </Grid>
         <IfHasPermission permission={IsGlobalAdmin}>
