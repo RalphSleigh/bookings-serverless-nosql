@@ -60,7 +60,7 @@ export const lambdaHandler = lambda_wrapper_json(
                     //@ts-ignore
                     const newLatestBookingDiscord = {...newVersion, participants: newVersion.participants.map(p => ({...p, name: p.basic.name}))}
 
-                    const diffOutput = newLatestBookingDiscord.participants.length > 200 ? diffString(existingLatestBookingDiscord, newLatestBookingDiscord, { outputKeys: ['name'], color: false, maxElisions: 1, excludeKeys: ['created', 'updated', 'version'] })
+                    const diffOutput = newLatestBookingDiscord.participants.length < 200 ? diffString(existingLatestBookingDiscord, newLatestBookingDiscord, { outputKeys: ['name'], color: false, maxElisions: 1, excludeKeys: ['created', 'updated', 'version'] })
                         .split("\n")
                         .slice(1, -2)
                         .filter(s => !s.includes("entries)"))
