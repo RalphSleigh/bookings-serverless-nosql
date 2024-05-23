@@ -42,7 +42,7 @@ variable "lambda_definitions" {
     user_disable_drive_sync = {
       name   = "user_disable_drive_sync"
       code   = "user/disableDriveSync"
-      path   = "user/disable_drive_sync"
+      path   = "user/disableDriveSync"
       method = "post"
     },
     user_logout = {
