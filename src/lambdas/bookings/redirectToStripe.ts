@@ -51,7 +51,7 @@ export const lambdaHandler = lambda_wrapper_json(
                         currency: 'gbp',
                         product_data: {
                             name: `${event.name} booking for ${booking.basic.contactName}`,
-                            description: feeLines.map(f => f.description).join("\n") + `\m${fees.getPaymentReference(booking as JsonBookingType)}`,
+                            description: feeLines.map(f => f.description).join(", ") + `, ${fees.getPaymentReference(booking as JsonBookingType)}`,
                         },
                         unit_amount: totalOutstanding * 100,
                     },

@@ -176,6 +176,7 @@ export class Large extends FeeStructure {
 
         return (<>
             <Typography variant="body2" mt={2}>PLACEHOLDER: SOME TEXT ABOUT THE FEES SHOULD GO HERE? IDK BTW YOUR PAYMENT REFERENCE IS {this.getPaymentReference(booking as PartialDeep<JsonBookingType> & { userId: string })}</Typography>
+            <Typography variant="body2" mt={2}>NEW BUTTON BELOW TO PAY VIA STRIPE</Typography>
             <Button variant="contained" sx={{ mt: 2 }} onClick={() => window.location.href = `/api/event/${event.id}/redirectToStripe`}>Pay Now</Button>
             <TableContainer component={Paper} sx={{ mt: 2, p: 1 }}>
                 <Table size="small">
