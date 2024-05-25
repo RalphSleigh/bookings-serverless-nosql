@@ -1,6 +1,6 @@
 import React from "react";
 import Markdown from 'react-markdown'
-import { Grid, InputAdornment, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from "@mui/material";
+import { Button, Grid, InputAdornment, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from "@mui/material";
 import { FeeLine, FeeStructure } from "./feeStructure.js";
 import { BookingType, EalingFeeEventType, EventType, JsonBookingType, JsonEventType, JsonParticipantType, LargeFeeEventType, ParticipantType } from "../../lambda-common/onetable.js";
 import { differenceInYears, format } from "date-fns";
@@ -176,6 +176,7 @@ export class Large extends FeeStructure {
 
         return (<>
             <Typography variant="body2" mt={2}>PLACEHOLDER: SOME TEXT ABOUT THE FEES SHOULD GO HERE? IDK BTW YOUR PAYMENT REFERENCE IS {this.getPaymentReference(booking as PartialDeep<JsonBookingType> & { userId: string })}</Typography>
+            <Button variant="contained" sx={{ mt: 2 }} onClick={() => window.location.href = `/api/event/${event.id}/redirectToStripe`}>Pay Now</Button>
             <TableContainer component={Paper} sx={{ mt: 2, p: 1 }}>
                 <Table size="small">
                     <TableHead>

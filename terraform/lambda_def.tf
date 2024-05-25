@@ -377,6 +377,18 @@ variable "lambda_definitions" {
       path   = "event/{id}/getParticipantsFromSheet"
       method = "get"
     }
+    redirect_to_stripe = {
+      name   = "redirect_to_stripe"
+      code   = "bookings/redirectToStripe"
+      path   = "event/{id}/redirectToStripe"
+      method = "get"
+    }
+    stripe_webhook = {
+      name   = "stripe_webhook"
+      code   = "strpie/webhook"
+      path   = "stripe/webhook"
+      method = "post"
+    }
   }
 }
 

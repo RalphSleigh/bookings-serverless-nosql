@@ -22,6 +22,7 @@ Please include a sensible reference and drop [NAME](mailto:email) an email to le
 export class Ealing extends FeeStructure {
     public feeName = "Ealing"
     public supportedAttendanceStructures = [WholeAttendance]
+    public hasPaymentReference = false
 
     public ConfigurationElement = ({ data, update }: { data: Partial<JsonEventType["feeData"]>, update: any }) => {
 
@@ -218,6 +219,10 @@ export class Ealing extends FeeStructure {
     }
 
     public getValueLabels = () => (["Standard", "Discounted"])
+
+    public getPaymentReference(booking: PartialDeep<JsonBookingType> & { userId: string }){
+        return ""
+    }
 }
 
 const currency = c => c.toLocaleString(undefined, { style: "currency", currency: "GBP" })
