@@ -1,6 +1,6 @@
 import { Model } from 'dynamodb-onetable';
 import { lambda_wrapper_json } from '../../lambda-common/lambda_wrappers.js';
-import { BookingType, EventBookingTimelineType, EventType, OnetableBookingType, OnetableEventType, table } from '../../lambda-common/onetable.js';
+import { BookingType, EventBookingTimelineType, EventType, JsonBookingType, OnetableBookingType, OnetableEventType, table } from '../../lambda-common/onetable.js';
 import { CanEditBooking, CanEditEvent, CanEditOwnBooking, PermissionError } from '../../shared/permissions.js';
 import { updateParticipantsDates } from '../../lambda-common/util.js';
 import { queueDriveSync } from '../../lambda-common/drive_sync.js';
@@ -51,7 +51,7 @@ export const lambdaHandler = lambda_wrapper_json(
                         currency: 'gbp',
                         product_data: {
                             name: `${event.name} booking for ${booking.basic.contactName}`,
-                            description: feeLines.map(f => f.description).join("\n"),
+                            description: feeLines.map(f => f.description).join("\n") + `\m${fees.getPaymentReference(booking as JsonBookingType)}`,
                         },
                         unit_amount: totalOutstanding * 100,
                     },
