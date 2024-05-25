@@ -385,7 +385,7 @@ variable "lambda_definitions" {
     }
     stripe_webhook = {
       name   = "stripe_webhook"
-      code   = "strpie/webhook"
+      code   = "stripe/webhook"
       path   = "stripe/webhook"
       method = "post"
     }
