@@ -139,7 +139,7 @@ export async function createSheetForBooking(config: ConfigType, event: OnetableE
                             "columnIndex": 0
                         },
                         rows: [{
-                            values: ['Name', 'Email', 'Date of Birth', 'Attendance', 'Dietary Requirements', 'Dietary Details', 'Dietary Preferences', 'Nut Free', 'Gluten Free', 'Soya Free', 'Dairy Free', 'Egg Free', 'Pork Free', 'Chickpea Free', 'Diabetic', 'Complicated Needs - Contact Me', 'Photo Consent', 'RSE Consent (12+ only)', 'Medical Details'].map(v => { return { userEnteredValue: { stringValue: v } } })
+                            values: ['Name', 'Email', 'Date of Birth', 'Attendance', 'Dietary Requirements', 'Dietary Details', 'Dietary Preferences', 'Nut Free', 'Gluten Free', 'Soya Free', 'Dairy Free', 'Egg Free', 'Pork Free', 'Chickpea Free', 'Diabetic', 'Complicated Needs - Contact Me', 'Photo Consent', 'RSE Consent (12 - 17 only)', 'Medical Details'].map(v => { return { userEnteredValue: { stringValue: v } } })
                         }],
                         fields: "userEnteredValue.stringValue"
                     }
