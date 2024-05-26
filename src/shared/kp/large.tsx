@@ -94,7 +94,7 @@ export class Large implements KpStructure {
                     onChange={updateField('preferences')}
                     InputProps={{
                         endAdornment: <InputAdornment position="end">
-                            <Tooltip title={`Please only include dislikes and preferences that are important to you, e.g. "I really hate mushrooms`}>
+                            <Tooltip title={`Please only include dislikes and preferences that are important to you, e.g. "I really hate mushrooms"`}>
                                 <IconButton
                                     aria-label="toggle password visibility"
                                     edge="end"
