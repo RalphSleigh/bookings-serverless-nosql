@@ -245,7 +245,7 @@ export class Large extends FeeStructure {
                     </tr>))}
                 </tbody>
             </table>
-            <p>Total: {currency(this.getFeeLines(event, booking).reduce<number>((a,c) => a + c.values[0],0) + booking.fees?.filter(f => f.type === "adjustment").reduce<number>((a,c) => a + c.value ,0))}</p>
+            <p><b>Total: {currency(this.getFeeLines(event, booking).reduce<number>((a,c) => a + c.values[0],0) + booking.fees?.filter(f => f.type === "adjustment").reduce<number>((a,c) => a + c.value ,0))}</b></p>
         </>)
     }
 
