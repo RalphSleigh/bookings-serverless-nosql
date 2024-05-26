@@ -220,7 +220,7 @@ export class Ealing extends FeeStructure {
 
     public getValueLabels = () => (["Standard", "Discounted"])
 
-    public getPaymentReference(booking: PartialDeep<JsonBookingType> & { userId: string }){
+    public getPaymentReference(booking: (PartialDeep<JsonBookingType> | BookingType) & { userId: string }){
         return ""
     }
 

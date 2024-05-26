@@ -116,7 +116,7 @@ export class Large extends FeeStructure {
             for (const [band, item] of Object.entries(totals)) {
                 for (const [index, option] of Object.entries(item)) {
                     results.push({
-                        description: `${option.count} ${option.count == 1 ? 'Person' : 'People'} for the ${event.attendanceData!.options![index]} before ${option.band.description}`,
+                        description: `${option.count} ${option.count == 1 ? 'Person' : 'People'} for the ${event.attendanceData!.options![index]}`,
                         tooltip: `${format(option.band.beforeDate!, 'PPPp')}`,
                         values: [option.count * option.band.fees[index]]
                     })
@@ -177,10 +177,10 @@ export class Large extends FeeStructure {
 
         return (<>
 
-            <Typography variant="body2">Once you have submitted your booking you will be sent an invoice via email. <br />
+<Typography mt={2} variant="body1">Once you have submitted your booking you will be sent an invoice via email. <br />
                 Please note your booking is only secure after you have paid 50% of your camp fees. The deposit is non-refundable but will be taken out of your group’s remaining balance.
             </Typography>
-            <Typography variant="body2">You need to have paid the remaining balance for your group by 10 June 2025 but please make payments as soon as your group can afford to.<br />
+            <Typography mt={2} variant="body1">You need to have paid the remaining balance for your group by 10 June 2025 but please make payments as soon as your group can afford to.<br />
                 Link to payment policy /how to pay doc<br />
                 YOUR PAYMENT REFERENCE IS {this.getPaymentReference(booking as PartialDeep<JsonBookingType> & { userId: string })} - please use this reference for all payments.
             </Typography >
@@ -228,25 +228,30 @@ export class Large extends FeeStructure {
             <table>
                 <thead>
                     <tr>
+                        <th>Detail of product:</th>
                         <th></th>
-                        {valueHeaders}
                     </tr>
                 </thead>
                 <tbody>
                     {this.getFeeLines(event, booking).map((row, i) => (
                         <tr key={i}>
-                            <td>My Booking: {row.description}</td>
+                            <td>{row.description}</td>
                             {row.values.map((v, i) => <td key={i}>{currency(v)}</td>)}
                         </tr>
                     ))}
+                    {booking.fees?.filter(f => f.type === "adjustment").map((f, i) => (<tr key={i}>
+                        <td>{f.description}</td>
+                        <td>{currency(f.value)}</td>
+                    </tr>))}
                 </tbody>
             </table>
+            <p>Total: {currency(this.getFeeLines(event, booking).reduce<number>((a,c) => a + c.values[0],0) + booking.fees?.filter(f => f.type === "adjustment").reduce<number>((a,c) => a + c.value ,0))}</p>
         </>)
     }
 
     public getValueLabels = () => (["Fee"])
 
-    public getPaymentReference(booking: PartialDeep<JsonBookingType> & { userId: string }) {
+    public getPaymentReference(booking: (PartialDeep<JsonBookingType> | BookingType) & { userId: string }) {
         return `C100-${booking.userId.toUpperCase().substring(0, 5)}`
     }
 
