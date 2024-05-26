@@ -36,4 +36,8 @@ export class Flat extends FeeStructure {
             <Typography variant="body2" mt={2}>Ok</Typography>
         </>)
     }
+
+    public StripeElement = ({ event }: { event: JsonEventType }) => {
+        return null
+    }
 }

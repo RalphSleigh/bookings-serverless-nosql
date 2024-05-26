@@ -35,6 +35,7 @@ export function ThanksPage({ event, booking, user }: { event: JsonEventType, boo
                     </TableContainer>
                     <Typography mt={2} variant="h5">Money</Typography>
                     <fee.DescriptionElement event={event} booking={booking} />
+                    <fee.StripeElement event={event} />
                     <Typography mt={2} variant="body1">If you have any questions, or need to get in touch for any reason please contact <a href={`mailto:${event.replyTo}`}>{event.replyTo}</a></Typography>
                 </Box>
             </Paper>

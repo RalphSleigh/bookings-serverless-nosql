@@ -223,6 +223,10 @@ export class Ealing extends FeeStructure {
     public getPaymentReference(booking: PartialDeep<JsonBookingType> & { userId: string }){
         return ""
     }
+
+    public StripeElement = ({ event }: { event: JsonEventType }) => {
+        return null
+    }
 }
 
 const currency = c => c.toLocaleString(undefined, { style: "currency", currency: "GBP" })

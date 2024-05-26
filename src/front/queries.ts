@@ -13,7 +13,7 @@ export function useEnv() {
     return useSuspenseQuery({
         queryKey: ['env'],
         queryFn: async () => (await axios.get("/api/env")).data
-    }) as QueryObserverSuccessResult<{ "env": string }>;
+    }) as QueryObserverSuccessResult<{ "env": string, "stripe": boolean }>;
 }
 
 export const userQuery = {

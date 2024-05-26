@@ -13,6 +13,8 @@ import { lambda_wrapper_json } from '../../lambda-common/lambda_wrappers.js'
 
 export const lambdaHandler = lambda_wrapper_json(
     async (lambda_event, config, current_user) => {
-        return { env: config.ENV };
+        return { env: config.ENV,
+                 stripe: !!config.STRIPE_SECRET_KEY,
+         };
     }
 )
