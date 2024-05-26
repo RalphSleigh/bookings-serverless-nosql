@@ -42,7 +42,7 @@ variable "lambda_definitions" {
     user_disable_drive_sync = {
       name   = "user_disable_drive_sync"
       code   = "user/disableDriveSync"
-      path   = "user/disable_drive_sync"
+      path   = "user/disableDriveSync"
       method = "post"
     },
     user_logout = {
@@ -376,6 +376,18 @@ variable "lambda_definitions" {
       code   = "bookings/getParticipantsFromSheet"
       path   = "event/{id}/getParticipantsFromSheet"
       method = "get"
+    }
+    redirect_to_stripe = {
+      name   = "redirect_to_stripe"
+      code   = "bookings/redirectToStripe"
+      path   = "event/{id}/redirectToStripe"
+      method = "get"
+    }
+    stripe_webhook = {
+      name   = "stripe_webhook"
+      code   = "stripe/webhook"
+      path   = "stripe/webhook"
+      method = "post"
     }
   }
 }

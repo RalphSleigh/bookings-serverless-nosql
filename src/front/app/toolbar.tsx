@@ -42,7 +42,7 @@ export function AppToolbar(props) {
             <IconButton sx={{ ml: 1 }} onClick={colourMode.toggleColorMode} color="inherit">
                 {theme.palette.mode === 'dark' ? <Brightness7 /> : <Brightness4 />}
             </IconButton>
-            {env === "dev" ? <><IconButton sx={{ ml: 1 }} onClick={() => { throw ("BOOM (event handler)") }} color="inherit">
+            {env.env === "dev" ? <><IconButton sx={{ ml: 1 }} onClick={() => { throw ("BOOM (event handler)") }} color="inherit">
                 <BugReport color="warning" />
             </IconButton>
                 <IconButton sx={{ ml: 1 }} onClick={() => { setError(true) }} color="inherit">

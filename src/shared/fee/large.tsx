@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useContext } from "react";
 import Markdown from 'react-markdown'
-import { Grid, InputAdornment, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from "@mui/material";
+import { Button, Grid, InputAdornment, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from "@mui/material";
 import { FeeLine, FeeStructure } from "./feeStructure.js";
 import { BookingType, EalingFeeEventType, EventType, JsonBookingType, JsonEventType, JsonParticipantType, LargeFeeEventType, ParticipantType } from "../../lambda-common/onetable.js";
 import { differenceInYears, format } from "date-fns";
@@ -11,6 +11,7 @@ import { OptionsAttendance } from "../attendance/options.js";
 import { DateTimePicker } from '@mui/x-date-pickers'
 import { JsonBookingWithExtraType } from "../computedDataTypes.js";
 import { organisations } from "../ifm.js";
+import { EnvContext } from "../../front/app/envContext.js";
 
 const paymentInstructions = `Please make bank transfers to:  
 
@@ -37,16 +38,16 @@ export class Large extends FeeStructure {
         })
 
         const regionItems = organisations.reduce((acc, org) => {
-            if(!(acc.includes(org[1])))acc.push(org[1])
+            if (!(acc.includes(org[1]))) acc.push(org[1])
             return acc
-        },[]).map((r, i) => <TextField
+        }, []).map((r, i) => <TextField
             InputProps={{ startAdornment: <InputAdornment position="start">£</InputAdornment> }}
             key={i}
             fullWidth
             id="outlined-required"
             label={r}
             type="number" //@ts-ignore
-            value={data.regionalPrices?.[r] || ""} 
+            value={data.regionalPrices?.[r] || ""}
             onChange={updateField(r)} />)
 
         return <>
@@ -71,7 +72,7 @@ export class Large extends FeeStructure {
 
             const filterParticipants: (any) => any = p => p.basic && p.basic.name && p.basic.dob && p.attendance && typeof p.attendance.option == "number"
             const validateParticipant: (any) => ParticipantType = p => {
-                const newP = {...p, created: p.created ? parseDate(p.created) : new Date() }
+                const newP = { ...p, created: p.created ? parseDate(p.created) : new Date() }
                 newP.basic.dob = parseDate(newP.basic!.dob)
                 return newP
             }
@@ -103,19 +104,19 @@ export class Large extends FeeStructure {
             const results: FeeLine[] = []
 
             const region = organisations.find(o => o[0] === booking.basic?.organisation)?.[1]
-            if(region && feeData.regionalPrices && feeData.regionalPrices[region]){
+            if (region && feeData.regionalPrices && feeData.regionalPrices[region]) {
                 const price = feeData.regionalPrices[region]
                 const paying = validParticipants.length - free
                 if (free > 0) results.push({ description: `${free} Under 5s for free`, values: [0] })
                 if (paying > 0) results.push({ description: `${paying} ${paying == 1 ? 'Person' : 'People'} for the ${region} price`, values: [paying * price] })
                 return results
             }
- 
+
             if (free > 0) results.push({ description: `${free} Under 5s for free`, values: [0] })
             for (const [band, item] of Object.entries(totals)) {
                 for (const [index, option] of Object.entries(item)) {
                     results.push({
-                        description: `${option.count} ${option.count == 1 ? 'Person' : 'People'} for the ${event.attendanceData!.options![index]} before ${option.band.description}`,
+                        description: `${option.count} ${option.count == 1 ? 'Person' : 'People'} for the ${event.attendanceData!.options![index]}`,
                         tooltip: `${format(option.band.beforeDate!, 'PPPp')}`,
                         values: [option.count * option.band.fees[index]]
                     })
@@ -127,7 +128,7 @@ export class Large extends FeeStructure {
         }
     }
 
-    public DescriptionElement = ({ event, booking }: { event: JsonEventType, booking: PartialDeep<JsonBookingType>}) => {
+    public DescriptionElement = ({ event, booking }: { event: JsonEventType, booking: PartialDeep<JsonBookingType> }) => {
 
         const feeData = event.feeData as EalingFeeEventType["feeData"]
         const valueHeaders = this.getValueLabels().map((l, i) => <TableCell component="th" key={i}><b>{l}</b></TableCell>)
@@ -175,7 +176,15 @@ export class Large extends FeeStructure {
         })
 
         return (<>
-            <Typography variant="body2" mt={2}>PLACEHOLDER: SOME TEXT ABOUT THE FEES SHOULD GO HERE? IDK BTW YOUR PAYMENT REFERENCE IS {this.getPaymentReference(booking as PartialDeep<JsonBookingType> & { userId: string })}</Typography>
+
+<Typography mt={2} variant="body1">Once you have submitted your booking you will be sent an invoice via email. <br />
+                Please note your booking is only secure after you have paid 50% of your camp fees. The deposit is non-refundable but will be taken out of your group’s remaining balance.
+            </Typography>
+            <Typography mt={2} variant="body1">You need to have paid the remaining balance for your group by 10 June 2025 but please make payments as soon as your group can afford to.<br />
+                Link to payment policy /how to pay doc<br />
+                YOUR PAYMENT REFERENCE IS {this.getPaymentReference(booking as PartialDeep<JsonBookingType> & { userId: string })} - please use this reference for all payments.
+            </Typography >
+
             <TableContainer component={Paper} sx={{ mt: 2, p: 1 }}>
                 <Table size="small">
                     <TableHead>
@@ -219,26 +228,40 @@ export class Large extends FeeStructure {
             <table>
                 <thead>
                     <tr>
+                        <th>Detail of product:</th>
                         <th></th>
-                        {valueHeaders}
                     </tr>
                 </thead>
                 <tbody>
                     {this.getFeeLines(event, booking).map((row, i) => (
                         <tr key={i}>
-                            <td>My Booking: {row.description}</td>
+                            <td>{row.description}</td>
                             {row.values.map((v, i) => <td key={i}>{currency(v)}</td>)}
                         </tr>
                     ))}
+                    {booking.fees?.filter(f => f.type === "adjustment").map((f, i) => (<tr key={i}>
+                        <td>{f.description}</td>
+                        <td>{currency(f.value)}</td>
+                    </tr>))}
                 </tbody>
             </table>
+            <p>Total: {currency(this.getFeeLines(event, booking).reduce<number>((a,c) => a + c.values[0],0) + booking.fees?.filter(f => f.type === "adjustment").reduce<number>((a,c) => a + c.value ,0))}</p>
         </>)
     }
 
     public getValueLabels = () => (["Fee"])
 
-    public getPaymentReference(booking: PartialDeep<JsonBookingType> & { userId: string }){
-        return `C100-${booking.userId.toUpperCase().substring(0,5)}`
+    public getPaymentReference(booking: (PartialDeep<JsonBookingType> | BookingType) & { userId: string }) {
+        return `C100-${booking.userId.toUpperCase().substring(0, 5)}`
+    }
+
+    public StripeElement = ({ event }: { event: JsonEventType }) => {
+        const env = useContext(EnvContext)
+        if (!env.stripe) return null
+        return <>
+            <Typography variant="body2" mt={2}>NEW BUTTON BELOW TO PAY VIA STRIPE</Typography>
+            <Button variant="contained" sx={{ mt: 2 }} onClick={() => window.location.href = `/api/event/${event.id}/redirectToStripe`}>Pay Now</Button>
+        </>
     }
 }
 

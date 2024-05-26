@@ -16,7 +16,8 @@ import { useBookingOperation, useAllUsersQuery } from "../queries.js";
 import { Close } from "@mui/icons-material";
 
 export function Component() {
-    const { event, bookings, displayDeleted } = useOutletContext<managePageContext>()
+    const { event, bookings: rawBookings, displayDeleted } = useOutletContext<managePageContext>()
+    const bookings = rawBookings.filter(b => !b.deleted)
     const allUsers = useAllUsersQuery(event.id).data.users
     const user = useContext(UserContext)!
     const [selectedBooking, setSelectedBooking] = React.useState<number | undefined>(undefined)
@@ -38,7 +39,7 @@ const MoneyTable = ({ event, bookings, onRowClick }: { event: JsonEventType, boo
     const fees = getFee(event)
     let totalPaid = 0
     const rows = bookings.filter(b => !b.deleted).map((b, i) => {
-        const rows = fees.getFeeLines(event, b).reduce<number[]>((a, c) => {
+        const row = fees.getFeeLines(event, b).reduce<number[]>((a, c) => {
             c.values.forEach((v, i) => {
                 if (a[i] === undefined) a[i] = 0
                 a[i] += v
@@ -49,18 +50,18 @@ const MoneyTable = ({ event, bookings, onRowClick }: { event: JsonEventType, boo
         }, fees.getValueLabels().map(() => 0))
 
         b.fees.filter(f => f.type === "adjustment").forEach(f => {
-            rows.forEach((v, i) => rows[i] += f.value)
+            row.forEach((v, i) => row[i] += f.value)
             totals.forEach((v, i) => totals[i] += f.value)
         })
 
         const paid = b.fees.filter(f => f.type === "payment").reduce((a, c) => a + c.value, 0)
         totalPaid += paid
-        const paidUp = paid >= rows[0]
+        const paidUp = row.filter(r => paid >= r).length > 0
 
         return <TableRow key={i} onClick={() => onRowClick(i)} hover>
             {fees.hasPaymentReference ? <TableCell>{fees.getPaymentReference(b)}</TableCell> : null}
             <TableCell>{event.bigCampMode ? b.basic.district : b.basic.contactName}</TableCell>
-            {rows.map((v, i) => <TableCell key={i}>{currency(v)}</TableCell>)}
+            {row.map((v, i) => <TableCell key={i}>{currency(v)}</TableCell>)}
             <TableCell>{currency(paid)} {paidUp ? '✅' : ''}</TableCell>
         </TableRow>
     })

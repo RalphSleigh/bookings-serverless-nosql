@@ -93,9 +93,10 @@ handlerSetup('/api/booking/delete', 'bookings/deletebooking', "POST")
 //handlerSetup('/api/booking/event/:id', 'bookings/event/handler')
 //handlerSetup('/api/booking/syncmax', 'bookings/syncmax/handler', "POST")
 
-handlerSetup('/api/event/:eventid/sheet', 'bookings/getBookingHasSheet')
-handlerSetup('/api/event/:eventid/createSheet', 'bookings/createSheetForBooking', "POST")
-handlerSetup('/api/event/:eventid/getParticipantsFromSheet', 'bookings/getParticipantsFromSheet')
+handlerSetup('/api/event/:id/sheet', 'bookings/getBookingHasSheet')
+handlerSetup('/api/event/:id/createSheet', 'bookings/createSheetForBooking', "POST")
+handlerSetup('/api/event/:id/getParticipantsFromSheet', 'bookings/getParticipantsFromSheet')
+handlerSetup('/api/event/:id/redirectToStripe', 'bookings/redirectToStripe')
 
 
 //handlerSetup('/api/village/create', 'village/create/handler', "POST")
@@ -134,6 +135,8 @@ handlerSetup('/api/auth/yahoo/callback', 'auth/yahoo/callback')
 
 handlerSetup('/api/auth/microsoft/redirect', 'auth/microsoft/redirect')
 handlerSetup('/api/auth/microsoft/callback', 'auth/microsoft/callback')
+
+handlerSetup('/api/stripe/webhook', 'stripe/webhook', "POST")
 
 handlerSetup('/api/error', 'error/reportError', "POST")
 

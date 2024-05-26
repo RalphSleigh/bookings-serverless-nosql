@@ -17,8 +17,13 @@ import { addComputedFieldsToBookingsQueryResult, parseDate } from "../../shared/
 export function EventList(props) {
     const { events } = useEvents().data
     const { bookings } = useUsersBookings().data
+    const user = useContext(UserContext)
 
-    const cards = events.sort((a, b) => (a.startDate < b.startDate) ? -1 : ((a.startDate > b.startDate) ? 1 : 0)).map(e => <EventCard event={e} key={e.id} booking={bookings.find(b => b.eventId === e.id)} />)
+    const futureEvents = events.filter(e => parseISO(e.endDate) > new Date())
+    const pastEventsCanManage = events.filter(e => parseISO(e.endDate) < new Date() && CanManageEvent.if({ event: e, user: user }))
+
+    const cards = futureEvents.sort((a, b) => (a.startDate < b.startDate) ? -1 : ((a.startDate > b.startDate) ? 1 : 0)).map(e => <EventCard event={e} key={e.id} booking={bookings.find(b => b.eventId === e.id)} />)
+    const manageCards = pastEventsCanManage.sort((a, b) => (a.startDate < b.startDate) ? -1 : ((a.startDate > b.startDate) ? 1 : 0)).map(e => <EventCard event={e} key={e.id} booking={bookings.find(b => b.eventId === e.id)} />)
 
     const fabStyle = {
         float: 'right',
@@ -31,6 +36,8 @@ export function EventList(props) {
         <Grid item xs={12} lg={10} xl={8}>
         <Grid container spacing={2} p={2}>
             {cards}
+            {manageCards.length > 0 ? <Typography sx={{mt: 2, ml: 2}}variant="h5">Past Events</Typography> : null}
+            {manageCards}
         </Grid>
         <IfHasPermission permission={IsGlobalAdmin}>
             <Fab sx={fabStyle} size="small" color="secondary" aria-label="add" href="/event/create">
@@ -112,5 +119,6 @@ function YourBooking({ event, booking }: { event: JsonEventType, booking: JsonBo
             </Table>
         </TableContainer>
         <fee.DescriptionElement event={event} booking={enhancedBooking} />
+        <fee.StripeElement event={event} />
     </>
 }
