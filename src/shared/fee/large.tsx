@@ -176,7 +176,14 @@ export class Large extends FeeStructure {
         })
 
         return (<>
-            <Typography variant="body2" mt={2}>PLACEHOLDER: SOME TEXT ABOUT THE FEES SHOULD GO HERE? IDK BTW YOUR PAYMENT REFERENCE IS {this.getPaymentReference(booking as PartialDeep<JsonBookingType> & { userId: string })}</Typography>
+
+            <Typography variant="body2">Once you have submitted your booking you will be sent an invoice via email. <br />
+                Please note your booking is only secure after you have paid 50% of your camp fees. The deposit is non-refundable but will be taken out of your group’s remaining balance.
+            </Typography>
+            <Typography variant="body2">You need to have paid the remaining balance for your group by 10 June 2025 but please make payments as soon as your group can afford to.<br />
+                Link to payment policy /how to pay doc<br />
+                YOUR PAYMENT REFERENCE IS {this.getPaymentReference(booking as PartialDeep<JsonBookingType> & { userId: string })} - please use this reference for all payments.
+            </Typography >
 
             <TableContainer component={Paper} sx={{ mt: 2, p: 1 }}>
                 <Table size="small">
