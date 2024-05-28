@@ -48,7 +48,7 @@ export const lambdaHandler = lambda_wrapper_json(
             }, config)
 
 
-            await postToDiscord(config, `Application recieved from ${application.name} (${application.email})`)
+            await postToDiscord(config, `Application recieved from ${application.name} (${application.email}) - ${application.bookingType === "group" ? application.district : "Indvidiual"}`)
 
             return {}
         } else {
