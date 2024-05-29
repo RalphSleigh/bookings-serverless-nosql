@@ -68,7 +68,7 @@ export const lambdaHandler = lambda_wrapper_json(
 
             await queueDriveSync(event.id, config)
 
-            await postToDiscord(config, `${newBooking.basic.contactName} (${newBooking.basic.district}) created a booking for event ${event.name}, they have booked ${booking.participants.length} people`)
+            await postToDiscord(config, `${newBooking.basic.contactName} (${newBooking.basic.district ? newBooking.basic.district : "Individual"}) created a booking for event ${event.name}, they have booked ${booking.participants.length} people`)
 
             return {}
         } else {
