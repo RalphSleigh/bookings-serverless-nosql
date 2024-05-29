@@ -24,6 +24,8 @@ export const lambdaHandler = async (lambda_event: APIGatewayProxyEvent): Promise
 
         if(event.type === 'payment_intent.succeeded'){
             const paymentIntent = event.data.object;
+            if(!paymentIntent.metadata.eventId || !paymentIntent.metadata.userId) return { statusCode: 200 }
+
             const booking = await BookingModel.get({ eventId: paymentIntent.metadata.eventId, userId: paymentIntent.metadata.userId, version: "latest" }) as BookingType
             if(booking){
                 const fees = [{ type: "payment", value: paymentIntent.amount_received/100, date: new Date().toISOString(), description: "Payment from Stripe", userId: paymentIntent.metadata.userId }] as Jsonify<OnetableBookingType["fees"][0]>[]
