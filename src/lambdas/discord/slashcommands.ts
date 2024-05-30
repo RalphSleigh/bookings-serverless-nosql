@@ -62,7 +62,7 @@ export const lambdaHandler = async (lambda_event: APIGatewayProxyEvent): Promise
 
         if (body.data.name === "bookingsopen") {
 
-            const result = formatDuration(intervalToDuration({ start: new Date(), end: new Date(2024, 6, 0, 0, 0, 0) }), { delimiter: ', ' }).replace("minutes,", "minutes and")
+            const result = formatDuration(intervalToDuration({ start: new Date(), end: new Date(2024, 6, 1, 0, 0, 0) }), { delimiter: ', ' }).replace("minutes,", "minutes and")
 
             return {
                 statusCode: 200, body: JSON.stringify({
