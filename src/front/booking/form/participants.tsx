@@ -215,10 +215,11 @@ function ParicipantMedicalForm({ index, event, data, update }: { index: number, 
             name={`${index}-participant-medical`}
             id={`${index}-participant-medical`}
             inputProps={{ 'data-form-type': 'other' }}
-            label="Please provide us with details of medical conditions, medication or additional needs:"
+            label="Medical conditions, medication or additional needs:"
             value={data.details || ''}
             onChange={updateField('details')}
         />
+        <Typography variant="body2" sx={{ mt: 2 }}>Please provide us with details of any accessibility requirements, this may include mobility issues, a requirement for power or other access requirements</Typography>
         <TextField
             autoComplete={`section-${index}-participant accessibility`}
             sx={{ mt: 2 }}
@@ -228,8 +229,7 @@ function ParicipantMedicalForm({ index, event, data, update }: { index: number, 
             name={`${index}-participant-accessibility`}
             id={`${index}-participant-accessibility`}
             inputProps={{ 'data-form-type': 'other' }}
-            label="Please provide us with details of any accessibility requirements:"
-            placeholder="This may include mobility issues, a requirement for power or other access requirements"
+            label="Accessibility requirements:"
             value={data.accessibility || ''}
             onChange={updateField('accessibility')}
             InputProps={event.bigCampMode ? {
