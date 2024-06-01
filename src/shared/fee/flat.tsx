@@ -37,7 +37,7 @@ export class Flat extends FeeStructure {
         </>)
     }
 
-    public StripeElement = ({ event }: { event: JsonEventType }) => {
+    public StripeElement = ({ event, booking }: { event: JsonEventType, booking: JsonBookingType}) => {
         return null
     }
 }

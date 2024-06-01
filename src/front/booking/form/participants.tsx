@@ -1,4 +1,4 @@
-import { Grid, Paper, TextField, Typography, Box, Button, FormControlLabel, Switch, IconButton, CardMedia, Divider, InputAdornment, Tooltip, Stack } from "@mui/material";
+import { Grid, Paper, TextField, Typography, Box, Button, FormControlLabel, Switch, IconButton, CardMedia, Divider, InputAdornment, Tooltip, Stack, Checkbox } from "@mui/material";
 import React, { useState } from "react";
 //import { validate } from "./validate.js";
 import { BookingType, JsonBookingType, JsonEventType, JsonParticipantType, UserType } from "../../../lambda-common/onetable.js";
@@ -147,11 +147,11 @@ function ParticipantForm({ index,
                     <kp.ParticipantFormElement index={index} data={participant.kp || {}} update={updateSubField('kp')} />
                 </Grid>
                 <Grid xs={12} item>
-                    <Divider />
+                    <Divider>Medical & Accessbility</Divider>
                     <ParicipantMedicalForm index={index} event={event} data={participant.medical || {}} update={updateSubField('medical')} />
                 </Grid>
                 <Grid xs={12} item>
-                    <Divider />
+                    <Divider>Consent</Divider>
                     <consent.ParticipantFormElement event={event} data={participant.consent || {}} basic={participant.basic || {}} update={updateSubField('consent')} />
                 </Grid>
                 {/*}Grid xs={12} item>
@@ -173,9 +173,10 @@ const MemoParticipantForm = React.memo(ParticipantForm)
 
 function ParicipantMedicalForm({ index, event, data, update }: { index: number, event: JsonEventType, data: any, update: any }) {
 
-    const { updateField } = getMemoUpdateFunctions(update)
+    const { updateField, updateSwitch } = getMemoUpdateFunctions(update)
 
-    return <>
+    if (!event.bigCampMode) {
+        return <>
         <TextField
             autoComplete={`section-${index}-participant medical`}
             sx={{ mt: 2 }}
@@ -185,7 +186,7 @@ function ParicipantMedicalForm({ index, event, data, update }: { index: number, 
             name={`${index}-participant-medical`}
             id={`${index}-participant-medical`}
             inputProps={{ 'data-form-type': 'other' }}
-            label="Additional medical information, medication taken or accessibility requirements:"
+            label="Please provide us with details of medical conditions, medication or additional needs:"
             value={data.details || ''}
             onChange={updateField('details')}
             InputProps={event.bigCampMode ? {
@@ -203,6 +204,51 @@ function ParicipantMedicalForm({ index, event, data, update }: { index: number, 
             } : {}}
         />
     </>
+    } else {
+    return <>
+        <TextField
+            autoComplete={`section-${index}-participant medical`}
+            sx={{ mt: 2 }}
+            multiline
+            fullWidth
+            minRows={2}
+            name={`${index}-participant-medical`}
+            id={`${index}-participant-medical`}
+            inputProps={{ 'data-form-type': 'other' }}
+            label="Please provide us with details of medical conditions, medication or additional needs:"
+            value={data.details || ''}
+            onChange={updateField('details')}
+        />
+        <TextField
+            autoComplete={`section-${index}-participant accessibility`}
+            sx={{ mt: 2 }}
+            multiline
+            fullWidth
+            minRows={2}
+            name={`${index}-participant-accessibility`}
+            id={`${index}-participant-accessibility`}
+            inputProps={{ 'data-form-type': 'other' }}
+            label="Please provide us with details of any accessibility requirements:"
+            placeholder="This may include mobility issues, a requirement for power or other access requirements"
+            value={data.accessibility || ''}
+            onChange={updateField('accessibility')}
+            InputProps={event.bigCampMode ? {
+                endAdornment: <InputAdornment position="end">
+                    <Tooltip title={`This is so we can best support all campers throughout Camp 100`}>
+                        <IconButton
+                            aria-label="help tooltip"
+                            edge="end"
+                        >
+                            <HelpOutline />
+                        </IconButton>
+                    </Tooltip>
+                </InputAdornment>,
+                sx: { alignItems: "flex-start" }
+            } : {}}
+        />
+        <FormControlLabel checked={data.contactMe || false} onChange={updateSwitch('contactMe')} control={<Checkbox />} label="I would like to talk to the accessibility team about my accessibility requirements" />
+    </>
+    }
 }
 
 const EmailField = ({ index, email, dob, event, update }: { index: number, email: Partial<Required<JsonParticipantType>["basic"]>["email"], dob: string | undefined, event: JsonEventType, update: any }) => {

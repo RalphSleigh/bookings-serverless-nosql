@@ -303,6 +303,8 @@ interface ParticipantKpType {
 interface ParticipantMedicalType {
     medical: {
         details: string | undefined
+        accessibility: string | undefined
+        contactMe: boolean | undefined
     }
 }
 

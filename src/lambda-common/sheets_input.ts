@@ -139,7 +139,7 @@ export async function createSheetForBooking(config: ConfigType, event: OnetableE
                             "columnIndex": 0
                         },
                         rows: [{
-                            values: ['Name', 'Email', 'Date of Birth', 'Attendance', 'Dietary Requirements', 'Dietary Details', 'Dietary Preferences', 'Nut Free', 'Gluten Free', 'Soya Free', 'Dairy Free', 'Egg Free', 'Pork Free', 'Chickpea Free', 'Diabetic', 'Complicated Needs - Contact Me', 'Photo Consent', 'RSE Consent (12 - 17 only)', 'Medical Details'].map(v => { return { userEnteredValue: { stringValue: v } } })
+                            values: ['Name', 'Email', 'Date of Birth', 'Attendance', 'Dietary Requirements', 'Dietary Details', 'Dietary Preferences', 'Nut Free', 'Gluten Free', 'Soya Free', 'Dairy Free', 'Egg Free', 'Pork Free', 'Chickpea Free', 'Diabetic', 'Complicated Needs - Contact Me', 'Photo Consent', 'RSE Consent (12 - 17 only)', 'Medical Details', "Accessbility Details", "Accessbility Contact Me"].map(v => { return { userEnteredValue: { stringValue: v } } })
                         }],
                         fields: "userEnteredValue.stringValue"
                     }
@@ -212,6 +212,18 @@ export async function createSheetForBooking(config: ConfigType, event: OnetableE
                             "startRowIndex": 1,
                             "startColumnIndex": 16,
                             "endColumnIndex": 18
+                        },
+                        cell: { dataValidation: { condition: { type: "ONE_OF_LIST", values: [{ userEnteredValue: "Yes" }, { userEnteredValue: "No" }] }, showCustomUi: true } },
+                        fields: "dataValidation"
+                    },
+                },
+                {
+                    repeatCell: {
+                        range: {
+                            "sheetId": 0,
+                            "startRowIndex": 1,
+                            "startColumnIndex": 20,
+                            "endColumnIndex": 21
                         },
                         cell: { dataValidation: { condition: { type: "ONE_OF_LIST", values: [{ userEnteredValue: "Yes" }, { userEnteredValue: "No" }] }, showCustomUi: true } },
                         fields: "dataValidation"
@@ -353,6 +365,8 @@ function getParticipantFromRow(row: NonNullable<sheets_v4.Schema$ValueRange["val
         },
         medical: {
             details: row[18] || "",
+            accessibility: row[19] || "",
+            contactMe: row[20] === "Yes"
         },
         consent: {}
     }
