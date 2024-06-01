@@ -249,15 +249,38 @@ export class Large extends FeeStructure {
         </>)
     }
 
+    getFeeRemaining(event: JsonEventType, booking: JsonBookingType): number {
+        const feeLines = this.getFeeLines(event, booking)
+
+        let totalOutstanding = 0
+
+        for (const feeLine of feeLines) {
+            totalOutstanding += feeLine.values[0]
+        }
+
+        for (const payment of booking.fees) {
+            if (payment.type === "payment") {
+                totalOutstanding -= payment.value
+            }
+            if (payment.type === "adjustment") {
+                totalOutstanding += payment.value
+            }
+        }
+        return totalOutstanding
+    }
+
     public getValueLabels = () => (["Fee"])
 
     public getPaymentReference(booking: (PartialDeep<JsonBookingType> | BookingType) & { userId: string }) {
         return `C100-${booking.userId.toUpperCase().substring(0, 5)}`
     }
 
-    public StripeElement = ({ event }: { event: JsonEventType }) => {
+    public StripeElement = ({ event, booking }: { event: JsonEventType, booking: JsonBookingType}) => {
         const env = useContext(EnvContext)
         if (!env.stripe) return null
+        if (booking.participants.length > 5) return null
+        const outstanding = this.getFeeRemaining(event, booking)
+        if(outstanding <= 0) return null
         return <>
             <Typography variant="body2" mt={2}>NEW BUTTON BELOW TO PAY VIA STRIPE</Typography>
             <Button variant="contained" sx={{ mt: 2 }} onClick={() => window.location.href = `/api/event/${event.id}/redirectToStripe`}>Pay Now</Button>

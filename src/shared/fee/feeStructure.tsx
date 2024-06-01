@@ -24,5 +24,5 @@ export abstract class FeeStructure {
     public abstract EmailElement: React.FC<{event: EventType, booking: BookingType}>
     public abstract getValueLabels: () => string[]
     public abstract getPaymentReference(booking: (PartialDeep<JsonBookingType> | BookingType) & { userId: string }): string | undefined
-    public abstract StripeElement: React.FC<{event: JsonEventType, booking: PartialDeep<JsonBookingType>}>
+    public abstract StripeElement: React.FC<{event: JsonEventType, booking: JsonBookingType}>
 }

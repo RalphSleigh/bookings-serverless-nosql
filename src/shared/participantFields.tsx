@@ -372,6 +372,32 @@ class Medical extends Field {
     }
 }
 
+class Accessbility extends Field {
+    fieldName = "Accessbility"
+    visbileMobile = false
+    roles: Array<RoleType["role"]> = ["Owner", "Manage"]
+    defaultValue = ""
+    enabled(): boolean {
+        return this.event.bigCampMode
+    }
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.medical?.accessibility
+    }
+}
+
+class AccessbilityContactMe extends Field {
+    fieldName = "Medical"
+    visbileMobile = false
+    roles: Array<RoleType["role"]> = ["Owner", "Manage"]
+    defaultValue = ""
+    enabled(): boolean {
+        return this.event.bigCampMode
+    }
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.medical?.contactMe
+    }
+}
+
 class Created extends Field {
     fieldName = "Created"
     visbileMobile = false
@@ -434,6 +460,8 @@ export class ParticipantFields {
             new DietDiabetic(event),
             new DietContactMe(event),
             new Medical(event),
+            new Accessbility(event),
+            new AccessbilityContactMe(event),
             new PhotoConsent(event),
             new RSEConsent(event),
             new Created(event),
