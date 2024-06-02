@@ -27,7 +27,7 @@ export class Validation {
     validate(data: PartialDeep<JsonBookingType>, permission: Boolean): validationResults {
         const results: validationResults = []
         const bigCamp = this.event.bigCampMode
-
+        const emailSet = new Set()
 
         if (bigCamp) {
 
@@ -44,6 +44,7 @@ export class Validation {
 
         if (data.participants) data.participants.forEach((participant, i) => {
             results.push(...this.validateParticipant(participant, i))
+            emailSet.add(participant.basic?.email)
         })
 
         if (bigCamp && data.basic?.bookingType === "individual") {
@@ -56,6 +57,11 @@ export class Validation {
                 if (typeof (data.customQuestions?.[i]) !== "boolean") results.push(`Please answer question "${question.questionLabel}"`)
             }
         })
+
+        if (bigCamp && this.event.allParticipantEmails) {
+            const requiredUniqueEmails = Math.floor(Math.pow(Math.max(1, (data.participants?.length || 1) - 5), 0.75))
+            if (emailSet.size < requiredUniqueEmails) results.push(`You appear to have entered the same email address for multiple campers.`)
+        }
 
         if (permission !== true) results.push("Please tick the permission checkbox")
 

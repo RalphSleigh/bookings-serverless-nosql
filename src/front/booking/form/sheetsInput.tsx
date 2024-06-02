@@ -48,17 +48,18 @@ const SheetExistsState: React.FC<{ event: JsonEventType, sheet: drive_v3.Schema$
             const groups: Array<Array<JsonParticipantType>> = chunk(getParticipantsDataMutation.data.participants, 5)
             let oldParticipants
             update("participants")(p => {
-                oldParticipants = p
+                oldParticipants = p.filter(p => p.created)
                 return []
             })
 
             const handles = groups.map((g, i) => {
                 return setTimeout((i => () => {
                     update("participants")(p => {
-
                         const newParticipants = g.map((n, j) => {
-                            n.created = oldParticipants?.[(i * 10) + j]?.created
-                            n.updated = oldParticipants?.[(i * 10) + j]?.updated
+                            const existingByName = oldParticipants?.find(p => p.basic?.name === n.basic?.name)
+                            n.created = existingByName?.created
+                            n.updated = existingByName?.updated
+                            oldParticipants = oldParticipants?.filter(p => p.created !== existingByName?.created)
                             return n
                         })
 
