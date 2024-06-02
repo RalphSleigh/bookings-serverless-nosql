@@ -386,7 +386,7 @@ class Accessbility extends Field {
 }
 
 class AccessbilityContactMe extends Field {
-    fieldName = "Medical"
+    fieldName = "Accessbility Contact Me"
     visbileMobile = false
     roles: Array<RoleType["role"]> = ["Owner", "Manage"]
     defaultValue = ""
