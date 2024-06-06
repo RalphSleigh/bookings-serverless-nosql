@@ -143,10 +143,8 @@ function ParticipantForm({ index,
                         slotProps={{ field: { autoComplete: "off" } }}
                     />
                 </Grid>
-                <Grid xs={12} item>
-                    {emailAndOptionsAttendance}
-                </Grid>
-                {dob && differenceInYears(parseDate(event.startDate)!, parseDate(dob)!) < 18 ? <Grid xs={12} item>
+                {emailAndOptionsAttendance}
+                {dob && differenceInYears(parseDate(event.startDate)!, parseDate(dob)!) >= 18 ? <Grid xs={12} item>
                     <FormControlLabel checked={participant.medical?.firstAid || false} onChange={updateSwitch('firstAid')} control={<Checkbox />} label="First Aider (18+ only)" />
                 </Grid>
                     : null}
