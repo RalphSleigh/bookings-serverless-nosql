@@ -305,6 +305,7 @@ interface ParticipantMedicalType {
         details: string | undefined
         accessibility: string | undefined
         contactMe: boolean | undefined
+        firstAid?: boolean
     }
 }
 
