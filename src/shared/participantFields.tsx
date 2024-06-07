@@ -398,6 +398,19 @@ class AccessbilityContactMe extends Field {
     }
 }
 
+class FirstAid extends Field {
+    fieldName = "First Aid"
+    visbileMobile = false
+    roles: Array<RoleType["role"]> = ["Owner", "Manage"]
+    defaultValue = ""
+    enabled(): boolean {
+        return this.event.bigCampMode
+    }
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.medical?.firstAid
+    }
+}
+
 class Created extends Field {
     fieldName = "Created"
     visbileMobile = false
@@ -462,6 +475,7 @@ export class ParticipantFields {
             new Medical(event),
             new Accessbility(event),
             new AccessbilityContactMe(event),
+            new FirstAid(event),
             new PhotoConsent(event),
             new RSEConsent(event),
             new Created(event),
