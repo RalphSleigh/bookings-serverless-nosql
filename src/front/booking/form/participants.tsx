@@ -144,10 +144,6 @@ function ParticipantForm({ index,
                     />
                 </Grid>
                 {emailAndOptionsAttendance}
-                {dob && differenceInYears(parseDate(event.startDate)!, parseDate(dob)!) >= 18 ? <Grid xs={12} item>
-                    <FormControlLabel checked={participant.medical?.firstAid || false} onChange={updateSwitch('firstAid')} control={<Checkbox />} label="First Aider (18+ only)" />
-                </Grid>
-                    : null}
                 <Grid xs={12} item>
                     <Divider >Diet</Divider>
                     <kp.ParticipantFormElement index={index} data={participant.kp || {}} update={updateSubField('kp')} />
@@ -160,6 +156,10 @@ function ParticipantForm({ index,
                     <Divider>Consent</Divider>
                     <consent.ParticipantFormElement event={event} data={participant.consent || {}} basic={participant.basic || {}} update={updateSubField('consent')} />
                 </Grid>
+                {event.bigCampMode && dob && differenceInYears(parseDate(event.startDate)!, parseDate(dob)!) >= 18 ? <Grid xs={12} item>
+                    <FormControlLabel checked={participant.medical?.firstAid || false} onChange={updateSwitch('firstAid')} control={<Checkbox />} label="First Aider (18+ only)" />
+                </Grid>
+                    : null}
                 {/*}Grid xs={12} item>
                     <FormControlLabel control={<Switch checked={participant.consent?.photo as boolean || false} onChange={getMemoUpdateFunctions(updateSubField('consent')).updateSwitch('photo')} />} label="Photo Consent" />
 </Grid>*/}
