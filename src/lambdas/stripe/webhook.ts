@@ -36,7 +36,7 @@ export const lambdaHandler = async (lambda_event: APIGatewayProxyEvent): Promise
                                 substitutions: { emptyList: [], newFees: fees }
                             })
 
-                await postToDiscord(config, `Payment of £${paymentIntent.amount_received/100} received from booking ${booking.basic.contactName}`)
+                await postToDiscord(config, `Stripe payment of £${paymentIntent.amount_received/100} received from booking ${booking.basic.contactName}`)
             }
         }
         return { statusCode: 200 }
