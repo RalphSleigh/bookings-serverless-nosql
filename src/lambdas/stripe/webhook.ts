@@ -4,6 +4,7 @@ import { BookingType, EventBookingTimelineType, EventType, OnetableBookingType, 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { Jsonify } from 'type-fest';
 import Stripe from 'stripe';
+import { postToDiscord } from '../../lambda-common/discord.js';
 
 const BookingModel: Model<OnetableBookingType> = table.getModel<OnetableBookingType>('Booking')
 
@@ -34,6 +35,8 @@ export const lambdaHandler = async (lambda_event: APIGatewayProxyEvent): Promise
                                 set: { fees: 'list_append(if_not_exists(fees, @{emptyList}), @{newFees})' },
                                 substitutions: { emptyList: [], newFees: fees }
                             })
+
+                await postToDiscord(config, `Stripe payment of £${paymentIntent.amount_received/100} received from booking ${booking.basic.contactName} (${booking.basic.district ? booking.basic.district : "Individual"})`)
             }
         }
         return { statusCode: 200 }

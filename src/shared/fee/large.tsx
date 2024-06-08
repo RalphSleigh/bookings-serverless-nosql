@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import Markdown from 'react-markdown'
-import { Button, Grid, InputAdornment, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from "@mui/material";
+import { Box, Button, Grid, InputAdornment, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from "@mui/material";
 import { FeeLine, FeeStructure } from "./feeStructure.js";
 import { BookingType, EalingFeeEventType, EventType, JsonBookingType, JsonEventType, JsonParticipantType, LargeFeeEventType, ParticipantType } from "../../lambda-common/onetable.js";
 import { differenceInYears, format } from "date-fns";
@@ -278,12 +278,14 @@ export class Large extends FeeStructure {
     public StripeElement = ({ event, booking }: { event: JsonEventType, booking: JsonBookingType}) => {
         const env = useContext(EnvContext)
         if (!env.stripe) return null
-        if (booking.participants.length > 5) return null
+        if (booking.participants.length > 3) return null
         const outstanding = this.getFeeRemaining(event, booking)
         if(outstanding <= 0) return null
         return <>
-            <Typography variant="body2" mt={2}>NEW BUTTON BELOW TO PAY VIA STRIPE</Typography>
-            <Button variant="contained" sx={{ mt: 2 }} onClick={() => window.location.href = `/api/event/${event.id}/redirectToStripe`}>Pay Now</Button>
+        <Box display="flex" alignItems="center" sx={{mb:2}}>
+                <Typography variant="body2" mt={2} sx={{ flexGrow: 1, pr: 2, }}>As you are booking thee or fewer people you can pay by card now:</Typography>
+                <Button variant="contained" sx={{ mt: 2 }} onClick={() => window.location.href = `/api/event/${event.id}/redirectToStripe`}>Pay by card</Button>
+        </Box>
         </>
     }
 }
