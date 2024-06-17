@@ -27,8 +27,8 @@ export class Large implements KpStructure {
 
         return <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item sm={8} xs={12}>
-                <Typography variant="body1">Choose the diet you want on camp. Only choose Omni if you want to eat meat on camp.
-                    Camp is a great time to try out a veggy diet.
+                <Typography variant="body1">Choose the diet you want on camp. Only choose omnivore if you want to eat meat on camp.
+                    Camp is a great time to try out a vegetarian diet.
                 </Typography>
             </Grid>
             <Grid item sm={4} xs={12}>
