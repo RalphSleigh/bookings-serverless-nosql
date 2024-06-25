@@ -7,6 +7,7 @@ import { UserResponseType } from './onetable.js';
 import { PermissionError } from '../shared/permissions.js';
 import { PublishCommand, SNSClient } from '@aws-sdk/client-sns';
 import { is_warmer_event } from './warmer.js';
+import am_in_lambda from './am_in_lambda.js';
 
 export type LambdaJSONHandlerEvent = Pick<APIGatewayProxyEvent, Exclude<keyof APIGatewayProxyEvent, 'body'>> & {
     body: any
@@ -21,7 +22,7 @@ export function lambda_wrapper_json(
         try {
             const config = await get_config()
 
-            if(is_warmer_event(lambda_event)) {
+            if (is_warmer_event(lambda_event)) {
                 console.log("Evocation was a warmer event")
                 //@ts-ignore
                 return {}
@@ -83,13 +84,15 @@ export function lambda_wrapper_json(
             log(`General failure in ${context.functionName}`)
             log(e)
 
-            const client = new SNSClient({});
-            const input = { // PublishInput
-                TopicArn: process.env.SNS_QUEUE_ARN,
-                Message: JSON.stringify(e), // required  
+            if (am_in_lambda()) {
+                const client = new SNSClient({});
+                const input = { // PublishInput
+                    TopicArn: process.env.SNS_QUEUE_ARN,
+                    Message: JSON.stringify(e), // required  
+                }
+                const command = new PublishCommand(input);
+                const response = await client.send(command);
             }
-            const command = new PublishCommand(input);
-            const response = await client.send(command);
 
             return {
                 statusCode: 500,
@@ -107,7 +110,7 @@ export function lambda_wrapper_json(
 export async function lambda_wrapper_raw(lambda_event, handler: (config: ConfigType) => Promise<APIGatewayProxyResult>): Promise<APIGatewayProxyResult> {
     try {
         const config = await get_config()
-        if(is_warmer_event(lambda_event)) {
+        if (is_warmer_event(lambda_event)) {
             console.log("Evocation was a warmer event")
             //@ts-ignore
             return {}
@@ -118,15 +121,18 @@ export async function lambda_wrapper_raw(lambda_event, handler: (config: ConfigT
         return await handler(config)
     }
     catch (e) {
-        console.log(e)
+        console.log("General failure:")
+        console.log(serializeError(e))
 
-        const client = new SNSClient({});
-        const input = { // PublishInput
-            TopicArn: process.env.SNS_QUEUE_ARN,
-            Message: JSON.stringify(serializeError(e)), // required  
+        if (am_in_lambda()) {
+            const client = new SNSClient({});
+            const input = { // PublishInput
+                TopicArn: process.env.SNS_QUEUE_ARN,
+                Message: JSON.stringify(serializeError(e)), // required  
+            }
+            const command = new PublishCommand(input);
+            const response = await client.send(command);
         }
-        const command = new PublishCommand(input);
-        const response = await client.send(command);
 
         return {
             statusCode: 500,

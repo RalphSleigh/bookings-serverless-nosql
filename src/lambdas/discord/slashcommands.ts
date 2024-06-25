@@ -10,6 +10,8 @@ import { verify } from "discord-verify/node";
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { formatDuration, intervalToDuration } from 'date-fns';
 
+const EventModel: Model<OnetableEventType> = table.getModel<OnetableEventType>('Event')
+const BookingModel:Model<BookingType> = table.getModel<BookingType>('Booking')
 
 export const lambdaHandler = async (lambda_event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => { //@ts-ignore
     return lambda_wrapper_raw(lambda_event, async (config) => {
@@ -60,7 +62,7 @@ export const lambdaHandler = async (lambda_event: APIGatewayProxyEvent): Promise
 
         if (body.data.name === "bookingsopen") {
 
-            const result = formatDuration(intervalToDuration({ start: new Date(), end: new Date(2024, 6, 0, 0, 0, 0) }), { delimiter: ', ' }).replace("minutes,", "minutes and")
+            const result = formatDuration(intervalToDuration({ start: new Date(), end: new Date(2024, 6, 1, 0, 0, 0) }), { delimiter: ', ' }).replace("minutes,", "minutes and")
 
             return {
                 statusCode: 200, body: JSON.stringify({
@@ -68,6 +70,29 @@ export const lambdaHandler = async (lambda_event: APIGatewayProxyEvent): Promise
                     "data": {
                         "tts": false,
                         "content": `📝🧑‍💻🎟️  Bookings Open in ${result}!  🎟️🧑‍💻📝`,
+                        "embeds": [],
+                        "allowed_mentions": { "parse": [] }
+                    }
+                })
+            }
+        }
+
+        if (body.data.name === "booked") {
+
+
+            const event = (await EventModel.scan()).pop()
+            const bookings = await BookingModel.find({ sk: { begins: `event:${event!.id}:version:latest` } }) as BookingType[]
+
+            const filtered = bookings.filter(b => b.deleted === false)
+
+            const total = filtered.reduce((acc, b) => acc + b.participants.length, 0)
+
+            return {
+                statusCode: 200, body: JSON.stringify({
+                    "type": 4,
+                    "data": {
+                        "tts": false,
+                        "content": `⛺  ${total} people have booked for ${event!.name}!  ⛺`,
                         "embeds": [],
                         "allowed_mentions": { "parse": [] }
                     }

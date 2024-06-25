@@ -33,7 +33,7 @@ export const lambdaHandler = lambda_wrapper_json(
                         event: event as EventType,
                     }, config)
 
-                    await postToDiscord(config, `${current_user.userName} approved application from ${appliction.name} (${appliction.district})`)
+                    await postToDiscord(config, `${current_user.userName} approved application from ${appliction.name} (${appliction.district || "Individual"})`)
 
                     return { message: "Application Approved" }
                 case "declineApplication":

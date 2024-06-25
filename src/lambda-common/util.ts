@@ -1,23 +1,20 @@
 import _ from 'lodash';
-import { OnetableEventType, ParticipantType, RoleType, UserType, UserWithRoles, table } from './onetable.js';
+import { JsonParticipantType, OnetableEventType, ParticipantType, RoleType, UserType, UserWithRoles, table } from './onetable.js';
 //import { db } from './orm'
 
 const RoleModel = table.getModel<RoleType>('Role')
 const UserModel = table.getModel<UserType>('User')
 
-export function updateParticipantsDates(existing: Array<ParticipantType>, incoming: Array<ParticipantType>) {
+export function updateParticipantsDates(existing: Array<ParticipantType>, incoming: Array<JsonParticipantType>) {
     let now = new Date()
 
     incoming.forEach(p => {
-        p.created = p.created ? new Date(p.created) : now
-        p.updated = p.updated ? new Date(p.updated) : now
-
-        const unchanged = existing.find(old => _.isEqual(old, p))
-        if(unchanged === undefined) p.updated = now
+        const existingParticipant = existing.find(ep => ep.basic.name === p.basic.name && ep.created.toISOString() === p.created)
+        const updated = existingParticipant && !_.isEqual(p, existingParticipant)
+        p.created = existingParticipant ? existingParticipant.created.toISOString() : now.toISOString()
+        p.updated = !existingParticipant || updated ? now.toISOString() : existingParticipant.updated.toISOString()
         now = new Date(now.getTime() + 1)
     })
-
-
 }
 
 export async function getUsersWithRolesForEvent(event: OnetableEventType, rolesNames: Array<RoleType["role"]>): Promise<UserWithRoles[]> {

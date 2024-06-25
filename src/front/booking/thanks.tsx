@@ -19,27 +19,53 @@ export function ThanksPage({ event, booking, user }: { event: JsonEventType, boo
         <TableCell component="td">{capitalizeWord(p.kp?.diet!)}</TableCell>
     </TableRow>)
 
-    return <Grid container spacing={2} p={2}>
-        <Grid xs={12} item>
-            <Paper elevation={3}>
-                <Box p={2}>
-                    <Typography variant="h4">{`Thanks for booking for  ${event.name}`}</Typography>
-                    <Typography mt={2} variant="body1">You can come back and <Link to={`/event/${event.id}/edit-my-booking`}>edit</Link> your booking at any time before the deadline</Typography>
-                    <Typography mt={2} variant="h5">Campers booked</Typography>
-                    <TableContainer component={Paper} sx={{ mt: 2, p: 1 }}>
-                        <Table size="small">
-                            <TableBody>
-                                {people}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                    <Typography mt={2} variant="h5">Money</Typography>
-                    <fee.DescriptionElement event={event} booking={booking} />
-                    <Typography mt={2} variant="body1">If you have any questions, or need to get in touch for any reason please contact <a href={`mailto:${event.replyTo}`}>{event.replyTo}</a></Typography>
-                </Box>
-            </Paper>
+    if (event.bigCampMode) {
+        return <Grid container spacing={2} p={2}>
+            <Grid xs={12} item>
+                <Paper elevation={3}>
+                    <Box p={2}>
+                        <Typography variant="h4">{`Thanks for booking for  ${event.name}`}</Typography>
+                        <Typography mt={2} variant="body1">You can come back and <Link to={`/event/${event.id}/edit-my-booking`}>edit</Link> your booking at any time before 18 May 2025. After 18 May you will no longer be able to add new campers but will be able to edit details for those booked until the payment deadline of 10 June 2025.</Typography>
+                        <Typography mt={2} variant="h5">Campers booked</Typography>
+                        <TableContainer component={Paper} sx={{ mt: 2, p: 1 }}>
+                            <Table size="small">
+                                <TableBody>
+                                    {people}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                        <Typography mt={2} variant="h5">Pricing</Typography>
+                        <fee.DescriptionElement event={event} booking={booking} />
+                        <fee.StripeElement event={event} booking={booking}/>
+                        <Typography mt={2} variant="body1">If you have any questions, or need to get in touch for any reason please contact <a href={`mailto:${event.replyTo}`}>{event.replyTo}</a></Typography>
+                    </Box>
+                </Paper>
+            </Grid>
         </Grid>
-    </Grid>
+    } else {
+        return <Grid container spacing={2} p={2}>
+            <Grid xs={12} item>
+                <Paper elevation={3}>
+                    <Box p={2}>
+                        <Typography variant="h4">{`Thanks for booking for  ${event.name}`}</Typography>
+                        <Typography mt={2} variant="body1">You can come back and <Link to={`/event/${event.id}/edit-my-booking`}>edit</Link> your booking at any time before the deadline</Typography>
+                        <Typography mt={2} variant="h5">Campers booked</Typography>
+                        <TableContainer component={Paper} sx={{ mt: 2, p: 1 }}>
+                            <Table size="small">
+                                <TableBody>
+                                    {people}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                        <Typography mt={2} variant="h5">Pricing</Typography>
+                        <fee.DescriptionElement event={event} booking={booking} />
+                        <fee.StripeElement event={event} booking={booking}/>
+                        <Typography mt={2} variant="body1">If you have any questions, or need to get in touch for any reason please contact <a href={`mailto:${event.replyTo}`}>{event.replyTo}</a></Typography>
+                    </Box>
+                </Paper>
+            </Grid>
+        </Grid>
+    }
 }
 /*
 <h3>Thanks for booking for {event.name}</h3>

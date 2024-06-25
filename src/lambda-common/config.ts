@@ -29,6 +29,8 @@ export type ConfigType = {
   MICROSOFT_CLIENT_SECRET: string,
   YAHOO_CLIENT_ID: string,
   YAHOO_CLIENT_SECRET: string,
+  STRIPE_SECRET_KEY: string,
+  STRIPE_WEBHOOK_SECRET: string,
 }
 
 let configData: ConfigType

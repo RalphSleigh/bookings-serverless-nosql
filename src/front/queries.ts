@@ -13,7 +13,7 @@ export function useEnv() {
     return useSuspenseQuery({
         queryKey: ['env'],
         queryFn: async () => (await axios.get("/api/env")).data
-    }) as QueryObserverSuccessResult<{ "env": string }>;
+    }) as QueryObserverSuccessResult<{ "env": string, "stripe": boolean }>;
 }
 
 export const userQuery = {
@@ -152,7 +152,7 @@ export function useEditBooking(user, event) {
                     queryKey: ['manage']
                 })
                 setSnackbar({ message: "Booking Updated", severity: 'success' })
-                const target = user.id === variables.userId ? '/' : `/event/${event.id}/manage`
+                const target = user.id === variables.userId ? `/event/${event.id}/thanks` : `/event/${event.id}/manage`
                 navigate(target)
             },
             onError: snackbarError(setSnackbar)

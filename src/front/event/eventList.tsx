@@ -119,5 +119,6 @@ function YourBooking({ event, booking }: { event: JsonEventType, booking: JsonBo
             </Table>
         </TableContainer>
         <fee.DescriptionElement event={event} booking={enhancedBooking} />
+        <fee.StripeElement event={event} booking={booking}/>
     </>
 }
