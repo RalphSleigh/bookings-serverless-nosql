@@ -6,7 +6,7 @@ import { PartialDeep } from "type-fest"
 
 function bookingMoneySection({ fees, event, data }: { fees: FeeStructure, event: JsonEventType, data: PartialDeep<JsonBookingType> }) {
     return <>
-        <Typography variant="h6" mt={2}>Money</Typography>
+        <Typography variant="h6" mt={2}>Pricing</Typography>
         <fees.DescriptionElement event={event} booking={data} />
     </>
 }
