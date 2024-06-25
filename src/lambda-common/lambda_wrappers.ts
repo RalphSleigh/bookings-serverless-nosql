@@ -121,7 +121,8 @@ export async function lambda_wrapper_raw(lambda_event, handler: (config: ConfigT
         return await handler(config)
     }
     catch (e) {
-        console.log(e)
+        console.log("General failure:")
+        console.log(serializeError(e))
 
         if (am_in_lambda()) {
             const client = new SNSClient({});

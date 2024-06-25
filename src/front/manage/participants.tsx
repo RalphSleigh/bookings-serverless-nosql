@@ -12,6 +12,7 @@ import { stringify } from 'csv-stringify/browser/esm/sync';
 import save from 'save-file'
 import { parseDate } from "../../shared/util.js";
 import { useStickyState } from "../util.js";
+import { ageGroups, groupParticipants } from "../../shared/woodcraft.js";
 
 export function Component() {
     const { event, bookings, displayDeleted } = useOutletContext<managePageContext>()
@@ -38,9 +39,12 @@ export function Component() {
         setSelectedParticipant(params.row.id)
     }, [participants])
 
+    const totalsString = groupParticipants(participants, event).filter(g => g.participants.length > 0).map(g => `${g.group.name}: ${g.participants.length}`).join(", ")
+
     return <>
         <Grid xs={12} p={2} item>
             <ParticipantModal selectedParticipant={selectedParticipant} participant={typeof selectedParticipant == "number" ? participants[selectedParticipant] : undefined} handleClose={() => setSelectedParticipant(undefined)} />
+            <Typography variant="body1"><b>Total: {participants.length}</b> {totalsString}</Typography>
             <DataGrid
                 rowSelection={false}
                 pageSizeOptions={[100]}
