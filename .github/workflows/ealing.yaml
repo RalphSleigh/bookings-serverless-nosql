@@ -1,0 +1,20 @@
+name: Build Camp100
+
+on:
+  push:
+    branches:
+      - ealing
+      
+  workflow_dispatch:    
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build:
+    name: "Ealing - Build and Deploy"
+    uses: ./.github/workflows/build-reusable.yaml
+    secrets: inherit
+    with:
+      environment: ealing
