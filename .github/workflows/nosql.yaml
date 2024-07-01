@@ -1,0 +1,20 @@
+name: Build Main
+
+on:
+  push:
+    branches:
+      - main
+      
+  workflow_dispatch:    
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build:
+    name: Build and Deploy
+    uses: ./.github/workflows/build-reusable.yaml
+    secrets: inherit
+    with:
+      environment: nosql
