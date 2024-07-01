@@ -2,7 +2,11 @@ name: Build and Deploy
 
 on:
   workflow_call:
-
+    inputs:
+      environment:
+        required: true
+        type: string
+        
 permissions:
   id-token: write
   contents: read
@@ -15,6 +19,7 @@ jobs:
   build:
     name: Build and Deploy
     runs-on: ubuntu-latest
+    environment: {{ inputs.environment }}
     env:
       NODE_ENV: production
     
