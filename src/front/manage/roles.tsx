@@ -9,6 +9,9 @@ import { Avatar, Badge, Box, Button, FormControl, FormControlLabel, Grid, IconBu
 import { Close } from "@mui/icons-material";
 import { JsonUserType, RoleType } from "../../lambda-common/onetable.js";
 
+const manageRoles = ["Owner", "Manage", "View", "Money", "KP"]
+const bookRoles = ["Book"]
+
 export function Component() {
     const { event, bookings } = useOutletContext<managePageContext>()
     const [userData, roleData] = useSuspenseQueries<[allUsersQueryType, eventRolesQueryType]>({ queries: [allUsersQuery(event.id), eventRolesQuery(event.id)] })
@@ -28,8 +31,8 @@ export function Component() {
     };
 
     const submit = e => {
-        if(role === "") return
-        createRole.mutate({ eventId: event.id, userId, role})
+        if (role === "") return
+        createRole.mutate({ eventId: event.id, userId, role })
         e.preventDefault()
     }
 
@@ -55,10 +58,16 @@ export function Component() {
         { field: 'delete', headerName: 'Remove', renderCell: renderDeleteCell(deleteRoleHandler, deleteRole) }
     ];
 
-    const rows = useMemo(() => roleData.data!.roles.map(r => {
+    const manageRows = useMemo(() => roleData.data!.roles.filter(r => manageRoles.includes(r.role)).sort((a,b) => manageRoles.indexOf(a.role) - manageRoles.indexOf(b.role)).map(r => {
         const u = userData.data!.users.find(u => u.id === r.userId)!
         return { id: r.id, user: u, role: r.role, delete: r.id }
     }), [roleData])
+
+    const bookRows = useMemo(() => roleData.data!.roles.filter(r => bookRoles.includes(r.role)).sort((a,b) => bookRoles.indexOf(a.role) - bookRoles.indexOf(b.role)).map(r => {
+        const u = userData.data!.users.find(u => u.id === r.userId)!
+        return { id: r.id, user: u, role: r.role, delete: r.id }
+    }), [roleData])
+
 
     return <Grid container sx={{ mt: 1 }}>
         <Grid xs={4} p={1} item>
@@ -96,8 +105,11 @@ export function Component() {
         <Grid xs={4} p={1} item>
             <Button disabled={userId === "" || role === "" || createRole.isPending} variant="contained" sx={{ mt: 0.8 }} size="large" onClick={submit}>Add Role</Button>
         </Grid>
-        <Grid xs={12} p={1} item>
-            <DataGrid rowSelection={false} pageSizeOptions={[100]} rows={rows} columns={columns} />
+        <Grid  xs={12} p={1} item>
+            <DataGrid rowSelection={false} pageSizeOptions={[100]} rows={manageRows} columns={columns} />
+        </Grid>
+        <Grid  xs={12} p={1} item>
+            <DataGrid rowSelection={false} pageSizeOptions={[100]} rows={bookRows} columns={columns} />
         </Grid>
     </Grid>
 }
@@ -124,7 +136,7 @@ const userSortComparator = (a, b) => {
     return a.userName.localeCompare(b.userName)
 }
 
-const WoodcraftAvatar: React.FC<{user: JsonUserType}>  = props => {
+const WoodcraftAvatar: React.FC<{ user: JsonUserType }> = props => {
     const { user } = props
     return (user.isWoodcraft ?
         <Badge
