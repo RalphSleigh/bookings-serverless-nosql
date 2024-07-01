@@ -43,7 +43,7 @@ export function Component() {
 
     const userItems = userData.data?.users
     .filter(u => u.userName && u.email)
-    .sort((a,b) => a.userName && b.userName ? b.userName?.localeCompare(a.userName): 0)
+    .sort((a,b) => a.userName && b.userName ? a.userName?.localeCompare(b.userName) : 0)
     .map(u => {
         return <MenuItem key={u.id} value={u.id}>
             <Stack direction="row" spacing={1}>
