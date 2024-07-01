@@ -10,6 +10,6 @@ on:
 jobs:
   build:
     name: Build and Deploy
-    uses: .github/workflows/build-reusable.yaml@main
+    uses: ./.github/workflows/build-reusable.yaml
     with:
       environment: nosql
