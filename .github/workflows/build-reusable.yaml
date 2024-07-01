@@ -6,20 +6,23 @@ on:
       environment:
         required: true
         type: string
+    secrets:
+      AWS_ACCOUNT_ID:
+        required: true
         
 permissions:
   id-token: write
   contents: read
 
 concurrency: 
-  group: ${ {inputs.environment }}
+  group: ${{ inputs.environment }}
   cancel-in-progress: true
 
 jobs:
   build:
     name: Build and Deploy
     runs-on: ubuntu-latest
-    environment: {{ inputs.environment }}
+    environment: ${{ inputs.environment }}
     env:
       NODE_ENV: production
     
@@ -30,7 +33,7 @@ jobs:
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-role
+          role-to-assume: arn:aws:iam::${{ secrets.account_id }}:role/github-role
           role-session-name: terraform-session
           aws-region: eu-west-2
 
