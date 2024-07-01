@@ -8,10 +8,6 @@ on:
       confirm:
         required: true  
 
-permissions:
-  id-token: write
-  contents: read
-
 concurrency: 
   group: ${{ github.ref_name }}
   cancel-in-progress: true
