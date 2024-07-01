@@ -33,7 +33,7 @@ jobs:
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: arn:aws:iam::${{ secrets.account_id }}:role/github-role
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-role
           role-session-name: terraform-session
           aws-region: eu-west-2
 
