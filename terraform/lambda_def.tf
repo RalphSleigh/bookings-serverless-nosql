@@ -39,6 +39,12 @@ variable "lambda_definitions" {
       path   = "user/edit"
       method = "post"
     },
+    user_toggle_event_email = {
+      name   = "user_toggle_event_email"
+      code   = "user/toggleEventEmail"
+      path   = "user/toggleEventEmail"
+      method = "post"
+    },
     user_disable_drive_sync = {
       name   = "user_disable_drive_sync"
       code   = "user/disableDriveSync"

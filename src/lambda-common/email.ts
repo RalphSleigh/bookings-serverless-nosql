@@ -57,7 +57,11 @@ export async function queueEmail(data: EmailData, config: ConfigType) {
 export async function queueManagerEmails(data: EmailData, config: ConfigType) {
     const users = await getUsersWithRolesForEvent(data.event, ["Owner", "Manage"])
     for (const user of users) {
-        await queueEmail({ ...data, recipient: user }, config)
+        if (user.eventEmailNopeList && user.eventEmailNopeList.includes(data.event.id)) {
+            log(`Not sending email to ${user.email} as they have opted out of emails for this event`)
+        } else {
+            await queueEmail({ ...data, recipient: user }, config)
+        }
     }
     console.log(users)
 }
@@ -94,7 +98,7 @@ export async function sendEmail(data: EmailData, config: any) {
     try {
         const { recipient, event } = data
 
-        if(!recipient.email) {
+        if (!recipient.email) {
             console.log("no email address")
             return
         }
@@ -141,7 +145,7 @@ export async function sendEmail(data: EmailData, config: any) {
     } catch (e) {
         console.log("error in sendEmail")
         console.log(e)
-        if(am_in_lambda()) throw e // Only throw if we're in lambda, so it errors
+        if (am_in_lambda()) throw e // Only throw if we're in lambda, so it errors
     }
 }
 

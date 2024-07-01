@@ -1,30 +1,31 @@
 name: Build and Deploy
 
 on:
-  push:
-    branches:
-      - main
-      - vcamp
-      - ealing
-      - camp100
-      
-  workflow_dispatch:    
-
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+    secrets:
+      AWS_ACCOUNT_ID:
+        required: true
+        
 permissions:
   id-token: write
   contents: read
 
 concurrency: 
-  group: ${{ github.ref_name }}
+  group: ${{ inputs.environment }}
   cancel-in-progress: true
 
 jobs:
   build:
-    name: Build and Deploy
+    name: ${{ inputs.environment }} - Build and Deploy
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
     env:
       NODE_ENV: production
-      AWS_ACCOUNT_SECRET_KEY: ${{ github.ref_name }}_aws_account
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -32,7 +33,7 @@ jobs:
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: arn:aws:iam::${{ secrets[env.AWS_ACCOUNT_SECRET_KEY] }}:role/github-role
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-role
           role-session-name: terraform-session
           aws-region: eu-west-2
 
@@ -61,4 +62,4 @@ jobs:
       - name: terraform apply
         working-directory: terraform
         run: |
-          terraform apply -auto-approve
+          terraform apply -auto-approve -var-file="env/${{ inputs.environment }}.tfvars"

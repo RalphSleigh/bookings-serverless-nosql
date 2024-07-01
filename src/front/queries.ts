@@ -47,6 +47,23 @@ export function useEditUser() {
         });
 }
 
+export function useToggleEventEmail() {
+    const queryClient = useQueryClient()
+    const setSnackbar = useContext(SnackBarContext)
+    return useMutation<{ eventId: string, state: boolean }, any, { eventId: string, state: boolean }, any>(
+        {
+            mutationFn: async data => (await axios.post('/api/user/toggleEventEmail', { eventId: data.eventId, state: data.state })),
+            onSuccess: () => {
+                queryClient.invalidateQueries({
+                    queryKey: ['user']
+                })
+                setSnackbar({ message: "Preference Saved", severity: 'success' })
+            },
+
+            onError: snackbarError(setSnackbar)
+        });
+}
+
 export const eventsQuery = {
     queryKey: ['events'],
     queryFn: async () => (await axios.get("/api/events")).data
