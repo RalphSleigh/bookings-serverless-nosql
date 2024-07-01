@@ -8,7 +8,6 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { Avatar, AvatarGroup, Badge, Box, Button, FormControl, FormControlLabel, Grid, IconButton, InputLabel, MenuItem, Paper, Select, SelectChangeEvent, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography, useTheme } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import { JsonUserType, RoleType } from "../../lambda-common/onetable.js";
-import app from "../../frontold/app/index.js";
 
 export function Component() {
     const { event, bookings } = useOutletContext<managePageContext>()
