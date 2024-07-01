@@ -58,9 +58,11 @@ const MoneyTable = ({ event, bookings, onRowClick }: { event: JsonEventType, boo
         totalPaid += paid
         const paidUp = row.filter(r => paid >= r).length > 0
 
+        const contactName = event.bigCampMode ? b.basic.district ? b.basic.district : b.basic.contactName : b.basic.contactName
+
         return <TableRow key={i} onClick={() => onRowClick(i)} hover>
             {fees.hasPaymentReference ? <TableCell>{fees.getPaymentReference(b)}</TableCell> : null}
-            <TableCell>{event.bigCampMode ? b.basic.district : b.basic.contactName}</TableCell>
+            <TableCell>{contactName}</TableCell>
             {row.map((v, i) => <TableCell key={i}>{currency(v)}</TableCell>)}
             <TableCell>{currency(paid)} {paidUp ? '✅' : ''}</TableCell>
         </TableRow>
