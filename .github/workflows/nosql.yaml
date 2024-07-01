@@ -14,6 +14,6 @@ permissions:
 jobs:
   build:
     name: Build and Deploy
+    uses: ./.github/workflows/build-reusable.yaml
     environment: nosql
     secrets: inherit
-    uses: ./.github/workflows/build-reusable.yaml
