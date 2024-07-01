@@ -1,8 +1,8 @@
 resource "aws_dynamodb_table" "bookings_table" {
   name           = "Bookings"
   billing_mode   = "PROVISIONED"
-  read_capacity  = 15
-  write_capacity = 15
+  read_capacity  = var.dynamodb_read_default_capacity
+  write_capacity = var.dynamodb_write_default_capacity
   hash_key       = "pk"
   range_key      = "sk"
 
@@ -36,8 +36,8 @@ resource "aws_dynamodb_table" "bookings_table" {
 }
 
 resource "aws_appautoscaling_target" "bookings_table_read_target" {
-  max_capacity       = 20
-  min_capacity       = 15
+  min_capacity       = var.dyanmodb_read_min_capacity
+  max_capacity       = var.dynamodb_read_max_capacity
   resource_id        = "table/${aws_dynamodb_table.bookings_table.name}"
   scalable_dimension = "dynamodb:table:ReadCapacityUnits"
   service_namespace  = "dynamodb"
@@ -60,8 +60,8 @@ resource "aws_appautoscaling_policy" "bookings_table_read_policy" {
 }
 
 resource "aws_appautoscaling_target" "bookings_table_write_target" {
-  max_capacity       = 20
-  min_capacity       = 15
+  min_capacity       = var.dynamodb_write_min_capacity
+  max_capacity       = var.dynamodb_write_max_capacity
   resource_id        = "table/${aws_dynamodb_table.bookings_table.name}"
   scalable_dimension = "dynamodb:table:WriteCapacityUnits"
   service_namespace  = "dynamodb"
