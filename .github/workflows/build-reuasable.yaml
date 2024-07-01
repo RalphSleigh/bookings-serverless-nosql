@@ -1,15 +1,6 @@
 name: Build and Deploy
 
 on:
-  push:
-    branches:
-      - main
-      - vcamp
-      - ealing
-      - camp100
-      
-  workflow_dispatch:    
-
   workflow_call:
     inputs:
       environment:
