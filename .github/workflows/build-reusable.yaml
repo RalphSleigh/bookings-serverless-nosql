@@ -20,7 +20,7 @@ concurrency:
 
 jobs:
   build:
-    name: Build and Deploy
+    name: ${{ inputs.environment }} - Build and Deploy
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     env:

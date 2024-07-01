@@ -1,4 +1,4 @@
-name: Build Main
+name: Build Camp100
 
 on:
   push:
@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   build:
-    name: Build and Deploy
+    name: "Camp100 - Build and Deploy"
     uses: ./.github/workflows/build-reusable.yaml
     secrets: inherit
     with:

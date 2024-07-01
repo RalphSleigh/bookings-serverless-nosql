@@ -34,6 +34,7 @@ const schema = {
             email: { type: String },
             picture: { type: String },
             tokens: { type: Object },
+            eventEmailNopeList: { type: Array, items: { type: String }, required: true, default: [] },
             created: { type: Date },
             updated: { type: Date },
         },

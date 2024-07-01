@@ -2,7 +2,7 @@ import React, { useContext, useMemo } from "react";
 import { Outlet, useOutletContext, useResolvedPath, useLocation } from "react-router-dom";
 import { manageLoaderContext } from "./manageLoader.js";
 import { Box, Button, ButtonGroup, FormControlLabel, Grid, Link, Modal, Paper, Switch, Tab, Tabs, TextField, Typography } from "@mui/material";
-import { useDisableDriveSync, useEventBookings, useHistoricalEventBookings } from "../queries.js";
+import { useDisableDriveSync, useEventBookings, useHistoricalEventBookings, useToggleEventEmail } from "../queries.js";
 import { JsonBookingType, JsonEventType, JsonUserResponseType } from "../../lambda-common/onetable.js";
 import { SuspenseWrapper } from "../suspense.js";
 import { UserContext } from "../user/userContext.js";
@@ -19,6 +19,8 @@ export function Component() {
     const user = useContext(UserContext)!
 
     const location = useLocation()
+
+    const toggleEventEmail = useToggleEventEmail()
 
     const participantPath = useResolvedPath('participants')
     const bookingsPath = useResolvedPath('bookings')
@@ -40,6 +42,11 @@ export function Component() {
 
     const updateBookingSearch = e => {
         setBookingSearch(e.target.value)
+    }
+
+    const emailEnabled = !(user.eventEmailNopeList && user.eventEmailNopeList.includes(event.id))
+    const emailChange = () => {
+        toggleEventEmail.mutate({eventId: event.id, state: !emailEnabled})
     }
 
     const Loader = timeline.latest ? MemoLatestDataLoader : MemoTimeLineDataLoader
@@ -66,6 +73,7 @@ export function Component() {
             <TextField autoComplete="off" sx={{ mr: 1, mt: 1 }} size="small" margin="dense" label="Booking search" value={bookingSearch} onChange={updateBookingSearch} />
         </Grid>
             {displayAdvanced ? <Grid xs={12} item sx={{ displayPrint: "none" }}>
+                <FormControlLabel sx={{ float: "right" }} control={<Switch checked={emailEnabled} onChange={() => emailChange()} />} label="Email me notifications" />
                 <FormControlLabel sx={{ float: "right" }} control={<Switch checked={displayDeleted} onChange={() => setDisplayDeleted(!displayDeleted)} />} label="Show Cancelled" />
                 <SyncWidget user={user} />
                 <ButtonGroup variant="outlined" sx={{ mr: 1 }} aria-label="outlined button group">

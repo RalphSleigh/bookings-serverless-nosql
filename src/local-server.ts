@@ -64,6 +64,7 @@ handlerSetup('/api/env', 'env/getEnv')
 
 handlerSetup('/api/user', 'user/getUser')
 handlerSetup('/api/user/edit', 'user/edit', "POST")
+handlerSetup('/api/user/toggleEventEmail', 'user/toggleEventEmail', "POST")
 handlerSetup('/api/user/disableDriveSync', 'user/disableDriveSync', "POST")
 handlerSetup('/api/user/logout', 'user/logout')
 handlerSetup('/api/user/list/:eventId', 'user/listUsers')
