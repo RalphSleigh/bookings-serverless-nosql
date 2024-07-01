@@ -33,7 +33,7 @@ export function Component() {
         return <TableRow key={i}>
             <TableCell>{applicationTypeIcon(a.bookingType)}</TableCell>
             <TableCell>{a.name}</TableCell>
-            <TableCell>{a.email}</TableCell>
+            <TableCell><a href={`mailto:${a.email}`}>{a.email}</a></TableCell>
             <TableCell>{a.district}</TableCell>
             <TableCell>{a.predictedParticipants}</TableCell>
             <TableCell>
