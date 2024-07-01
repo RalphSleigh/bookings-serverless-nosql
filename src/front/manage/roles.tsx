@@ -41,7 +41,10 @@ export function Component() {
         e.preventDefault()
     }
 
-    const userItems = userData.data?.users.map(u => {
+    const userItems = userData.data?.users
+    .filter(u => u.userName && u.email)
+    .sort((a,b) => a.userName && b.userName ? a.userName?.localeCompare(b.userName) : 0)
+    .map(u => {
         return <MenuItem key={u.id} value={u.id}>
             <Stack direction="row" spacing={1}>
                 <WoodcraftAvatar user={u} />
