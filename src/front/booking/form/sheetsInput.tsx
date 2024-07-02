@@ -48,7 +48,7 @@ const SheetExistsState: React.FC<{ event: JsonEventType, sheet: drive_v3.Schema$
             const groups: Array<Array<JsonParticipantType>> = chunk(getParticipantsDataMutation.data.participants, 5)
             let oldParticipants
             update("participants")(p => {
-                oldParticipants = p.filter(p => p.created)
+                oldParticipants = (p || []).filter(p => p.created)
                 return []
             })
 
@@ -68,6 +68,8 @@ const SheetExistsState: React.FC<{ event: JsonEventType, sheet: drive_v3.Schema$
                     setImportProgress((i + 1) / groups.length * 100)
                 })(i), i * 500)
             })
+
+            if(handles.length == 0) setImportProgress(100)
 
             return () => {
                 handles.forEach(h => clearTimeout(h))
