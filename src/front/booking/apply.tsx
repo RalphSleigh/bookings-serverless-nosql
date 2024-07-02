@@ -7,7 +7,7 @@ import { CanBookIntoEvent } from "../../shared/permissions.js";
 import { BookingType, JsonApplicationType, JsonBookingType, JsonEventType, JsonUserResponseType, UserResponseType } from "../../lambda-common/onetable.js";
 import { SnackBarContext, SnackbarDataType } from "../app/toasts.js";
 import { PartialDeep } from "type-fest";
-import { Box, Button, Card, CardContent, Checkbox, Grid, Skeleton, TextField, Typography, useTheme } from "@mui/material";
+import { Alert, AlertTitle, Box, Button, Card, CardContent, Checkbox, Grid, Skeleton, TextField, Typography, useTheme } from "@mui/material";
 import { getMemoUpdateFunctions } from "../../shared/util.js";
 import { BorderColor, Send } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
@@ -64,8 +64,11 @@ export function CreateApplicationPage({ event, user }: { event: JsonEventType, u
                         <form>
                             <TextField autoComplete="name" name="name" id="name" inputProps={{'data-form-type': 'name'}} fullWidth sx={{ mt: 2 }} label="Name" value={applicationData.name || ''} onChange={updateField('name')} />
                             <TextField autoComplete="email" name="email" id="email" inputProps={{'data-form-type': 'phone'}} fullWidth sx={{ mt: 2 }} required label="Email" value={applicationData.email || ''} onChange={updateField('email')} />
-                            <TextField autoComplete="group" name="group" id="group" inputProps={{'data-form-type': 'other'}} fullWidth sx={{ mt: 2 }} required={applicationData.bookingType !== "individual"} label="Group/District" value={applicationData.district || ''} onChange={updateField('district')} />
+                            <TextField autoComplete="group" name="group" id="group" inputProps={{'data-form-type': 'other'}} fullWidth sx={{ mt: 2 }} required={applicationData.bookingType !== "individual"} label="Group/District" value={applicationData.district || ''} onChange={updateField('district')} />                      
                             <TextField autoComplete="predicted" name="predicted" id="predicted" fullWidth inputProps={{ inputMode: "numeric", "data-form-type": "other" }} sx={{ mt: 2 }} required label="Predicted Number of Campers" value={applicationData.predictedParticipants || ''} onChange={updateNumber('predictedParticipants')} />
+                            {applicationData.bookingType == "individual" && applicationData.predictedParticipants === 1 ? <Alert severity="warning" sx={{ mt: 2, pt: 2 }}>
+            <AlertTitle>If you are planning to camp with your Woodcraft Folk group or district please get in touch with and book though them. Only do this if you do not have a group you are planning on camping with.</AlertTitle>
+        </Alert> : null}
                             <LoadingButton
                                 sx={{ mt: 2 }}
                                 onClick={submit}
