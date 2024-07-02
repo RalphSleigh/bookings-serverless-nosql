@@ -20,7 +20,7 @@ export const lambdaHandler = lambda_wrapper_json(
             const operation: ApplicationOperationType = lambda_event.body.operation
             const appliction = await ApplicationModel.get({ eventId: event.id, userId: operation.userId })
             if (!appliction) throw new Error("Can't find application")
-            CanManageApplications.throw({ user: current_user, event: event })    
+            CanManageApplications.throw({ user: current_user, event: event })
             switch (operation.type) {
                 case "approveApplication":
                     const role = await RoleModel.create({ userId: operation.userId, eventId: event.id, role: "Book" })
@@ -38,7 +38,7 @@ export const lambdaHandler = lambda_wrapper_json(
                     return { message: "Application Approved" }
                 case "declineApplication":
                     await ApplicationModel.remove({ eventId: event.id, userId: operation.userId })
-                    
+
                     await postToDiscord(config, `${current_user.userName} declined application from ${appliction.name} (${appliction.district || "Individual"})`)
 
                     return { message: "Application Declined" }
