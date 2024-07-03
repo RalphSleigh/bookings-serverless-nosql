@@ -111,6 +111,7 @@ class Age extends Field {
             const existing = e.getApplyFilterFn
             const newFilter = (filterItem,column) => {
                 const filterFunction = existing(filterItem, column)
+                if(!filterFunction) return filterFunction
                 return function newFilterFunction(params) {
                     return filterFunction!({...params, value: params.value.dob})
                 }
@@ -152,8 +153,9 @@ class DisplayAge extends Field {
             const existing = e.getApplyFilterFn
             const newFilter = (filterItem,column) => {
                 const filterFunction = existing(filterItem, column)
+                if(!filterFunction) return filterFunction
                 return function newFilterFunction(params) {
-                    return filterFunction!({...params, value: params.value.dob})
+                    return filterFunction({...params, value: params.value.dob})
                 }
             }
             return {...e, getApplyFilterFn: newFilter}
