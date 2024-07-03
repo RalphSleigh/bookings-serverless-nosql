@@ -11,7 +11,7 @@ import { useMediaQuery, useTheme } from "@mui/material";
 abstract class Field {
     event: JsonEventType | OnetableEventType;
     abstract fieldName: string
-    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "Money", "KP"]
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "Money", "KP", "Comms"]
     defaultValue: string = "N/A"
 
     enabledCSV: boolean = true

@@ -75,7 +75,7 @@ export const CanEditEvent = new LoggedInPermission<"event">(data => {
 
 export const CanManageEvent = new LoggedInPermission<"event">(data => {
     if (IsGlobalAdmin.if(data)) return true
-    if (hasRoleOnEvent(data.user, data.event, ["Owner", "Manage", "View", "Money", "KP"])) return true
+    if (hasRoleOnEvent(data.user, data.event, ["Owner", "Manage", "View", "Money", "KP", "Comms"])) return true
     return false
 }, "User can't manage event")
 
@@ -132,6 +132,11 @@ export const CanSeeMoneyPage = new LoggedInPermission<"event">(data => {
     if (IsGlobalAdmin.if(data)) return true
     return hasRoleOnEvent(data.user, data.event, ["Owner", "Manage", "View", "Money"])
 }, "User can't see money page")
+
+export const CanSeeKPPage = new LoggedInPermission<"event">(data => {
+    if (IsGlobalAdmin.if(data)) return true
+    return hasRoleOnEvent(data.user, data.event, ["Owner", "Manage", "View", "KP"])
+}, "User can't see KP page")
 
 export const CanWriteMoney = new LoggedInPermission<"event">(data => {
     if (IsGlobalAdmin.if(data)) return true

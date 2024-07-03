@@ -9,7 +9,7 @@ import { Avatar, Badge, Box, Button, FormControl, FormControlLabel, Grid, IconBu
 import { Close } from "@mui/icons-material";
 import { JsonUserType, RoleType } from "../../lambda-common/onetable.js";
 
-const manageRoles = ["Owner", "Manage", "View", "Money", "KP"]
+const manageRoles = ["Owner", "Manage", "View", "Money", "KP", "Comms"]
 const bookRoles = ["Book"]
 
 export function Component() {
@@ -101,6 +101,7 @@ export function Component() {
                     <MenuItem value="View">View</MenuItem>
                     <MenuItem value="Money">Money</MenuItem>
                     <MenuItem value="KP">KP</MenuItem>
+                    <MenuItem value="Comms">Comms</MenuItem>
                     <MenuItem value="Book">Book</MenuItem>
                 </Select>
             </FormControl>

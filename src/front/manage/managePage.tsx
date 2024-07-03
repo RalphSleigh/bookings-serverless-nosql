@@ -6,7 +6,7 @@ import { useDisableDriveSync, useEventBookings, useHistoricalEventBookings, useT
 import { JsonBookingType, JsonEventType, JsonUserResponseType } from "../../lambda-common/onetable.js";
 import { SuspenseWrapper } from "../suspense.js";
 import { UserContext } from "../user/userContext.js";
-import { CanCreateAnyRole, CanManageApplications, CanSeeMoneyPage } from "../../shared/permissions.js";
+import { CanCreateAnyRole, CanManageApplications, CanSeeKPPage, CanSeeMoneyPage } from "../../shared/permissions.js";
 import { bookingsBookingSearch, bookingsParticipantSearch, useDebounceState, useStickyState } from "../util.js";
 import { JsonBookingWithExtraType } from "../../shared/computedDataTypes.js";
 import { ReactErrorBoundary } from "../app/errors.js";
@@ -26,6 +26,7 @@ export function Component() {
     const bookingsPath = useResolvedPath('bookings')
     const applicationsPath = useResolvedPath('applications')
     const kpPath = useResolvedPath('kp')
+    const emailsPath = useResolvedPath('emails')
     const rolesPath = useResolvedPath('roles')
     const moneyPath = useResolvedPath('money')
 
@@ -60,7 +61,8 @@ export function Component() {
                 <Tab label="Participants" value={participantPath.pathname} href={participantPath.pathname} component={Link} />
                 <Tab label="Bookings" value={bookingsPath.pathname} href={bookingsPath.pathname} component={Link} />
                 { event.applicationsRequired ? <PermissionTab user={user} event={event} permission={CanManageApplications} label="Applications" value={applicationsPath.pathname} href={applicationsPath.pathname} component={Link} /> : null }
-                <Tab label="KP" value={kpPath.pathname} href={kpPath.pathname} component={Link} />
+                <PermissionTab user={user} event={event} permission={CanSeeKPPage} label="KP" value={kpPath.pathname} href={kpPath.pathname} component={Link} />
+                <Tab label="Emails" value={emailsPath.pathname} href={emailsPath.pathname} component={Link} />
                 <PermissionTab user={user} event={event} permission={CanCreateAnyRole} label="Roles" value={rolesPath.pathname} href={rolesPath.pathname} component={Link} />
                 <PermissionTab user={user} event={event} permission={CanSeeMoneyPage} label="Money" value={moneyPath.pathname} href={moneyPath.pathname} component={Link} />
             </Tabs>
@@ -91,7 +93,7 @@ export function Component() {
 }
 
 function shouldShowSearch(location) {
-    return location.pathname.endsWith("manage") || location.pathname.endsWith("participants") || location.pathname.endsWith("bookings") || location.pathname.endsWith("kp")
+    return location.pathname.endsWith("manage") || location.pathname.endsWith("participants") || location.pathname.endsWith("bookings") || location.pathname.endsWith("kp") || location.pathname.endsWith("emails")
 }
 
 export type managePageContext = manageLoaderContext & {

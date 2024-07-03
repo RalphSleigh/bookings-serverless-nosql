@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 abstract class Field {
     event: JsonEventType | OnetableEventType;
     fieldName: string = ""
-    roles: string[] = ["Owner", "Manage", "View", "Money", "KP"]
+    roles: string[] = ["Owner", "Manage", "View", "Money", "KP", "Comms"]
     defaultValue: string = "N/A"
 
     enabledCSV: boolean = true
