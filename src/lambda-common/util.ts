@@ -10,7 +10,9 @@ export function updateParticipantsDates(existing: Array<ParticipantType>, incomi
 
     incoming.forEach(p => {
         const existingParticipant = existing.find(ep => ep.basic.name === p.basic.name && ep.created.toISOString() === p.created)
-        const updated = existingParticipant && !_.isEqual(p, existingParticipant)
+        const existingToCompare = {..._.cloneDeep(existingParticipant), created: null, updated: null}
+        const newToCompare = {..._.cloneDeep(p), created: null, updated: null}
+        const updated = existingParticipant && !_.isEqual(existingToCompare, newToCompare)
         p.created = existingParticipant ? existingParticipant.created.toISOString() : now.toISOString()
         p.updated = !existingParticipant || updated ? now.toISOString() : existingParticipant.updated.toISOString()
         now = new Date(now.getTime() + 1)
