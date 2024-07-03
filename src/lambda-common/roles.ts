@@ -83,6 +83,17 @@ class CommsFilter extends RoleFilter {
     }
 }
 
+class AccessibilityFilter extends RoleFilter {
+    filterBooking(bookings: BookingType): Boolean {
+        return true
+    }
+
+    filterParticipantFields(participant: ParticipantType) {
+        const { basic, created, updated, attendance, medical } = participant
+        return { basic, created, updated, attendance, medical }
+    }
+}
+
 class NullFilter extends RoleFilter {
     filterBooking(bookings: BookingType): Boolean {
         return false
@@ -106,6 +117,8 @@ function getRoleFilter(role: RoleType) {
             return new MoneyFilter(role)
         case "Comms":
             return new CommsFilter(role)
+        case "Accessibility":
+            return new AccessibilityFilter(role)
         case "KP":
             return new KpFilter(role)
     }

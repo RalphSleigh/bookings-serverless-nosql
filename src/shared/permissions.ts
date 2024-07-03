@@ -75,7 +75,7 @@ export const CanEditEvent = new LoggedInPermission<"event">(data => {
 
 export const CanManageEvent = new LoggedInPermission<"event">(data => {
     if (IsGlobalAdmin.if(data)) return true
-    if (hasRoleOnEvent(data.user, data.event, ["Owner", "Manage", "View", "Money", "KP", "Comms"])) return true
+    if (hasRoleOnEvent(data.user, data.event, ["Owner", "Manage", "View", "Money", "KP", "Comms", "Accessibility"])) return true
     return false
 }, "User can't manage event")
 

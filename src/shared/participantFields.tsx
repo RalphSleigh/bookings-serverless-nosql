@@ -11,7 +11,7 @@ import { useMediaQuery, useTheme } from "@mui/material";
 abstract class Field {
     event: JsonEventType | OnetableEventType;
     abstract fieldName: string
-    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "Money", "KP", "Comms"]
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "Money", "KP", "Comms", "Accessibility"]
     defaultValue: string = "N/A"
 
     enabledCSV: boolean = true
@@ -426,7 +426,7 @@ class RSEConsent extends Field {
 class Medical extends Field {
     fieldName = "Medical"
     visbileMobile = false
-    roles: Array<RoleType["role"]> = ["Owner", "Manage"]
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "Accessibility"]
     defaultValue = ""
     value (participant: JsonParticipantWithExtraType) {
         return participant.medical?.details
@@ -436,7 +436,7 @@ class Medical extends Field {
 class Accessbility extends Field {
     fieldName = "Accessbility"
     visbileMobile = false
-    roles: Array<RoleType["role"]> = ["Owner", "Manage"]
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "Accessibility"]
     defaultValue = ""
     enabled(): boolean {
         return this.event.bigCampMode
@@ -449,7 +449,7 @@ class Accessbility extends Field {
 class AccessbilityContactMe extends Field {
     fieldName = "Accessbility Contact Me"
     visbileMobile = false
-    roles: Array<RoleType["role"]> = ["Owner", "Manage"]
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "Accessibility"]
     defaultValue = ""
     enabled(): boolean {
         return this.event.bigCampMode
