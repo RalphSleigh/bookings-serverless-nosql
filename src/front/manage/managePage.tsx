@@ -30,7 +30,7 @@ export function Component() {
     const rolesPath = useResolvedPath('roles')
     const moneyPath = useResolvedPath('money')
 
-    const [acceptedPolicy, setAcceptedPolicy] = useStickyState<boolean>(false, "acceptedPolicy")
+    const [acceptedPolicy, setAcceptedPolicy] = useStickyState<boolean>(false, "acceptedPolicy20240703")
 
     const [displayAdvanced, setDisplayAdvanced] = React.useState<boolean>(false)
     const [displayDeleted, setDisplayDeleted] = React.useState<boolean>(false)

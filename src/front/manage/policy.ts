@@ -39,6 +39,7 @@ Users must report any suspected breaches of this policy or incidents involving p
 By accessing and using our online events platform, users acknowledge that they have read, understood, and agree to comply with this Data Protection and Acceptable Use Policy.
 
 ### Best Practices for Keeping our data secure
+- Access will only be granted to accounts owned by an identified individual, and not shared or team accounts.
 - Never share your account or password with anyone else, if someone else needs access please ask the camp coordination team to grant it.
 - Make sure the device you are using is up to date and secure with the latest security patches and updates, if possible avoid accessing the data on a shared device or one that does not require a password/other authentication.
 - If you have exported data from the system for any reason, make sure that you delete it from your device when you have finished, or transfer it to your Woodcraft Folk account’s cloud storage (Google Drive). Please avoid keeping data on your devices if possible, especially portable ones that are more likely to be lost or stolen.
