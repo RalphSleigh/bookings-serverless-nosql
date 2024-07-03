@@ -67,8 +67,19 @@ class KpFilter extends RoleFilter {
     }
 
     filterParticipantFields(participant: ParticipantType) {
-        const { basic, created, updated, kp } = participant
-        return { basic, created, updated, kp }
+        const { basic, created, updated, kp, attendance } = participant
+        return { basic, created, updated, kp, attendance }
+    }
+}
+
+class CommsFilter extends RoleFilter {
+    filterBooking(bookings: BookingType): Boolean {
+        return true
+    }
+
+    filterParticipantFields(participant: ParticipantType) {
+        const { basic, created, updated, attendance } = participant
+        return { basic, created, updated, attendance }
     }
 }
 
@@ -93,6 +104,8 @@ function getRoleFilter(role: RoleType) {
             return new ViewFilter(role)
         case "Money":
             return new MoneyFilter(role)
+        case "Comms":
+            return new CommsFilter(role)
         case "KP":
             return new KpFilter(role)
     }
