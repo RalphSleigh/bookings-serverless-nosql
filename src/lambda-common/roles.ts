@@ -89,8 +89,8 @@ class AccessibilityFilter extends RoleFilter {
     }
 
     filterParticipantFields(participant: ParticipantType) {
-        const { basic, created, updated, medical } = participant
-        return { basic, created, updated, medical }
+        const { basic, created, updated, attendance, medical } = participant
+        return { basic, created, updated, attendance, medical }
     }
 }
 
