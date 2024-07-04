@@ -25,12 +25,12 @@ export function Component() {
         return days
     }, [participants, event])
 
-    const entries = birthdays.map(b => {
+    const entries = birthdays.map((b,i) => {
         const people = b.participants.map(p => <Typography key={p.basic.name} variant="body1">{p.age < 20 ? `${p.basic.name} ${p.age + 1}` : `${p.basic.name}`}</Typography>)
-        return <>
-            <Typography variant="h5">{format(b.date, "eee co MMMM")}</Typography>
+        return <div key={i}>
+            <Typography variant="h5">{format(b.date, "EEE do MMMM")}</Typography>
             {people}
-        </>
+        </div>
     })
 
     return <>
