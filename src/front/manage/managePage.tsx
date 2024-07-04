@@ -30,6 +30,7 @@ export function Component() {
     const rolesPath = useResolvedPath('roles')
     const moneyPath = useResolvedPath('money')
     const birthdaysPath = useResolvedPath('birthdays')
+    const graphsPath = useResolvedPath('graphs')
 
     const [acceptedPolicy, setAcceptedPolicy] = useStickyState<boolean>(false, "acceptedPolicy20240703")
 
@@ -67,6 +68,7 @@ export function Component() {
                 <PermissionTab user={user} event={event} permission={CanCreateAnyRole} label="Roles" value={rolesPath.pathname} href={rolesPath.pathname} component={Link} />
                 <PermissionTab user={user} event={event} permission={CanSeeMoneyPage} label="Money" value={moneyPath.pathname} href={moneyPath.pathname} component={Link} />
                 <Tab label="🎂" value={birthdaysPath.pathname} href={birthdaysPath.pathname} component={Link} />
+                <Tab label="📈" value={graphsPath.pathname} href={graphsPath.pathname} component={Link} />
             </Tabs>
         </Grid>
         </Grid>
