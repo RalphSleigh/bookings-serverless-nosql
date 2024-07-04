@@ -1,6 +1,7 @@
 import { lambda_wrapper_json } from '../../../lambda-common/lambda_wrappers.js';
 import { BookingType, EventType, table } from '../../../lambda-common/onetable.js';
 import { filterDataByRoles } from '../../../lambda-common/roles.js';
+import { CanManageEvent } from '../../../shared/permissions.js';
 
 /**
  *
@@ -18,6 +19,7 @@ const BookingModel = table.getModel<BookingType>('Booking')
 export const lambdaHandler = lambda_wrapper_json(
     async (lambda_event, config, current_user) => {
     const event = await EventModel.get({ id: lambda_event.pathParameters?.id })
+    CanManageEvent.throw({ user: current_user, event: event })
     const bookings = await BookingModel.find({sk: {begins: `event:${lambda_event.pathParameters?.id}`}}) as [BookingType]
     //ts-ignore
     const bookingsBeforeTimestamp = bookings.filter(b => b.version !== "latest" && Date.parse(b.version) <= parseInt(lambda_event.pathParameters!.timestamp!))
@@ -28,7 +30,7 @@ export const lambdaHandler = lambda_wrapper_json(
         seenUsers.add(b.userId)
         return true
     })
-    const filtered = filterDataByRoles(event, latestBookingsBeforeTimestamp, current_user)
+    const filtered = filterDataByRoles(event, latestBookingsBeforeTimestamp, current_user!)
     return { bookings: filtered };
     }
 )

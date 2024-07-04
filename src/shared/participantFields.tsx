@@ -1,22 +1,23 @@
 import { ReactNode } from "react";
 import { EventType, JsonEventType, JsonParticipantType, JsonUserResponseType, JsonUserType, OnetableEventType, ParticipantType, RoleType, UserResponseType, UserWithRoles } from "../lambda-common/onetable.js";
 import React from "react";
-import { GridColDef, GridColumnVisibilityModel } from "@mui/x-data-grid";
+import { GridColDef, GridColumnVisibilityModel, GridFilterOperator, getGridDateOperators } from "@mui/x-data-grid";
 import { JsonParticipantWithExtraType } from "./computedDataTypes.js";
 import { parseDate } from "./util.js";
-import { differenceInYears, formatDistanceToNow } from "date-fns";
+import { differenceInYears, format, formatDistanceToNow } from "date-fns";
 import { getAgeGroup } from "./woodcraft.js";
 import { useMediaQuery, useTheme } from "@mui/material";
 
 abstract class Field {
     event: JsonEventType | OnetableEventType;
     abstract fieldName: string
-    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "Money", "KP"]
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "Money", "KP", "Comms", "Accessibility"]
     defaultValue: string = "N/A"
 
     enabledCSV: boolean = true
     visbileMobile: boolean = true
     visibleDesktop: boolean = true
+    filterOperators?: () => GridFilterOperator[]
 
     constructor(event: JsonEventType | OnetableEventType) {
         this.event = event
@@ -33,7 +34,9 @@ abstract class Field {
     }
 
     dataGridColumnDef(): GridColDef {
-        return { field: this.fieldName, headerName: this.fieldName, renderCell: this.dataGridCellRenderer.bind(this), valueGetter: params => this.value.bind(this)(params.row.participant), sortComparator: this.sortComparator.bind(this), flex: 1 }
+        const def: GridColDef = { type: "string", field: this.fieldName, headerName: this.fieldName, renderCell: this.dataGridCellRenderer.bind(this), valueGetter: params => this.value.bind(this)(params.row.participant), sortComparator: this.sortComparator.bind(this), flex: 1 }
+        if(this.filterOperators) def.filterOperators = this.filterOperators()
+        return def
     }
 
     dataGridCellRenderer(params): ReactNode {
@@ -85,6 +88,46 @@ class BookedBy extends Field {
 
 class Age extends Field {
     fieldName = "Age"
+
+    visbileMobile = false
+    visibleDesktop = false
+
+    value (participant: JsonParticipantWithExtraType | ParticipantType) {
+        return participant
+        
+    }
+
+    dataGridCellRenderer(params: {value: JsonParticipantWithExtraType}): ReactNode {
+        return format(params.value.dob, "dd-MM-yyyy")
+    }
+
+    csvCellValue(participant: JsonParticipantWithExtraType | ParticipantType) {
+        return participant.basic.dob
+    }
+
+    filterOperators = () => {
+        const existing = getGridDateOperators()
+        return existing.map(e => {
+            const existing = e.getApplyFilterFn
+            const newFilter = (filterItem,column) => {
+                const filterFunction = existing(filterItem, column)
+                if(!filterFunction) return filterFunction
+                return function newFilterFunction(params) {
+                    return filterFunction!({...params, value: params.value.dob})
+                }
+            }
+            return {...e, getApplyFilterFn: newFilter}
+            })
+    }
+
+    sortComparator(a: JsonParticipantWithExtraType | ParticipantType, b: JsonParticipantWithExtraType | ParticipantType) {
+        if('dob' in a && 'dob' in b) return b.dob.getTime() - a.dob.getTime()
+        return parseDate(b.basic.dob)!.getTime() - parseDate(a.basic.dob)!.getTime()
+    }
+}
+
+class DisplayAge extends Field {
+    fieldName = "Age Group"
     value (participant: JsonParticipantWithExtraType | ParticipantType) {
         return participant
         
@@ -98,7 +141,25 @@ class Age extends Field {
     }
 
     csvCellValue(participant: JsonParticipantWithExtraType | ParticipantType) {
-        return participant.basic.dob
+        if('age' in participant) return participant.ageGroup.displayAgeGroup(participant.age)
+            const startDate = parseDate(this.event.startDate)!
+            const age = differenceInYears(startDate, parseDate(participant.basic.dob)!)
+            return getAgeGroup(age).displayAgeGroup(age)
+    }
+
+    filterOperators = () => {
+        const existing = getGridDateOperators()
+        return existing.map(e => {
+            const existing = e.getApplyFilterFn
+            const newFilter = (filterItem,column) => {
+                const filterFunction = existing(filterItem, column)
+                if(!filterFunction) return filterFunction
+                return function newFilterFunction(params) {
+                    return filterFunction({...params, value: params.value.dob})
+                }
+            }
+            return {...e, getApplyFilterFn: newFilter}
+            })
     }
 
     sortComparator(a: JsonParticipantWithExtraType | ParticipantType, b: JsonParticipantWithExtraType | ParticipantType) {
@@ -365,7 +426,7 @@ class RSEConsent extends Field {
 class Medical extends Field {
     fieldName = "Medical"
     visbileMobile = false
-    roles: Array<RoleType["role"]> = ["Owner", "Manage"]
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "Accessibility"]
     defaultValue = ""
     value (participant: JsonParticipantWithExtraType) {
         return participant.medical?.details
@@ -375,7 +436,7 @@ class Medical extends Field {
 class Accessbility extends Field {
     fieldName = "Accessbility"
     visbileMobile = false
-    roles: Array<RoleType["role"]> = ["Owner", "Manage"]
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "Accessibility"]
     defaultValue = ""
     enabled(): boolean {
         return this.event.bigCampMode
@@ -388,13 +449,20 @@ class Accessbility extends Field {
 class AccessbilityContactMe extends Field {
     fieldName = "Accessbility Contact Me"
     visbileMobile = false
-    roles: Array<RoleType["role"]> = ["Owner", "Manage"]
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "Accessibility"]
     defaultValue = ""
     enabled(): boolean {
         return this.event.bigCampMode
     }
     value (participant: JsonParticipantWithExtraType) {
         return participant.medical?.contactMe
+    }
+    dataGridCellRenderer(params): ReactNode {
+        //const value = this.value(params.value)
+        const value = params.value
+        if(value === true) return "✔️"
+        if(value === false) return ""
+        return ""
     }
 }
 
@@ -408,6 +476,23 @@ class FirstAid extends Field {
     }
     value (participant: JsonParticipantWithExtraType) {
         return participant.medical?.firstAid
+    }
+    dataGridCellRenderer(params): ReactNode {
+        //const value = this.value(params.value)
+        const value = params.value
+        if(value === true) return "✔️"
+        if(value === false) return ""
+        return ""
+    }
+}
+
+class Village extends Field {
+    fieldName = "Village"
+    visbileMobile = false
+    visibleDesktop = false
+    defaultValue = ""
+    value (participant: JsonParticipantWithExtraType) {
+        return ""
     }
 }
 
@@ -457,6 +542,7 @@ export class ParticipantFields {
         this.fields = [
             new Name(event),
             new Age(event),
+            new DisplayAge(event),
             new Email(event),
             new AttendanceOption(event),
             new BookedBy(event),
@@ -478,6 +564,7 @@ export class ParticipantFields {
             new FirstAid(event),
             new PhotoConsent(event),
             new RSEConsent(event),
+            new Village(event),
             new Created(event),
             new Updated(event),
         ]    

@@ -22,9 +22,9 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
         const current_user = await get_user_from_event(event, config)
 
         if (current_user) {
-            log(`User request, current user is ${current_user.userName} (${current_user.email})`)
+            log(`User request, current user is ${current_user.userName} (${current_user.email}) (${event.headers?.['X-Forwarded-For']})`)
             const jwt_token = jwt.sign({ remoteId: current_user.remoteId }, config.JWT_SECRET, { expiresIn: 60 * 60 * config.COOKIE_EXPIRY})
-            const cookie_string = cookie.serialize("jwt", jwt_token, { maxAge: 60 * 60, httpOnly: true, sameSite: true, path: '/' })
+            const cookie_string = cookie.serialize("jwt", jwt_token, { maxAge: 60 * 60 * config.COOKIE_EXPIRY, httpOnly: true, sameSite: true, path: '/' })
             await flush_logs()
             return {
                 statusCode: 200,
@@ -35,7 +35,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
                 body: JSON.stringify({ user: current_user }),
             }
         } else {
-            log(`User request, current user is annon`)
+            log(`User request, current user is annon (${event.headers?.['X-Forwarded-For']})`)
             await flush_logs()
             return {
                 statusCode: 200,

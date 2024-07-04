@@ -48,7 +48,7 @@ const SheetExistsState: React.FC<{ event: JsonEventType, sheet: drive_v3.Schema$
             const groups: Array<Array<JsonParticipantType>> = chunk(getParticipantsDataMutation.data.participants, 5)
             let oldParticipants
             update("participants")(p => {
-                oldParticipants = p.filter(p => p.created)
+                oldParticipants = (p || []).filter(p => p.created)
                 return []
             })
 
@@ -68,6 +68,8 @@ const SheetExistsState: React.FC<{ event: JsonEventType, sheet: drive_v3.Schema$
                     setImportProgress((i + 1) / groups.length * 100)
                 })(i), i * 500)
             })
+
+            if(handles.length == 0) setImportProgress(100)
 
             return () => {
                 handles.forEach(h => clearTimeout(h))
@@ -114,10 +116,12 @@ const CreateSheetState: React.FC<{ event: JsonEventType, basic: JsonBookingType[
 
     return <Alert severity="success" sx={{ mt: 2 }} icon={<ListAlt />}>
         <AlertTitle>Spreadsheet Input</AlertTitle>
-        Rather than filling in the form below with details of your campers, we can create you a Google Sheet to fill in and then import the data. This may be easier for larger groups. Clicking the button below will create a Google Sheet and share it with the email you have provided ({basic?.contactEmail}).
+        Rather than filling in the form below with details of your campers, we can create you a Google Sheet to fill in and then import the data. This may be easier for larger groups. Clicking the button below will create a Google Sheet and share it with the email you have provided: 
+        <br /><br />
+        <b style={{fontSize:"110%"}}>{basic?.contactEmail}</b>
         <br /><br />
         Using this method will overwrite any data you have already entered on the form below.
-        {notGotNeededData && <><br /><br />Please fill in your name, email and district to use this feature.</>}
+        {notGotNeededData && <><br />Please fill in your name, email and district to use this feature.</>}
         <Box
             mt={1}
             //margin

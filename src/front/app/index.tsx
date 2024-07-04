@@ -123,6 +123,15 @@ const router = createBrowserRouter([{
                     }, {
                         path: "money",
                         lazy: () => import('../manage/money.js')
+                    }, {
+                        path: "emails",
+                        lazy: () => import('../manage/comms.js')
+                    }, {
+                        path: "birthdays",
+                        lazy: () => import('../manage/birthdays.js')
+                    }, {
+                        path: "graphs",
+                        lazy: () => import('../manage/graphs.js')
                     }]
                 }]
             }
