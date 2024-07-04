@@ -50,7 +50,6 @@ export async function syncEventToDrive(eventId, config) {
     const users = await UserModel.scan()
     const bookings = await BookingModel.find({ sk: { begins: `event:${eventId}:version` } }) as BookingType[]
     //@ts-ignore
-    const betterBookings = addComputedFieldsToBookingsQueryResult(bookings, event)
     if (event) {
         for (const user of users) {
             if (!user.tokens) continue
