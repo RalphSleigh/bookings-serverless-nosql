@@ -1,6 +1,6 @@
 import { sheets, auth } from "@googleapis/sheets"
 import { drive } from '@googleapis/drive'
-import { BookingType, EventType, FoundUserResponseType, JsonBookingType, OnetableEventType, ParticipantType, RoleType, UserType, UserWithRoles, table } from "./onetable.js"
+import { BookingType, EventType, FoundUserResponseType, JsonBookingType, JsonParticipantType, OnetableEventType, ParticipantType, RoleType, UserType, UserWithRoles, table } from "./onetable.js"
 import { filterDataByRoles } from "./roles.js"
 import { ParticipantFields, CSVCurrent } from "../shared/participantFields.js"
 import { User } from "discord.js"
@@ -8,7 +8,7 @@ import { ConfigType } from "./config.js"
 import { log } from "./logging.js"
 import am_in_lambda from "./am_in_lambda.js"
 import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs"
-import { addComputedFieldsToBookingsQueryResult } from "../shared/util.js"
+import { addComputedFieldsToBookingsQueryResult, parseDate } from "../shared/util.js"
 
 const EventModel = table.getModel<OnetableEventType>('Event')
 const RoleModel = table.getModel<RoleType>('Role')
@@ -58,8 +58,9 @@ export async function syncEventToDrive(eventId, config) {
             if (userRoles.length > 0) {
                 const fullUser: UserWithRoles = { roles: userRoles, ...user }
                 //@ts-ignore
-                const filtered = filterDataByRoles(event, betterBookings, fullUser)
-                const participants = getParticipantRecords(filtered)
+                const filtered = filterDataByRoles(event, bookings, fullUser)
+                const filteredAndEnhanced = addComputedFieldsToBookingsQueryResult(filtered, event)
+                const participants = getParticipantRecords(filteredAndEnhanced)
                 try {
                     await syncToDrive(event, fullUser, participants, config)
                     console.log(`Synced drive for ${user.userName} event ${event.name}`)
@@ -76,21 +77,21 @@ export async function syncEventToDrive(eventId, config) {
     }
 }
 
-type CSVParticipant = ParticipantType & { current: boolean }
+type CSVParticipant = ParticipantType | JsonParticipantType & { current: boolean }
 
-function getParticipantRecords(bookings: BookingType[]): CSVParticipant[] {
+function getParticipantRecords(bookings: BookingType[] | JsonBookingType[]): CSVParticipant[] {
     bookings.sort((a, b) => a.version.localeCompare(b.version!))
     //console.log(bookings)
     const participants: Record<string, CSVParticipant> = {}
     for (const booking of bookings) {
         for (const participant of booking.participants) {
-            const key = participant.created.toISOString()
+            const key = parseDate(participant.created)!.toISOString()
             if (participants[key]) {
                 console.log(`Updating participant ${key}`)
             } else {
                 console.log(`Creating participant ${key}`)
             }
-            participants[participant.created.toISOString()] = { ...participant, current: booking.version === "latest" && !booking.deleted }
+            participants[key] = { ...participant, current: booking.version === "latest" && !booking.deleted }
         }
     }
 
@@ -99,7 +100,7 @@ function getParticipantRecords(bookings: BookingType[]): CSVParticipant[] {
     for (const [key, participant] of Object.entries(participants))
         result.push(participant)
 
-    return result.sort((a, b) => a.created.getTime() - b.created.getTime())
+    return result.sort((a, b) => parseDate(a.created)!.getTime() - parseDate(b.created)!.getTime())
 }
 
 async function syncToDrive(event: OnetableEventType, user: UserWithRoles, data, config) {
