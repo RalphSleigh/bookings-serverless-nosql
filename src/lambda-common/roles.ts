@@ -1,4 +1,4 @@
-import { BookingType, FoundUserResponseType, OnetableEventType, ParticipantType, RoleType, UserWithRoles } from "./onetable.js";
+import { BookingType, FoundUserResponseType, OnetableEventType, ParticipantType, RoleType, JsonBookingType, UserWithRoles } from "./onetable.js";
 
 abstract class RoleFilter {
     role: RoleType;
@@ -12,7 +12,7 @@ abstract class RoleFilter {
 }
 
 class AdminFilter extends RoleFilter {
-    filterBooking(bookings: BookingType): Boolean {
+    filterBooking(bookings: BookingType | JsonBookingType): Boolean {
         return true
     }
 
@@ -22,7 +22,7 @@ class AdminFilter extends RoleFilter {
 }
 
 class OwnerFilter extends RoleFilter {
-    filterBooking(bookings: BookingType): Boolean {
+    filterBooking(bookings: BookingType | JsonBookingType): Boolean {
         return true
     }
 
@@ -32,7 +32,7 @@ class OwnerFilter extends RoleFilter {
 }
 
 class ManageFilter extends RoleFilter {
-    filterBooking(bookings: BookingType): Boolean {
+    filterBooking(bookings: BookingType | JsonBookingType): Boolean {
         return true
     }
 
@@ -42,7 +42,7 @@ class ManageFilter extends RoleFilter {
 }
 
 class ViewFilter extends RoleFilter {
-    filterBooking(bookings: BookingType): Boolean {
+    filterBooking(bookings: BookingType | JsonBookingType): Boolean {
         return true
     }
 
@@ -52,7 +52,7 @@ class ViewFilter extends RoleFilter {
 }
 
 class MoneyFilter extends RoleFilter {
-    filterBooking(bookings: BookingType): Boolean {
+    filterBooking(bookings: BookingType | JsonBookingType): Boolean {
         return false
     }
 
@@ -62,7 +62,7 @@ class MoneyFilter extends RoleFilter {
 }
 
 class KpFilter extends RoleFilter {
-    filterBooking(bookings: BookingType): Boolean {
+    filterBooking(bookings: BookingType | JsonBookingType): Boolean {
         return true
     }
 
@@ -73,7 +73,7 @@ class KpFilter extends RoleFilter {
 }
 
 class CommsFilter extends RoleFilter {
-    filterBooking(bookings: BookingType): Boolean {
+    filterBooking(bookings: BookingType | JsonBookingType): Boolean {
         return true
     }
 
@@ -84,7 +84,7 @@ class CommsFilter extends RoleFilter {
 }
 
 class AccessibilityFilter extends RoleFilter {
-    filterBooking(bookings: BookingType): Boolean {
+    filterBooking(bookings: BookingType | JsonBookingType): Boolean {
         return true
     }
 
@@ -95,7 +95,7 @@ class AccessibilityFilter extends RoleFilter {
 }
 
 class NullFilter extends RoleFilter {
-    filterBooking(bookings: BookingType): Boolean {
+    filterBooking(bookings: BookingType | JsonBookingType): Boolean {
         return false
     }
 
@@ -126,7 +126,7 @@ function getRoleFilter(role: RoleType) {
     return new NullFilter(role)
 }
 
-export function filterDataByRoles(event: OnetableEventType, bookings: BookingType[] = [], user: FoundUserResponseType | UserWithRoles) {
+export function filterDataByRoles<T extends BookingType | JsonBookingType>(event: OnetableEventType, bookings: T[] = [], user: FoundUserResponseType | UserWithRoles): T[]  {
     if (user.admin) return bookings
 
     /*
