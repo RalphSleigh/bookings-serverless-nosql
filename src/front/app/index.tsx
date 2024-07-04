@@ -126,6 +126,9 @@ const router = createBrowserRouter([{
                     }, {
                         path: "emails",
                         lazy: () => import('../manage/comms.js')
+                    }, {
+                        path: "birthdays",
+                        lazy: () => import('../manage/birthdays.js')
                     }]
                 }]
             }

@@ -4,7 +4,7 @@ import React from "react";
 import { GridColDef, GridColumnVisibilityModel, GridFilterOperator, getGridDateOperators } from "@mui/x-data-grid";
 import { JsonParticipantWithExtraType } from "./computedDataTypes.js";
 import { parseDate } from "./util.js";
-import { differenceInYears, formatDistanceToNow } from "date-fns";
+import { differenceInYears, format, formatDistanceToNow } from "date-fns";
 import { getAgeGroup } from "./woodcraft.js";
 import { useMediaQuery, useTheme } from "@mui/material";
 
@@ -97,8 +97,8 @@ class Age extends Field {
         
     }
 
-    dataGridCellRenderer(params): ReactNode {
-        return params.value.basic.dob
+    dataGridCellRenderer(params: {value: JsonParticipantWithExtraType}): ReactNode {
+        return format(params.value.dob, "dd-MM-yyyy")
     }
 
     csvCellValue(participant: JsonParticipantWithExtraType | ParticipantType) {

@@ -29,6 +29,7 @@ export function Component() {
     const emailsPath = useResolvedPath('emails')
     const rolesPath = useResolvedPath('roles')
     const moneyPath = useResolvedPath('money')
+    const birthdaysPath = useResolvedPath('birthdays')
 
     const [acceptedPolicy, setAcceptedPolicy] = useStickyState<boolean>(false, "acceptedPolicy20240703")
 
@@ -65,6 +66,7 @@ export function Component() {
                 <Tab label="Emails" value={emailsPath.pathname} href={emailsPath.pathname} component={Link} />
                 <PermissionTab user={user} event={event} permission={CanCreateAnyRole} label="Roles" value={rolesPath.pathname} href={rolesPath.pathname} component={Link} />
                 <PermissionTab user={user} event={event} permission={CanSeeMoneyPage} label="Money" value={moneyPath.pathname} href={moneyPath.pathname} component={Link} />
+                <Tab label="🎂" value={birthdaysPath.pathname} href={birthdaysPath.pathname} component={Link} />
             </Tabs>
         </Grid>
         </Grid>
@@ -93,7 +95,7 @@ export function Component() {
 }
 
 function shouldShowSearch(location) {
-    return location.pathname.endsWith("manage") || location.pathname.endsWith("participants") || location.pathname.endsWith("bookings") || location.pathname.endsWith("kp") || location.pathname.endsWith("emails")
+    return location.pathname.endsWith("manage") || location.pathname.endsWith("participants") || location.pathname.endsWith("bookings") || location.pathname.endsWith("kp") || location.pathname.endsWith("emails") || location.pathname.endsWith("birthdays")
 }
 
 export type managePageContext = manageLoaderContext & {
