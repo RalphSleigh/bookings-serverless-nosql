@@ -5,7 +5,7 @@ import { JsonBookingWithExtraType } from "../../shared/computedDataTypes.js";
 import { getFee } from "../../shared/fee/fee.js";
 import { Link } from "react-router-dom";
 
-const capitalizeWord = (word: string) => {
+const capitalizeWord = (word: string = "") => {
     return word.charAt(0).toUpperCase() + word.slice(1);
 };
 

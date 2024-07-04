@@ -11,7 +11,7 @@ export class Basic implements KpStructure {
 
         const { updateField } = getMemoUpdateFunctions(update)
 
-        const capitalizeWord = (word: string) => {
+        const capitalizeWord = (word: string = "") => {
             return word.charAt(0).toUpperCase() + word.slice(1);
         };
 

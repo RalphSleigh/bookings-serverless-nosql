@@ -101,7 +101,7 @@ const ParticipantModal = ({ selectedParticipant, participant, handleClose }: { s
     if (!participant) return null
 
     const noWrap = { whiteSpace: 'nowrap' as 'nowrap', mt: 1 }
-    const capitalizeWord = (word: string) => {
+    const capitalizeWord = (word: string = "") => {
         return word.charAt(0).toUpperCase() + word.slice(1);
     };
 
