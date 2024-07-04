@@ -26,7 +26,7 @@ export const lambdaHandler = lambda_wrapper_json(
         const earliestBooking = timelineBookings[timelineBookings.length - 1]
         const latestBooking = timelineBookings[0]
         const participantTotals: { day: Date, total: number }[] = []
-        for (let i = Date.parse(earliestBooking.version); i <= Date.parse(latestBooking.version); i += 24 * 60 * 60 * 1000) {
+        for (let i = Date.parse(earliestBooking.version); i <= Date.parse(latestBooking.version) + 24 * 60 * 60 * 1000; i += 24 * 60 * 60 * 1000) {
             const day = new Date(i)
             const bookingsBeforeTimestamp = timelineBookings.filter(b => Date.parse(b.version) <= day.getTime())
             const seenUsers = new Set()
@@ -35,7 +35,7 @@ export const lambdaHandler = lambda_wrapper_json(
                 seenUsers.add(b.userId)
                 return true
             })
-            participantTotals.push({ day, total: latestBookingsBeforeTimestamp.reduce((acc, b) => acc + b.participants.length, 0) })
+            participantTotals.push({ day, total: latestBookingsBeforeTimestamp.filter(b=> !b.deleted).reduce((acc, b) => acc + b.participants.length, 0) })
         }
         return { participantTotals };
     }
