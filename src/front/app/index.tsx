@@ -129,6 +129,9 @@ const router = createBrowserRouter([{
                     }, {
                         path: "birthdays",
                         lazy: () => import('../manage/birthdays.js')
+                    }, {
+                        path: "graphs",
+                        lazy: () => import('../manage/graphs.js')
                     }]
                 }]
             }
