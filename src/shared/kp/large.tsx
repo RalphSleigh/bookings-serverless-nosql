@@ -2,7 +2,7 @@ import React from "react";
 import { KpStructure, kpValidationResults } from "./kp_class.js";
 import { JsonParticipantType } from "../../lambda-common/onetable.js";
 import { Checkbox, FormControl, FormControlLabel, FormGroup, Grid, IconButton, InputAdornment, InputLabel, MenuItem, Select, TextField, Tooltip, Typography } from "@mui/material";
-import { getMemoUpdateFunctions } from "../util.js";
+import { capitalizeWord, getMemoUpdateFunctions } from "../util.js";
 import { HelpOutline } from '@mui/icons-material';
 
 export class Large implements KpStructure {
@@ -11,10 +11,6 @@ export class Large implements KpStructure {
 
 
         const { updateField, updateSwitch } = getMemoUpdateFunctions(update)
-
-        const capitalizeWord = (word: string = "") => {
-            return word.charAt(0).toUpperCase() + word.slice(1);
-        };
 
         const updateDietSelect = (e) => {
             update(data => ({ ...(data || {}), 'diet': e.target.value, pork: e.target.value !== "omnivore", dairy: !!data?.dairy || e.target.value == "vegan", egg: !!data?.egg || e.target.value == "vegan" }))
@@ -117,4 +113,30 @@ export class Large implements KpStructure {
         }
         return results
     }
+
+    PaticipantCardElement({data}) {
+
+        if(!data) return null
+
+        const noWrap = { whiteSpace: 'nowrap' as 'nowrap', mt: 1 }
+
+        const no = [[data.dairy, "Dairy"],
+        [data.soya, "Soya"],
+        [data.egg, "Egg"],
+        [data.gluten, "Gluten"],
+        [data.pork, "Pork"],
+        [data.nuts, "Nuts"],
+        [data.chickpea, "Chickpea"]].filter(i => i[0]).map(i => i[1]).join(", ")
+
+        return <>
+        <Typography variant="body1" sx={noWrap}><b>Diet: </b>{capitalizeWord(data.diet)}</Typography>
+        {isNonEmptyString(data.details) ? <Typography variant="body1" sx={{ mt: 2 }}><b>Additional&nbsp;Dietary&nbsp;Requirements:</b><br />{data.details}</Typography> : null }
+        {isNonEmptyString(data.preferences) ? <Typography variant="body1" sx={{ mt: 2 }}><b>Food&nbsp;Dislikes/Preferences:</b><br />{data.preferences}</Typography> : null }
+        {no ? <Typography variant="body1" sx={{ mt: 2 }}><b>No:</b><br />{no}</Typography> : null }
+        {data.diabetic ? <Typography variant="body1" sx={{ mt: 2 }}><strong>Diabetic</strong></Typography> : null}
+        {data.contactMe ? <Typography variant="body1" sx={{ mt: 2 }}><strong>Needs are complex, please contact me</strong></Typography> : null}              
+        </>
+    }
 }
+
+const isNonEmptyString = (str: string | undefined): boolean => str !== undefined && str !== ""
