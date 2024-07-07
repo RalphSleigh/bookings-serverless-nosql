@@ -124,10 +124,10 @@ const ParticipantModal = ({ event, selectedParticipant, participant, handleClose
                         <a href={`mailto:${participant.booking.basic.contactEmail}`}>{participant.booking.basic.contactEmail}</a><br />
                         <a href={`tel:${participant.booking.basic.contactPhone}`}>{participant.booking.basic.contactPhone}</a>
                     </Typography>
-                    <Typography variant="body1" sx={noWrap}>
+                    { participant.booking.emergency?.name || participant.booking.emergency?.phone ? <Typography variant="body1" sx={noWrap}>
                         <b>Emergency Contact:</b><br /> {participant.booking.emergency?.name}<br />
                         <a href={`tel:${participant.booking.emergency?.phone}`}>{participant.booking.emergency?.phone}</a>
-                    </Typography>
+                    </Typography> : null }
                     <consent.PaticipantCardElement data={participant} />
                     {event.bigCampMode && participant.medical && participant.age > 17 ? <Typography variant="body1" sx={noWrap}><b>First aid: </b> {participant.medical?.firstAid ? "✔️" : "❌"}</Typography> : null}
                 </Grid>
@@ -136,7 +136,7 @@ const ParticipantModal = ({ event, selectedParticipant, participant, handleClose
                     {participant.medical ? <>
                         {participant.medical.details ? <Typography variant="body1" sx={{ mt: 2 }}><b>Medical:</b><br />{participant.medical?.details}</Typography> : null}
                         {event.bigCampMode && participant.medical.accessibility ? <Typography variant="body1" sx={{ mt: 2 }}><b>Accessibility:</b><br />{participant.medical?.accessibility}</Typography> : null}
-                        {event.bigCampMode && participant.medical.contactMe ? <Typography variant="body1" sx={{ mt: 2 }}><b>Please contact me about accessibility:</b><br /></Typography> : null}
+                        {event.bigCampMode && participant.medical.contactMe ? <Typography variant="body1" sx={{ mt: 2 }}><b>Please contact me about accessibility.</b><br /></Typography> : null}
                     </> : null}
                 </Grid>
             </Grid>
