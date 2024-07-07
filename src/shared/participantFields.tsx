@@ -536,6 +536,16 @@ class Village extends Field {
     }
 }
 
+class Town extends Field {
+    fieldName = "Town"
+    visbileMobile = false
+    visibleDesktop = false
+    defaultValue = ""
+    value (participant: JsonParticipantWithExtraType) {
+        return ""
+    }
+}
+
 class Created extends Field {
     fieldName = "Created"
     visbileMobile = false
@@ -563,7 +573,6 @@ class Updated extends Field {
         return <>{formatDistanceToNow(value)} ago</>
     }
 }
-
 
 export class CSVCurrent extends Field {
     fieldName = "Current"
@@ -605,6 +614,7 @@ export class ParticipantFields {
             new PhotoConsent(event),
             new RSEConsent(event),
             new Village(event),
+            new Town(event),
             new Created(event),
             new Updated(event),
         ]    

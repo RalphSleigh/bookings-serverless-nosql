@@ -139,6 +139,6 @@ async function syncToDrive(event: OnetableEventType, user: UserWithRoles, data, 
     const participants = data.map(p => fields.getCSVValues(p, user))
 
 
-    await sheets_instance.spreadsheets.values.batchUpdate({ spreadsheetId: sheetId, requestBody: { valueInputOption: "RAW", data: [{ range: "Sheet1!A1", values: [headers, ...participants] }] } })
+    await sheets_instance.spreadsheets.values.batchUpdate({ spreadsheetId: sheetId, requestBody: { valueInputOption: "USER_ENTERED", data: [{ range: "Sheet1!A1", values: [headers, ...participants] }] } })
     //await sheets_instance.spreadsheets.values.batchUpdate({spreadsheetId: sheetId, requestBody: {data: {range:"Sheet1!A1", values:[headers]}}})
 }
