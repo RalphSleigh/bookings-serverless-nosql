@@ -62,6 +62,7 @@ export async function syncEventToDrive(eventId, config) {
                 const participants = getParticipantRecords(filteredAndEnhanced)
                 try {
                     await syncToDrive(event, fullUser, participants, config)
+                    console.log(JSON.stringify(fullUser))
                     console.log(`Synced drive for ${user.userName} event ${event.name}`)
                 } catch (e: any) {
                     if (e.code === 401) {
@@ -86,9 +87,9 @@ function getParticipantRecords(bookings: BookingType[] | JsonBookingType[]): CSV
         for (const participant of booking.participants) {
             const key = parseDate(participant.created)!.toISOString()
             if (participants[key]) {
-                console.log(`Updating participant ${key}`)
+                // console.log(`Updating participant ${key}`)
             } else {
-                console.log(`Creating participant ${key}`)
+                // console.log(`Creating participant ${key}`)
             }
             participants[key] = { ...participant, current: booking.version === "latest" && !booking.deleted }
         }
