@@ -103,18 +103,36 @@ const BookingsModal = ({ selectedBooking, booking, handleClose }: { selectedBook
                     <Typography id="modal-modal-title" variant="h6">
                         {booking.basic.contactName}
                     </Typography>
+                    <Typography id="modal-modal-title" variant="subtitle1">
+                        {booking.basic.organisation}
+                    </Typography>
+                    {booking.basic.district ? <Typography id="modal-modal-title" variant="subtitle1">
+                        {booking.basic.district}
+                    </Typography> : null }
                     <Typography variant="body1" sx={noWrap}>
                         <b>Booked By:</b><br /> {booking.basic.contactName}<br />
                         <a href={`mailto:${booking.basic.contactEmail}`}>{booking.basic.contactEmail}</a><br />
                         <a href={`tel:${booking.basic.contactPhone}`}>{booking.basic.contactPhone}</a>
                     </Typography>
-                    <Typography variant="body1" sx={noWrap}>
+                    { booking.emergency?.name || booking.emergency?.phone ? <Typography variant="body1" sx={noWrap}>
                         <b>Emergency Contact:</b><br /> {booking.emergency?.name}<br />
                         <a href={`tel:${booking.emergency?.phone}`}>{booking.emergency?.phone}</a>
+                    </Typography> : null }
+                    <Typography variant="body1" sx={noWrap}>
+                        <b>Camp with:</b><br /> {booking.camping?.campWith } 
+                    </Typography>
+                    <Typography variant="body1" sx={noWrap}>
+                        <b>Camping Equipment:</b><br /> {booking.camping?.canBringEquipment } 
+                    </Typography>
+                    <Typography variant="body1" sx={noWrap}>
+                        <b>Camping Accessibility:</b><br /> {booking.camping?.accessibilityNeeds } 
+                    </Typography>
+                    <Typography variant="body1" sx={noWrap}>
+                        <b>How heard:</b><br /> {booking.basic.howDidYouHear } 
                     </Typography>
                 </Grid>
                 {chunks.map((c, i) => <Grid item xs={12} sm>
-                    {i == 0 ? <Typography key={i} variant="body1" sx={noWrap}><b>Attendees:</b></Typography> : null}
+                    {i == 0 ? <Typography key={i} variant="body1" sx={noWrap}><b>Attendees: ({booking.participants.length})</b></Typography> : null}
                     <ul>
                         {c}
                     </ul>
