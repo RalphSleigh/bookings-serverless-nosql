@@ -3,6 +3,7 @@ import { BookingType, JsonBookingType, JsonEventType, JsonUserResponseType, Onet
 import { ReactNode } from 'react';
 import React from "react";
 import { Link } from "react-router-dom";
+import { capitalizeWord } from "./util.js";
 
 abstract class Field {
     event: JsonEventType | OnetableEventType;
@@ -51,6 +52,16 @@ abstract class Field {
     }
 
     abstract value(booking: JsonBookingType | BookingType): any | undefined
+}
+
+class BookingTypeField extends Field {
+    fieldName = "Type"
+    enabled(): boolean {
+        return this.event.bigCampMode
+    }
+    value(booking: JsonBookingType) {
+        return capitalizeWord(booking.basic.bookingType)
+    }
 }
 
 class BookingOrganisationField extends Field {
@@ -201,6 +212,7 @@ export class BookingFields {
         this.event = event
 
         this.fields = [
+            new BookingTypeField(event),
             new BookingOrganisationField(event),
             new BookingDistrictField(event),
             new BookingContactName(event),

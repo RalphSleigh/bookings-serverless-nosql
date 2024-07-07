@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useMemo } from "react";
 import { useOutletContext } from "react-router-dom";
 import { JsonEventType, JsonParticipantType, JsonUserResponseType } from "../../lambda-common/onetable.js";
 import { managePageContext } from "./managePage.js";
-import { Button, Grid, MenuItem, Modal, Paper, Typography } from "@mui/material";
+import { Avatar, AvatarGroup, Box, Button, Grid, MenuItem, Modal, Paper, Stack, Typography } from "@mui/material";
 import { ParticipantFields } from "../../shared/participantFields.js";
 import { DataGrid, GridCallbackDetails, GridColumnVisibilityModel, GridExportMenuItemProps, GridPrintExportMenuItem, GridRowParams, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarDensitySelector, GridToolbarExportContainer, GridToolbarFilterButton, MuiEvent } from "@mui/x-data-grid";
 import { JsonBookingWithExtraType, JsonParticipantWithExtraType } from "../../shared/computedDataTypes.js";
@@ -100,9 +100,11 @@ const BookingsModal = ({ selectedBooking, booking, handleClose }: { selectedBook
         <Paper elevation={6} sx={{ p: 2, outline: 'none' }}>
             <Grid container spacing={2}>
                 <Grid item xs={12} sm>
-                    <Typography id="modal-modal-title" variant="h6">
+                    <Stack alignItems="center" gap={1} direction="row"><Typography id="modal-modal-title" variant="h6">
                         {booking.basic.contactName}
                     </Typography>
+                    {applicationTypeIcon(booking.basic.bookingType)}
+                    </Stack>
                     <Typography id="modal-modal-title" variant="subtitle1">
                         {booking.basic.organisation}
                     </Typography>
@@ -150,4 +152,19 @@ function saveCSV(event: JsonEventType, user: JsonUserResponseType, bookings: Jso
     const csvData = stringify([headers, ...values])
     const filename = `${event.name}-Bookings-${format(new Date(), 'yyyy-MM-dd')}.csv`
     save(new TextEncoder().encode(csvData), filename)
+}
+
+const applicationTypeIcon = type => {
+    if (type === "group") return <div>
+        <Box sx={{ display: "flex" }}>
+            <AvatarGroup spacing="small" >
+                <Avatar sx={{ width: "24px", height: "24px" }}></Avatar>
+                <Avatar sx={{ width: "24px", height: "24px" }}></Avatar>
+                <Avatar sx={{ width: "24px", height: "24px" }}></Avatar>
+                <Avatar sx={{ width: "24px", height: "24px" }}></Avatar>
+            </AvatarGroup>
+        </Box>
+        <Box sx={{ display: "flex", flexGrow: 1 }}></Box>
+    </div>
+    else return <Avatar sx={{ width: "24px", height: "24px" }}></Avatar>
 }
