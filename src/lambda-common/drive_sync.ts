@@ -57,7 +57,7 @@ export async function syncEventToDrive(eventId, config) {
             if (userRoles.length > 0) {
                 const fullUser: UserWithRoles = { roles: userRoles, ...user }
                 //@ts-ignore
-                const filtered = filterDataByRoles(event, bookings, fullUser)
+                const filtered = filterDataByRoles(event, _.cloneDeep(bookings), fullUser)
                 const filteredAndEnhanced = addComputedFieldsToBookingsQueryResult(filtered, event)
                 const participants = getParticipantRecords(filteredAndEnhanced)
                 try {
