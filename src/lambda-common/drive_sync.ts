@@ -9,6 +9,7 @@ import { log } from "./logging.js"
 import am_in_lambda from "./am_in_lambda.js"
 import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs"
 import { addComputedFieldsToBookingsQueryResult, parseDate } from "../shared/util.js"
+import _ from "lodash"
 
 const EventModel = table.getModel<OnetableEventType>('Event')
 const RoleModel = table.getModel<RoleType>('Role')
