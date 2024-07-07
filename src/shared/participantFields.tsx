@@ -231,6 +231,10 @@ class DietNutAllergy extends Field {
         if(value === false) return ""
         return ""
     }
+
+    csvCellValue(participant: JsonParticipantWithExtraType) {
+        return this.value(participant) ? true : ""
+    }
 }
 
 class DietGlutenAllergy extends Field {
@@ -249,6 +253,9 @@ class DietGlutenAllergy extends Field {
         if(value === true) return "❌"
         if(value === false) return ""
         return ""
+    }
+    csvCellValue(participant: JsonParticipantWithExtraType) {
+        return this.value(participant) ? true : ""
     }
 }
 
@@ -269,6 +276,9 @@ class DietSoyaAllergy extends Field {
         if(value === false) return ""
         return ""
     }
+    csvCellValue(participant: JsonParticipantWithExtraType) {
+        return this.value(participant) ? true : ""
+    }
 }
 
 class DietDairyAllergy extends Field {
@@ -287,6 +297,9 @@ class DietDairyAllergy extends Field {
         if(value === true) return "❌"
         if(value === false) return ""
         return ""
+    }
+    csvCellValue(participant: JsonParticipantWithExtraType) {
+        return this.value(participant) ? true : ""
     }
 }
 
@@ -307,6 +320,9 @@ class DietEggAllergy extends Field {
         if(value === false) return ""
         return ""
     }
+    csvCellValue(participant: JsonParticipantWithExtraType) {
+        return this.value(participant) ? true : ""
+    }
 }
 
 class DietPorkAllergy extends Field {
@@ -325,6 +341,9 @@ class DietPorkAllergy extends Field {
         if(value === true) return "❌"
         if(value === false) return ""
         return ""
+    }
+    csvCellValue(participant: JsonParticipantWithExtraType) {
+        return this.value(participant) ? true : ""
     }
 }
 
@@ -345,6 +364,9 @@ class DietChickpeaAllergy extends Field {
         if(value === false) return ""
         return ""
     }
+    csvCellValue(participant: JsonParticipantWithExtraType) {
+        return this.value(participant) ? true : ""
+    }
 }
 
 class DietDiabetic extends Field {
@@ -363,6 +385,9 @@ class DietDiabetic extends Field {
         if(value === true) return "❌"
         if(value === false) return ""
         return ""
+    }
+    csvCellValue(participant: JsonParticipantWithExtraType) {
+        return this.value(participant) ? true : ""
     }
 }
 
@@ -383,6 +408,9 @@ class DietContactMe extends Field {
         if(value === false) return ""
         return ""
     }
+    csvCellValue(participant: JsonParticipantWithExtraType) {
+        return this.value(participant) ? true : ""
+    }
 }
 
 class PhotoConsent extends Field {
@@ -402,6 +430,9 @@ class PhotoConsent extends Field {
         if(value === false) return "❌"
         return ""
     }
+    csvCellValue(participant: JsonParticipantWithExtraType) {
+        return this.value(participant) ? true : ""
+    }
 }
 
 class RSEConsent extends Field {
@@ -420,6 +451,9 @@ class RSEConsent extends Field {
         if(value === true) return "✔️"
         if(value === false) return "❌"
         return ""
+    }
+    csvCellValue(participant: JsonParticipantWithExtraType) {
+        return this.value(participant) ? true : ""
     }
 }
 
@@ -464,6 +498,9 @@ class AccessbilityContactMe extends Field {
         if(value === false) return ""
         return ""
     }
+    csvCellValue(participant: JsonParticipantWithExtraType) {
+        return this.value(participant) ? true : ""
+    }
 }
 
 class FirstAid extends Field {
@@ -483,6 +520,9 @@ class FirstAid extends Field {
         if(value === true) return "✔️"
         if(value === false) return ""
         return ""
+    }
+    csvCellValue(participant: JsonParticipantWithExtraType) {
+        return this.value(participant) ? true : ""
     }
 }
 
