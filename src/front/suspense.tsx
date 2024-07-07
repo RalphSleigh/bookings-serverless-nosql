@@ -14,7 +14,7 @@ export function SuspenseElement(props) {
 }
 
 function Loader() {
-    return <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", flexGrow: 1 }}>
+    return <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexGrow: 1, height:"calc(100vh - 110px)" }}>
         <img src="/newspinner.svg" alt="spinner" width="100px" />
     </Box>
 }
