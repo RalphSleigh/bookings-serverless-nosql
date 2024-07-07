@@ -47,6 +47,9 @@ const randomCamp100Participant: () => ParticipantType = () => {
         },
         medical: {
             details: getRandomMedical(),
+            accessibility: randomBool(0.10) ? "Yes" : "",
+            firstAid: randomBool(0.40),
+            contactMe: randomBool(0.10),
         },
         consent: {
             photo: randomBool(0.95),

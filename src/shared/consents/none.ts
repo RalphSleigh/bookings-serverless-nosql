@@ -13,4 +13,8 @@ export class None implements ConsentStructure {
     public validate(participant: Partial<JsonParticipantType>): ConsentValidationResults {
         return []
     }
+
+    PaticipantCardElement({data}) {
+        return null
+    }
 }
