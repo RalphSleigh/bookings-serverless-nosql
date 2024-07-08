@@ -102,7 +102,7 @@ class Age extends Field {
     }
 
     csvCellValue(participant: JsonParticipantWithExtraType) {
-        return format(participant.dob, "YYYY-MM-DD")
+        return format(participant.dob, "yyyy-MM-dd")
     }
 
     filterOperators = () => {
