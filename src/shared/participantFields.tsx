@@ -4,7 +4,7 @@ import React from "react";
 import { GridColDef, GridColumnVisibilityModel, GridFilterOperator, getGridDateOperators } from "@mui/x-data-grid";
 import { JsonParticipantWithExtraType } from "./computedDataTypes.js";
 import { parseDate } from "./util.js";
-import { differenceInYears, format, formatDistanceToNow } from "date-fns";
+import { differenceInYears, format, formatDistanceToNow, formatISO9075 } from "date-fns";
 import { getAgeGroup } from "./woodcraft.js";
 import { useMediaQuery, useTheme } from "@mui/material";
 
@@ -558,6 +558,9 @@ class Created extends Field {
         const value = params.value
         return <>{formatDistanceToNow(value)} ago</>
     }
+    csvCellValue(participant: JsonParticipantWithExtraType) {
+        return formatISO9075(this.value(participant))
+    }
 }
 
 class Updated extends Field {
@@ -571,6 +574,9 @@ class Updated extends Field {
         //const value = this.value(params.value)
         const value = params.value
         return <>{formatDistanceToNow(value)} ago</>
+    }
+    csvCellValue(participant: JsonParticipantWithExtraType) {
+        return formatISO9075(this.value(participant))
     }
 }
 
