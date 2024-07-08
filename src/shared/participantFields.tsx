@@ -101,8 +101,8 @@ class Age extends Field {
         return format(params.value.dob, "dd-MM-yyyy")
     }
 
-    csvCellValue(participant: JsonParticipantWithExtraType | ParticipantType) {
-        return participant.basic.dob
+    csvCellValue(participant: JsonParticipantWithExtraType) {
+        return format(participant.dob, "YYYY-MM-DD")
     }
 
     filterOperators = () => {
