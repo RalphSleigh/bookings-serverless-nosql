@@ -29,7 +29,6 @@ export function Component() {
         applicationOperation.mutate({ userId, operation: {type: "declineApplication", userId: userId }})
     }
 
-
     const applicationRows = waitingApplications.map((a, i) => {
         return <TableRow key={i}>
             <TableCell>{applicationTypeIcon(a.bookingType)}</TableCell>

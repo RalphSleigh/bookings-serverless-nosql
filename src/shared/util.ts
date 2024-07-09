@@ -19,7 +19,9 @@ const addComputedFieldToParticipant = (booking, startDate) => (p: JsonParticipan
 export function addComputedFieldsToBookingsQueryResult(bookings: JsonBookingType[] | BookingType[], event: JsonEventType): JsonBookingWithExtraType[] {
     const startDate = parseDate(event.startDate)!
     return bookings.map(b => {
-        return {...b, participants: b.participants.map(addComputedFieldToParticipant(b, startDate))}
+        const newBooking = {...b, town: event.villages?.find(v => v.name === b.village)?.town }
+        newBooking.participants = newBooking.participants.map(addComputedFieldToParticipant(newBooking, startDate))
+        return newBooking
     }) as [JsonBookingWithExtraType]
 }
 

@@ -532,7 +532,7 @@ class Village extends Field {
     visibleDesktop = false
     defaultValue = ""
     value (participant: JsonParticipantWithExtraType) {
-        return ""
+        return participant.booking.village ? participant.booking.village : ""
     }
 }
 
@@ -542,7 +542,7 @@ class Town extends Field {
     visibleDesktop = false
     defaultValue = ""
     value (participant: JsonParticipantWithExtraType) {
-        return ""
+        return participant.booking.town ? participant.booking.town : ""
     }
 }
 

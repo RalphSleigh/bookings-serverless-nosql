@@ -11,6 +11,7 @@ export type JsonParticipantWithExtraType = JsonParticipantType & {
 
 export type JsonBookingWithExtraType = Omit<JsonBookingType, "participants"> & {
     participants: JsonParticipantWithExtraType[];
+    town: string;
 };
 
 type AddPaymentType = {

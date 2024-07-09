@@ -169,6 +169,22 @@ class CampingAccessibilityNeeds extends Field {
     }
 }
 
+class Village extends Field {
+    fieldName = "Village"
+    defaultValue = ""
+    value(booking: JsonBookingType) {
+        return booking.village
+    }
+}
+
+class Town extends Field {
+    fieldName = "Town"
+    defaultValue = ""
+    value(booking: JsonBookingType) {
+        return this.event.villages?.find(v => v.name === booking.village)?.town
+    }
+}
+
 class EditLink extends Field {
     fieldName = "Edit"
     roles = ["Owner", "Manage"]
@@ -224,7 +240,9 @@ export class BookingFields {
             new BookingHowDidYouHear(event),
             new CampWith(event),
             new CanBringEquipemnt(event),
-            new CampingAccessibilityNeeds(event)
+            new CampingAccessibilityNeeds(event),
+            new Village(event),
+            new Town(event)
         ]
 
         event.customQuestions?.forEach((q, i) => {
