@@ -30,7 +30,17 @@ type RemoveFeeItemType = {
     type: "removeFeeItem"
 }
 
-export type BookingOperationType = AddPaymentType | AddAdjustmentType | RemoveFeeItemType
+type AssignVillageType = {
+    type: "assignVillage",
+    village: string
+}
+
+type UnassignVillageType = {
+    type: "unassignVillage",
+    village: string
+}
+
+export type BookingOperationType = AddPaymentType | AddAdjustmentType | RemoveFeeItemType | AssignVillageType | UnassignVillageType
 
 type ApproveApplicationType = {
     type: "approveApplication"
@@ -43,3 +53,11 @@ type DeclineApplicationType = {
 }
 
 export type ApplicationOperationType = ApproveApplicationType | DeclineApplicationType
+
+type AddVillageType = {
+    type: "addVillage",
+    name: string
+    town: string
+}
+
+export type EventOperationType = AddVillageType

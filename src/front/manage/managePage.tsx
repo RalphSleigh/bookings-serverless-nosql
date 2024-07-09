@@ -6,7 +6,7 @@ import { useDisableDriveSync, useEventBookings, useHistoricalEventBookings, useT
 import { JsonBookingType, JsonEventType, JsonUserResponseType } from "../../lambda-common/onetable.js";
 import { SuspenseWrapper } from "../suspense.js";
 import { UserContext } from "../user/userContext.js";
-import { CanCreateAnyRole, CanManageApplications, CanSeeKPPage, CanSeeMoneyPage } from "../../shared/permissions.js";
+import { CanCreateAnyRole, CanManageApplications, CanManageVillages, CanSeeKPPage, CanSeeMoneyPage } from "../../shared/permissions.js";
 import { bookingsBookingSearch, bookingsParticipantSearch, useDebounceState, useStickyState } from "../util.js";
 import { JsonBookingWithExtraType } from "../../shared/computedDataTypes.js";
 import { ReactErrorBoundary } from "../app/errors.js";
@@ -29,6 +29,7 @@ export function Component() {
     const emailsPath = useResolvedPath('emails')
     const rolesPath = useResolvedPath('roles')
     const moneyPath = useResolvedPath('money')
+    const villagesPath = useResolvedPath('villages')
     const birthdaysPath = useResolvedPath('birthdays')
     const graphsPath = useResolvedPath('graphs')
 
@@ -67,6 +68,7 @@ export function Component() {
                 <Tab label="Emails" value={emailsPath.pathname} href={emailsPath.pathname} component={Link} />
                 <PermissionTab user={user} event={event} permission={CanCreateAnyRole} label="Roles" value={rolesPath.pathname} href={rolesPath.pathname} component={Link} />
                 <PermissionTab user={user} event={event} permission={CanSeeMoneyPage} label="Money" value={moneyPath.pathname} href={moneyPath.pathname} component={Link} />
+                <PermissionTab user={user} event={event} permission={CanManageVillages} label="Villages" value={villagesPath.pathname} href={villagesPath.pathname} component={Link} />
                 <Tab label="🎂" value={birthdaysPath.pathname} href={birthdaysPath.pathname} component={Link} />
                 <Tab label="📈" value={graphsPath.pathname} href={graphsPath.pathname} component={Link} />
             </Tabs>

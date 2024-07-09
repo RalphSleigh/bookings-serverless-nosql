@@ -12,6 +12,7 @@ import { stringify } from 'csv-stringify/browser/esm/sync';
 import save from "save-file";
 import format from "date-fns/format";
 import { useStickyState } from "../util.js";
+import { applicationTypeIcon } from "./utils.js";
 
 export function Component() {
     const { event, bookings, displayDeleted } = useOutletContext<managePageContext>()
@@ -152,19 +153,4 @@ function saveCSV(event: JsonEventType, user: JsonUserResponseType, bookings: Jso
     const csvData = stringify([headers, ...values])
     const filename = `${event.name}-Bookings-${format(new Date(), 'yyyy-MM-dd')}.csv`
     save(new TextEncoder().encode(csvData), filename)
-}
-
-const applicationTypeIcon = type => {
-    if (type === "group") return <div>
-        <Box sx={{ display: "flex" }}>
-            <AvatarGroup spacing="small" >
-                <Avatar sx={{ width: "24px", height: "24px" }}></Avatar>
-                <Avatar sx={{ width: "24px", height: "24px" }}></Avatar>
-                <Avatar sx={{ width: "24px", height: "24px" }}></Avatar>
-                <Avatar sx={{ width: "24px", height: "24px" }}></Avatar>
-            </AvatarGroup>
-        </Box>
-        <Box sx={{ display: "flex", flexGrow: 1 }}></Box>
-    </div>
-    else return <Avatar sx={{ width: "24px", height: "24px" }}></Avatar>
 }

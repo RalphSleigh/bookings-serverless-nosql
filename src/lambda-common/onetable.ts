@@ -113,6 +113,16 @@ const schema = {
                     }
                 },
             },
+            villages: {
+                type:Array,
+                items: {
+                    type: Object,
+                    schema: {
+                        name: { type: String, required: true },
+                        town: { type: String, required: true },
+                    }
+                }
+            },
             created: { type: Date },
             updated: { type: Date },
         },
@@ -225,6 +235,7 @@ const schema = {
                     accessibilityNeeds: { type: String },
                 }
             },
+            village: { type: String },
             created: { type: Date, required: true },
             updated: { type: Date, required: true },
         },
