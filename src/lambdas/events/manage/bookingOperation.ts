@@ -1,7 +1,7 @@
 import { Model } from 'dynamodb-onetable';
 import { lambda_wrapper_json } from '../../../lambda-common/lambda_wrappers.js';
 import { EventType, OnetableBookingType, RoleType, UserType, table } from '../../../lambda-common/onetable.js';
-import { CanCreateRole, CanWriteMoney } from '../../../shared/permissions.js';
+import { CanCreateRole, CanManageVillages, CanWriteMoney } from '../../../shared/permissions.js';
 import { admin, auth } from '@googleapis/admin';
 import { BookingOperationType } from '../../../shared/computedDataTypes.js';
 import { Jsonify } from 'type-fest'
@@ -55,6 +55,14 @@ export const lambdaHandler = lambda_wrapper_json(
                         await postToDiscord(config, `${current_user.userName} deleted a payment/adjustment from booking ${booking.basic.district} (TODO: Figure out what)`)
 
                         return { message: "Fee removed" }
+                    case "assignVillage":
+                        CanManageVillages.throw({ user: current_user, event: event })
+                        await BookingModel.update({ eventId: booking.eventId, userId: booking.userId, version: "latest", village: operation.village })
+                        return { message: "Village assigned" }
+                    case "unassignVillage":
+                            CanManageVillages.throw({ user: current_user, event: event })
+                            await BookingModel.update({ eventId: booking.eventId, userId: booking.userId, version: "latest", village: null })
+                            return { message: "Village unassigned" }
                     default:
                         throw new Error("Invalid operation")
                 }

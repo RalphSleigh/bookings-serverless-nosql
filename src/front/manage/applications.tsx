@@ -8,6 +8,7 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { Avatar, AvatarGroup, Badge, Box, Button, FormControl, FormControlLabel, Grid, IconButton, InputLabel, MenuItem, Paper, Select, SelectChangeEvent, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography, useTheme } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import { JsonUserType, RoleType } from "../../lambda-common/onetable.js";
+import { applicationTypeIcon } from "./utils.js";
 
 export function Component() {
     const { event, bookings } = useOutletContext<managePageContext>()
@@ -27,7 +28,6 @@ export function Component() {
         if(!confirm("Are you sure you want to decline this application?")) return
         applicationOperation.mutate({ userId, operation: {type: "declineApplication", userId: userId }})
     }
-
 
     const applicationRows = waitingApplications.map((a, i) => {
         return <TableRow key={i}>
@@ -99,19 +99,4 @@ export function Component() {
             </Table>
         </TableContainer>
     </Grid>
-}
-
-const applicationTypeIcon = type => {
-    if (type === "group") return <div>
-        <Box sx={{ display: "flex" }}>
-            <AvatarGroup spacing="small" >
-                <Avatar sx={{ width: "24px", height: "24px" }}></Avatar>
-                <Avatar sx={{ width: "24px", height: "24px" }}></Avatar>
-                <Avatar sx={{ width: "24px", height: "24px" }}></Avatar>
-                <Avatar sx={{ width: "24px", height: "24px" }}></Avatar>
-            </AvatarGroup>
-        </Box>
-        <Box sx={{ display: "flex", flexGrow: 1 }}></Box>
-    </div>
-    else return <Avatar sx={{ width: "24px", height: "24px" }}></Avatar>
 }
