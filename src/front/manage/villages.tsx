@@ -7,6 +7,7 @@ import { Close, ContentCopy, Email } from "@mui/icons-material";
 import { getMemoUpdateFunctions } from "../../shared/util.js";
 import { eventRolesQuery, useBookingOperation, useEventOperation } from "../queries.js";
 import { applicationTypeIcon } from "./utils.js";
+import { groupParticipants } from "../../shared/woodcraft.js";
 
 export function Component() {
     const { event, bookings: rawBookings, displayDeleted } = useOutletContext<managePageContext>()
@@ -22,6 +23,11 @@ export function Component() {
         e.preventDefault()
     }
 
+    const removeVillage = name => e => {
+        eventOperation.mutate({ operation: { type: "removeVillage", name: name } })
+        e.preventDefault()
+    }
+
     const newEnabled = newVillage.name && newVillage.town && !event.villages?.find(v => v.name === newVillage.name)
 
     const unassignVillage = userId => e => {
@@ -29,20 +35,42 @@ export function Component() {
     }
 
     const rows = event.villages?.map((v, i) => {
-        const bookingsInVillage = rawBookings.filter(b => b.village === v.name && !b.deleted).map((b, i) => {
-            return <Stack alignItems="center" gap={1} direction="row" key={i}>
-                <Typography variant="h6">
-                    {b.basic.bookingType === "group" ? b.basic.district : b.basic.contactName}
-                </Typography>
-                <IconButton disabled={bookingOperation.isPending} onClick={unassignVillage(b.userId)} color="warning">
-                    <Close />
-                </IconButton>
-            </Stack>
+        const bookingsInVillage = rawBookings.filter(b => b.village === v.name && !b.deleted)
+        const participants = bookingsInVillage.reduce<JsonParticipantWithExtraType[]>((a, c) => {
+            return [...a, ...c.participants]
+        }, [])
+        const totalsString = groupParticipants(participants, event).filter(g => g.participants.length > 0).map(g => `${g.group.name}: ${g.participants.length}`).join(", ")
+
+        const tableRows = bookingsInVillage.map((b, i) => {
+            return <TableRow key={i}>
+                <TableCell>{b.basic.bookingType === "group" ? b.basic.district : b.basic.contactName}</TableCell>
+                <TableCell>{b.participants.length}</TableCell>
+                <TableCell>
+                    <IconButton disabled={bookingOperation.isPending} onClick={unassignVillage(b.userId)} color="warning">
+                        <Close />
+                    </IconButton>
+                </TableCell>
+            </TableRow>
         })
         return <TableRow key={i} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-            <TableCell component="td" scope="row">{v.name}</TableCell>
+            <TableCell component="td" scope="row">
+                <Stack alignItems="center" gap={1} direction="row">{v.name}
+                    <IconButton disabled={eventOperation.isPending} color="warning" onClick={removeVillage(v.name)} className="hidden-button">
+                        <Close />
+                    </IconButton>
+                </Stack>
+            </TableCell>
             <TableCell component="td">{v.town}</TableCell>
-            <TableCell component="td">{bookingsInVillage}</TableCell>
+            <TableCell component="td">
+                <TableContainer component={Paper}>
+                    <Table size="small">
+                        <TableBody>
+                            {tableRows}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+                <Typography variant="body1" sx={{ mt: 1 }} color={t => participants.length < 80 ? t.palette.success.main : participants.length < 90 ? t.palette.warning.main : t.palette.error.main }>Total: {participants.length} {totalsString}</Typography>
+            </TableCell>
         </TableRow>
     })
 
@@ -54,7 +82,7 @@ export function Component() {
         bookingOperation.mutate({ eventId: event.id, userId: userId, operation: { type: "assignVillage", village: e.target.value } })
     }
 
-    const bookingVillages = rawBookings.filter(b => !b.village && !b.deleted).map((b, i) => {
+    const bookingVillages = rawBookings.filter(b => !event.villages?.find(v => v.name === b.village) && !b.deleted).map((b, i) => {
         return <Paper sx={{ p: 2 }} key={i}>
             <Stack alignItems="center" gap={1} direction="row"><Typography variant="h6">
                 {b.basic.bookingType === "group" ? b.basic.district : b.basic.contactName}
@@ -89,7 +117,7 @@ export function Component() {
         </Grid>
         <Grid item xs={8}>
             <TableContainer component={Paper}>
-                <Table size="small">
+                <Table size="medium">
                     <TableHead>
                         <TableRow>
                             <TableCell><strong>Name</strong></TableCell>

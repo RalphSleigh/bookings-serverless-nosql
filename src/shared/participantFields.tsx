@@ -532,7 +532,7 @@ class Village extends Field {
     visibleDesktop = false
     defaultValue = ""
     value (participant: JsonParticipantWithExtraType) {
-        return participant.booking.village ? participant.booking.village : ""
+        return this.event.villages?.find(v => v.name === participant.booking.village) ? participant.booking.village : ""
     }
 }
 
