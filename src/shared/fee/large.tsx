@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import Markdown from 'react-markdown'
-import { Box, Button, Grid, InputAdornment, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from "@mui/material";
+import { Box, Button, Grid, InputAdornment, List, ListItem, ListItemIcon, ListItemText, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from "@mui/material";
 import { FeeLine, FeeStructure } from "./feeStructure.js";
 import { BookingType, EalingFeeEventType, EventType, JsonBookingType, JsonEventType, JsonParticipantType, LargeFeeEventType, ParticipantType } from "../../lambda-common/onetable.js";
 import { differenceInYears, format } from "date-fns";
@@ -12,6 +12,7 @@ import { DateTimePicker } from '@mui/x-date-pickers'
 import { JsonBookingWithExtraType } from "../computedDataTypes.js";
 import { organisations } from "../ifm.js";
 import { EnvContext } from "../../front/app/envContext.js";
+import { Description } from "@mui/icons-material";
 
 const paymentInstructions = `Please make bank transfers to:  
 
@@ -176,15 +177,28 @@ export class Large extends FeeStructure {
         })
 
         return (<>
-
-<Typography mt={2} variant="body1">Once you have submitted your booking you will be sent an invoice via email. <br />
+            <Typography mt={2} variant="body1">Once you have submitted your booking you will be sent an invoice via email.</Typography>
+            <Typography mt={1} variant="body1">
                 Please note your booking is only secure after you have paid 50% of your camp fees. The deposit is non-refundable but will be taken out of your group’s remaining balance.
             </Typography>
-            <Typography mt={2} variant="body1">You need to have paid the remaining balance for your group by 10 June 2025 but please make payments as soon as your group can afford to.<br />
-                Link to payment policy /how to pay doc<br />
-                YOUR PAYMENT REFERENCE IS {this.getPaymentReference(booking as PartialDeep<JsonBookingType> & { userId: string })} - please use this reference for all payments.
+            <Typography mt={1} variant="body1">You need to have paid the remaining balance for your group by 10 June 2025 but please make payments as soon as your group can afford to.</Typography>
+            <Typography mt={1} variant="body1">
+                Your Payment Reference is  <b>{this.getPaymentReference(booking as PartialDeep<JsonBookingType> & { userId: string })}</b> - please use this reference for all payments.
             </Typography >
-
+            <List dense={true}>
+                <ListItem>
+                  <ListItemIcon>
+                    <Description/>
+                  </ListItemIcon>
+                  <ListItemText><a href="https://camp100.org.uk/wp-content/uploads/2024/06/payment_policy_v1.pdf" target="_blank">Payment Policy</a></ListItemText>
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon>
+                    <Description/>
+                  </ListItemIcon>
+                  <ListItemText><a href="https://camp100.org.uk/wp-content/uploads/2024/06/how_to_pay_v1.pdf" target="_blank">How To Pay</a></ListItemText>
+                </ListItem>
+            </List>
             <TableContainer component={Paper} sx={{ mt: 2, p: 1 }}>
                 <Table size="small">
                     <TableHead>
@@ -245,7 +259,7 @@ export class Large extends FeeStructure {
                     </tr>))}
                 </tbody>
             </table>
-            <p><b>Total: {currency(this.getFeeLines(event, booking).reduce<number>((a,c) => a + c.values[0],0) + booking.fees?.filter(f => f.type === "adjustment").reduce<number>((a,c) => a + c.value ,0))}</b></p>
+            <p><b>Total: {currency(this.getFeeLines(event, booking).reduce<number>((a, c) => a + c.values[0], 0) + booking.fees?.filter(f => f.type === "adjustment").reduce<number>((a, c) => a + c.value, 0))}</b></p>
         </>)
     }
 
@@ -275,17 +289,17 @@ export class Large extends FeeStructure {
         return `C100-${booking.userId.toUpperCase().substring(0, 5)}`
     }
 
-    public StripeElement = ({ event, booking }: { event: JsonEventType, booking: JsonBookingType}) => {
+    public StripeElement = ({ event, booking }: { event: JsonEventType, booking: JsonBookingType }) => {
         const env = useContext(EnvContext)
         if (!env.stripe) return null
         if (booking.participants.length > 3) return null
         const outstanding = this.getFeeRemaining(event, booking)
-        if(outstanding <= 0) return null
+        if (outstanding <= 0) return null
         return <>
-        <Box display="flex" alignItems="center" sx={{mb:2}}>
+            <Box display="flex" alignItems="center" sx={{ mb: 2 }}>
                 <Typography variant="body2" mt={2} sx={{ flexGrow: 1, pr: 2, }}>As you are booking thee or fewer people you can pay by card now:</Typography>
                 <Button variant="contained" sx={{ mt: 2 }} onClick={() => window.location.href = `/api/event/${event.id}/redirectToStripe`}>Pay by card</Button>
-        </Box>
+            </Box>
         </>
     }
 }
