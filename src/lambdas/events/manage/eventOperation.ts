@@ -22,6 +22,18 @@ export const lambdaHandler = lambda_wrapper_json(
                                 substitutions: { emptyList: [], newVillage: village }
                             })
                         return { message: "Village added" }
+                    case "removeVillage":
+                        CanManageVillages.throw({ user: current_user, event: event })
+                        const villageIndex = event.villages.findIndex(v => v.name === operation.name)
+                        if (villageIndex === -1) {
+                            throw new Error("Village not found")
+                        }
+                        const villages = event.villages.filter(v => v.name !== operation.name)
+                        await EventModel.update({ id: event.id },
+                            {
+                                set: { villages: villages }
+                            })
+                        return { message: "Village removed" }
                     default:
                         throw new Error("Invalid operation")
                 }

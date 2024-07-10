@@ -173,7 +173,7 @@ class Village extends Field {
     fieldName = "Village"
     defaultValue = ""
     value(booking: JsonBookingType) {
-        return booking.village
+        return this.event.villages?.find(v => v.name === booking.village) ? booking.village : ""
     }
 }
 
