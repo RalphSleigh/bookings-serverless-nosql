@@ -11,6 +11,7 @@ import { JsonUserType, RoleType } from "../../lambda-common/onetable.js";
 
 const manageRoles = ["Owner", "Manage", "View", "Money", "KP", "Comms", "Accessibility"]
 const bookRoles = ["Book"]
+const villageRoles = ["View - Village"]
 
 export function Component() {
     const { event, bookings } = useOutletContext<managePageContext>()
@@ -18,6 +19,7 @@ export function Component() {
 
     const [userId, setUserId] = useState<string>("")
     const [role, setRole] = useState<RoleType["role"] | "">("")
+    const [village, setVillage] = useState<string>("All")
 
     const createRole = useCreateRole(event.id)
     const deleteRole = useDeleteRole(event.id)
@@ -30,9 +32,16 @@ export function Component() {
         setRole(event.target.value as RoleType["role"] | "");
     };
 
+    const handleVillageChange = (event: SelectChangeEvent) => {
+        setVillage(event.target.value);
+    };
+
+
     const submit = e => {
         if (role === "") return
-        createRole.mutate({ eventId: event.id, userId, role })
+        if(village === "All") createRole.mutate({ eventId: event.id, userId, role })
+        else createRole.mutate({ eventId: event.id, userId, role, village: village })
+        
         e.preventDefault()
     }
 
@@ -61,6 +70,13 @@ export function Component() {
         { field: 'delete', headerName: 'Remove', renderCell: renderDeleteCell(deleteRoleHandler, deleteRole) }
     ];
 
+    const villageColumns: GridColDef[] = [
+        { field: 'user', headerName: 'User', flex: 10, sortComparator: userSortComparator, renderCell: renderUserCell },
+        { field: 'role', headerName: 'Role', flex: 5 },
+        { field: 'village', headerName: 'Village', flex: 5 },
+        { field: 'delete', headerName: 'Remove', renderCell: renderDeleteCell(deleteRoleHandler, deleteRole) }
+    ];
+
     const manageRows = useMemo(() => roleData.data!.roles.filter(r => manageRoles.includes(r.role)).sort((a,b) => manageRoles.indexOf(a.role) - manageRoles.indexOf(b.role)).map(r => {
         const u = userData.data!.users.find(u => u.id === r.userId)!
         return { id: r.id, user: u, role: r.role, delete: r.id }
@@ -71,9 +87,18 @@ export function Component() {
         return { id: r.id, user: u, role: r.role, delete: r.id }
     }), [roleData])
 
+    const villageRows = useMemo(() => roleData.data!.roles.filter(r => villageRoles.includes(r.role)).sort((a,b) => villageRoles.indexOf(a.role) - villageRoles.indexOf(b.role)).map(r => {
+        const u = userData.data!.users.find(u => u.id === r.userId)!
+        return { id: r.id, user: u, role: r.role, village: r.village, delete: r.id }
+    }), [roleData])
+
+
+    const villagesOptions = event.villages?.map((v, i) => {
+        return <MenuItem key={i} value={v.name}>{v.name}</MenuItem>
+    })
 
     return <Grid container sx={{ mt: 1 }}>
-        <Grid xs={4} p={1} item>
+        <Grid xs={3} p={1} item>
             <FormControl fullWidth>
                 <InputLabel id="user-select-label">User</InputLabel>
                 <Select
@@ -86,7 +111,7 @@ export function Component() {
                 </Select>
             </FormControl>
         </Grid>
-        <Grid xs={4} p={1} item>
+        <Grid xs={3} p={1} item>
             <FormControl fullWidth>
                 <InputLabel id="role-select-label">Role</InputLabel>
                 <Select
@@ -104,14 +129,27 @@ export function Component() {
                     <MenuItem value="Comms">Comms</MenuItem>
                     <MenuItem value="Accessibility">Accessibility</MenuItem>
                     <MenuItem value="Book">Book</MenuItem>
+                    <MenuItem value="View - Village">View - Village</MenuItem>
                 </Select>
             </FormControl>
         </Grid>
-        <Grid xs={4} p={1} item>
-            <Button disabled={userId === "" || role === "" || createRole.isPending} variant="contained" sx={{ mt: 0.8 }} size="large" onClick={submit}>Add Role</Button>
+        <Grid xs={3} p={1} item>
+        <FormControl fullWidth>
+                        <InputLabel id="villages">Village</InputLabel>
+                        <Select label="Village" labelId="villages" onChange={handleVillageChange} value={village} disabled={role != "View - Village"}>
+                            <MenuItem value="All">All</MenuItem>
+                            {villagesOptions}
+                        </Select>
+                    </FormControl>
+                    </Grid>
+        <Grid xs={3} p={1} item>
+            <Button disabled={userId === "" || role === "" || createRole.isPending || (role === "View - Village" && village === "All")} variant="contained" sx={{ mt: 0.8 }} size="large" onClick={submit}>Add Role</Button>
         </Grid>
         <Grid  xs={12} p={1} item>
             <DataGrid rowSelection={false} pageSizeOptions={[100]} rows={manageRows} columns={columns} />
+        </Grid>
+        <Grid  xs={12} p={1} item>
+            <DataGrid rowSelection={false} pageSizeOptions={[100]} rows={villageRows} columns={villageColumns} />
         </Grid>
         <Grid  xs={12} p={1} item>
             <DataGrid rowSelection={false} pageSizeOptions={[100]} rows={bookRows} columns={columns} />

@@ -94,6 +94,18 @@ class AccessibilityFilter extends RoleFilter {
     }
 }
 
+class VillageViewFilter extends RoleFilter {
+    filterBooking(bookings: BookingType | JsonBookingType): Boolean {
+        if(!this.role.village) return false
+        return bookings.village === this.role.village
+    }
+
+    filterParticipantFields(participant: ParticipantType) {
+        const { basic, created, updated, attendance, kp, consent, medical } = participant
+        return { basic, created, updated, attendance, kp, consent, medical }
+    }
+}
+
 class NullFilter extends RoleFilter {
     filterBooking(bookings: BookingType | JsonBookingType): Boolean {
         return false
@@ -121,6 +133,8 @@ function getRoleFilter(role: RoleType) {
             return new AccessibilityFilter(role)
         case "KP":
             return new KpFilter(role)
+        case "View - Village":
+            return new VillageViewFilter(role)
     }
 
     return new NullFilter(role)
