@@ -10,6 +10,8 @@ const EventModel = table.getModel<EventType>('Event')
 const RoleModel: Model<RoleType> = table.getModel<RoleType>('Role')
 const UserModel: Model<UserType> = table.getModel<UserType>('User')
 
+const exemptRoles: RoleType["role"][] = ["Book", "View - Village"]
+
 export const lambdaHandler = lambda_wrapper_json(
     async (lambda_event, config, current_user) => {
         const event = await EventModel.get({ id: lambda_event.pathParameters?.id })
@@ -20,7 +22,7 @@ export const lambdaHandler = lambda_wrapper_json(
 
             if(!targetUser) throw new Error("Can't find user")
 
-            if (event.bigCampMode) {
+            if (event.bigCampMode && !exemptRoles.includes(lambda_event.body.role.role)) {
 
                 if (!targetUser) throw new Error("Can't find user")
                 if (targetUser.source !== "google") throw new Error("User is not a Woodcraft GSuite account")

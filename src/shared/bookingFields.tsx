@@ -8,7 +8,7 @@ import { capitalizeWord } from "./util.js";
 abstract class Field {
     event: JsonEventType | OnetableEventType;
     fieldName: string = ""
-    roles: string[] = ["Owner", "Manage", "View", "Money", "KP", "Comms", "Accessibility"]
+    roles: string[] = ["Owner", "Manage", "View", "Money", "KP", "Comms", "Accessibility", "View - Village"]
     defaultValue: string = "N/A"
 
     enabledCSV: boolean = true
