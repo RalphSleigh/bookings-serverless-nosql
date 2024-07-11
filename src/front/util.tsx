@@ -57,8 +57,10 @@ export function bookingsParticipantSearch(bookings: JsonBookingWithExtraType[], 
     .filter(b => b.participants.length > 0)
 }
 
-export function bookingsBookingSearch(bookings: JsonBookingWithExtraType[], search: string): JsonBookingWithExtraType[] {
+export function bookingsBookingSearch(event: JsonEventType, bookings: JsonBookingWithExtraType[], search: string, village: string, town: string): JsonBookingWithExtraType[] {
     return bookings
+    .filter(b => event.villages?.find(v => v.name === b.village)?.town === town || town === "All")
+    .filter(b => village === "All" || b.village === village)
     .filter(b => {
         return b.basic.contactName.toLowerCase().includes(search.toLowerCase()) || b.basic.contactEmail.toLowerCase().includes(search.toLowerCase()) || b.basic.district?.toLowerCase().includes(search.toLowerCase())
     })
