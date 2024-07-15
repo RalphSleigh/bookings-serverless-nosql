@@ -8,13 +8,13 @@ abstract class RoleFilter {
         this.role = role
     }
 
-    abstract filterBooking(bookings: BookingType): Boolean
+    abstract filterBooking(booking: BookingType): Boolean
     abstract filterBookingFields<T extends BookingType | JsonBookingType>(booking: T): Partial<T> & Pick<T, "participants">
     abstract filterParticipantFields(participant: ParticipantType): Partial<ParticipantType>
 }
 
 class AdminFilter extends RoleFilter {
-    filterBooking(bookings: BookingType | JsonBookingType): Boolean {
+    filterBooking(booking: BookingType | JsonBookingType): Boolean {
         return true
     }
 
@@ -28,7 +28,7 @@ class AdminFilter extends RoleFilter {
 }
 
 class OwnerFilter extends RoleFilter {
-    filterBooking(bookings: BookingType | JsonBookingType): Boolean {
+    filterBooking(booking: BookingType | JsonBookingType): Boolean {
         return true
     }
 
@@ -42,7 +42,7 @@ class OwnerFilter extends RoleFilter {
 }
 
 class ManageFilter extends RoleFilter {
-    filterBooking(bookings: BookingType | JsonBookingType): Boolean {
+    filterBooking(booking: BookingType | JsonBookingType): Boolean {
         return true
     }
 
@@ -71,7 +71,7 @@ class ViewFilter extends RoleFilter {
 }
 
 class MoneyFilter extends RoleFilter {
-    filterBooking(bookings: BookingType | JsonBookingType): Boolean {
+    filterBooking(booking: BookingType | JsonBookingType): Boolean {
         return true
     }
 
@@ -86,7 +86,7 @@ class MoneyFilter extends RoleFilter {
 }
 
 class KpFilter extends RoleFilter {
-    filterBooking(bookings: BookingType | JsonBookingType): Boolean {
+    filterBooking(booking: BookingType | JsonBookingType): Boolean {
         return true
     }
 
@@ -102,7 +102,7 @@ class KpFilter extends RoleFilter {
 }
 
 class CommsFilter extends RoleFilter {
-    filterBooking(bookings: BookingType | JsonBookingType): Boolean {
+    filterBooking(booking: BookingType | JsonBookingType): Boolean {
         return true
     }
 
@@ -118,7 +118,7 @@ class CommsFilter extends RoleFilter {
 }
 
 class AccessibilityFilter extends RoleFilter {
-    filterBooking(bookings: BookingType | JsonBookingType): Boolean {
+    filterBooking(booking: BookingType | JsonBookingType): Boolean {
         return true
     }
 
@@ -134,9 +134,9 @@ class AccessibilityFilter extends RoleFilter {
 }
 
 class VillageViewFilter extends RoleFilter {
-    filterBooking(bookings: BookingType | JsonBookingType): Boolean {
+    filterBooking(booking: BookingType | JsonBookingType): Boolean {
         if(!this.role.village) return false
-        return bookings.village === this.role.village
+        return booking.village === this.role.village
     }
 
     filterBookingFields<T extends BookingType | JsonBookingType>(booking: T): Partial<T> & Pick<T, "participants"> {
@@ -151,8 +151,8 @@ class VillageViewFilter extends RoleFilter {
 }
 
 class NullFilter extends RoleFilter {
-    filterBooking(bookings: BookingType | JsonBookingType): Boolean {
-        return false
+    filterBooking(booking: BookingType | JsonBookingType): Boolean {
+        return true
     }
 
     filterBookingFields<T extends BookingType | JsonBookingType>(booking: T): Partial<T> & Pick<T, "participants"> {
