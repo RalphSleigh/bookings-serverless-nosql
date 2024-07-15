@@ -20,7 +20,8 @@ export const lambdaHandler = lambda_wrapper_json(
         const event = await EventModel.get({ id: lambda_event.pathParameters?.id })
         const bookings = await BookingModel.find({ sk: { begins: `event:${lambda_event.pathParameters?.id}` } }) as [BookingType]
         //ts-ignore
-        const timelineBookings = bookings
+        const filteredBookings = filterDataByRoles(event, bookings, current_user!)
+        const timelineBookings = filteredBookings
         .filter(b => b.version !== "latest")
         .sort((a, b) => Date.parse(b.version) - Date.parse(a.version))
         const earliestBooking = timelineBookings[timelineBookings.length - 1]
