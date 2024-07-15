@@ -1,3 +1,4 @@
+import _ from "lodash";
 import { BookingType, FoundUserResponseType, OnetableEventType, ParticipantType, RoleType, JsonBookingType, UserWithRoles } from "./onetable.js";
 
 abstract class RoleFilter {
@@ -8,12 +9,17 @@ abstract class RoleFilter {
     }
 
     abstract filterBooking(bookings: BookingType): Boolean
+    abstract filterBookingFields<T extends BookingType | JsonBookingType>(booking: T): Partial<T> & Pick<T, "participants">
     abstract filterParticipantFields(participant: ParticipantType): Partial<ParticipantType>
 }
 
 class AdminFilter extends RoleFilter {
     filterBooking(bookings: BookingType | JsonBookingType): Boolean {
         return true
+    }
+
+    filterBookingFields<T extends BookingType | JsonBookingType>(booking: T): Partial<T> & Pick<T, "participants"> {
+        return _.cloneDeep(booking)
     }
 
     filterParticipantFields(participant: ParticipantType) {
@@ -26,6 +32,10 @@ class OwnerFilter extends RoleFilter {
         return true
     }
 
+    filterBookingFields<T extends BookingType | JsonBookingType>(booking: T): Partial<T> & Pick<T, "participants"> {
+        return _.cloneDeep(booking)
+    }
+
     filterParticipantFields(participant: ParticipantType) {
         return participant
     }
@@ -36,14 +46,23 @@ class ManageFilter extends RoleFilter {
         return true
     }
 
+    filterBookingFields<T extends BookingType | JsonBookingType>(booking: T): Partial<T> & Pick<T, "participants"> {
+        return _.cloneDeep(booking)
+    }
+
     filterParticipantFields(participant: ParticipantType) {
         return participant
     }
 }
 
 class ViewFilter extends RoleFilter {
-    filterBooking(bookings: BookingType | JsonBookingType): Boolean {
+    filterBooking(booking: BookingType | JsonBookingType): Boolean {
         return true
+    }
+
+    filterBookingFields<T extends BookingType | JsonBookingType>(booking: T): Partial<T> & Pick<T, "participants"> {
+        const {fees, ...rest} = booking
+        return {...rest} as Partial<T> & Pick<T, "participants">
     }
 
     filterParticipantFields(participant: ParticipantType) {
@@ -56,14 +75,24 @@ class MoneyFilter extends RoleFilter {
         return false
     }
 
+    filterBookingFields<T extends BookingType | JsonBookingType>(booking: T): Partial<T> & Pick<T, "participants"> {
+        return _.cloneDeep(booking)
+    }
+
     filterParticipantFields(participant: ParticipantType) {
-        return participant
+        const { basic, created, updated, attendance } = participant
+        return { basic, created, updated, attendance }
     }
 }
 
 class KpFilter extends RoleFilter {
     filterBooking(bookings: BookingType | JsonBookingType): Boolean {
         return true
+    }
+
+    filterBookingFields<T extends BookingType | JsonBookingType>(booking: T): Partial<T> & Pick<T, "participants"> {
+        const {fees, ...rest} = booking
+        return {...rest} as Partial<T> & Pick<T, "participants">
     }
 
     filterParticipantFields(participant: ParticipantType) {
@@ -77,6 +106,11 @@ class CommsFilter extends RoleFilter {
         return true
     }
 
+    filterBookingFields<T extends BookingType | JsonBookingType>(booking: T): Partial<T> & Pick<T, "participants"> {
+        const {fees, ...rest} = booking
+        return {...rest} as Partial<T> & Pick<T, "participants">
+    }
+
     filterParticipantFields(participant: ParticipantType) {
         const { basic, created, updated, attendance } = participant
         return { basic, created, updated, attendance }
@@ -86,6 +120,11 @@ class CommsFilter extends RoleFilter {
 class AccessibilityFilter extends RoleFilter {
     filterBooking(bookings: BookingType | JsonBookingType): Boolean {
         return true
+    }
+
+    filterBookingFields<T extends BookingType | JsonBookingType>(booking: T): Partial<T> & Pick<T, "participants"> {
+        const {fees, ...rest} = booking
+        return {...rest} as Partial<T> & Pick<T, "participants">
     }
 
     filterParticipantFields(participant: ParticipantType) {
@@ -100,6 +139,11 @@ class VillageViewFilter extends RoleFilter {
         return bookings.village === this.role.village
     }
 
+    filterBookingFields<T extends BookingType | JsonBookingType>(booking: T): Partial<T> & Pick<T, "participants"> {
+        const {fees, ...rest} = booking
+        return {...rest} as Partial<T> & Pick<T, "participants">
+    }
+
     filterParticipantFields(participant: ParticipantType) {
         const { basic, created, updated, attendance, kp, consent, medical } = participant
         return { basic, created, updated, attendance, kp, consent, medical }
@@ -109,6 +153,11 @@ class VillageViewFilter extends RoleFilter {
 class NullFilter extends RoleFilter {
     filterBooking(bookings: BookingType | JsonBookingType): Boolean {
         return false
+    }
+
+    filterBookingFields<T extends BookingType | JsonBookingType>(booking: T): Partial<T> & Pick<T, "participants"> {
+        const {fees, ...rest} = booking
+        return {...rest} as Partial<T> & Pick<T, "participants">
     }
 
     filterParticipantFields(participant: ParticipantType) {
@@ -156,6 +205,12 @@ export function filterDataByRoles<T extends BookingType | JsonBookingType>(event
             if (role.filterBooking(b)) return true
         }
         return false
+    }).map(b => {
+        let booking: any = {}
+        for (const role of roles) {
+            booking = {...role.filterBookingFields(b), ...booking}
+        }
+        return booking
     })
 
     //here we want to OR together the various participant fields, IF a booking is allowed by that role.
