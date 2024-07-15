@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useMemo } from "react";
 import { useOutletContext } from "react-router-dom";
 import { JsonEventType, JsonParticipantType, JsonUserResponseType } from "../../lambda-common/onetable.js";
 import { managePageContext } from "./managePage.js";
-import { Button, Grid, MenuItem, Modal, Paper, Typography } from "@mui/material";
+import { Avatar, AvatarGroup, Box, Button, Grid, MenuItem, Modal, Paper, Stack, Typography } from "@mui/material";
 import { ParticipantFields } from "../../shared/participantFields.js";
 import { DataGrid, GridCallbackDetails, GridColumnVisibilityModel, GridExportMenuItemProps, GridPrintExportMenuItem, GridRowParams, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarDensitySelector, GridToolbarExportContainer, GridToolbarFilterButton, MuiEvent } from "@mui/x-data-grid";
 import { JsonBookingWithExtraType, JsonParticipantWithExtraType } from "../../shared/computedDataTypes.js";
@@ -12,6 +12,7 @@ import { stringify } from 'csv-stringify/browser/esm/sync';
 import save from "save-file";
 import format from "date-fns/format";
 import { useStickyState } from "../util.js";
+import { applicationTypeIcon } from "./utils.js";
 
 export function Component() {
     const { event, bookings, displayDeleted } = useOutletContext<managePageContext>()
@@ -34,7 +35,7 @@ export function Component() {
     }, [bookings])
 
     return <Grid xs={12} p={2} item>
-        <BookingsModal selectedBooking={selectedBooking} booking={typeof selectedBooking == "number" ? bookings[selectedBooking] : undefined} handleClose={() => setSelectedBooking(undefined)} />
+        <BookingsModal event={event} selectedBooking={selectedBooking} booking={typeof selectedBooking == "number" ? bookings[selectedBooking] : undefined} handleClose={() => setSelectedBooking(undefined)} />
         <DataGrid rowSelection={false}
             pageSizeOptions={[100]}
             rows={rows}
@@ -78,7 +79,7 @@ const CSVExportMenuItem: React.FC<GridExportMenuItemProps<{}> & { saveCSV: () =>
 }
 
 
-const BookingsModal = ({ selectedBooking, booking, handleClose }: { selectedBooking: number | undefined, booking: JsonBookingWithExtraType | undefined, handleClose: () => void }) => {
+const BookingsModal = ({ event, selectedBooking, booking, handleClose }: { event: JsonEventType, selectedBooking: number | undefined, booking: JsonBookingWithExtraType | undefined, handleClose: () => void }) => {
     if (!booking) return null
 
     const noWrap = { whiteSpace: 'nowrap' as 'nowrap', mt: 1 }
@@ -91,6 +92,10 @@ const BookingsModal = ({ selectedBooking, booking, handleClose }: { selectedBook
 
     }
 
+    const customAnswers = event.customQuestions.map((q, i) => <Typography key={i} variant="body1" sx={noWrap}>
+        <b>{q.questionLabel}</b><br /> {booking.customQuestions?.[i]}
+        </Typography>)
+
     return (<Modal
         open={selectedBooking !== undefined}
         onClose={handleClose}
@@ -100,21 +105,44 @@ const BookingsModal = ({ selectedBooking, booking, handleClose }: { selectedBook
         <Paper elevation={6} sx={{ p: 2, outline: 'none' }}>
             <Grid container spacing={2}>
                 <Grid item xs={12} sm>
-                    <Typography id="modal-modal-title" variant="h6">
+                    <Stack alignItems="center" gap={1} direction="row"><Typography id="modal-modal-title" variant="h6">
                         {booking.basic.contactName}
                     </Typography>
+                    {applicationTypeIcon(booking.basic.bookingType)}
+                    </Stack>
+                    <Typography id="modal-modal-title" variant="subtitle1">
+                        {booking.basic.organisation}
+                    </Typography>
+                    {booking.basic.district ? <Typography id="modal-modal-title" variant="subtitle1">
+                        {booking.basic.district}
+                    </Typography> : null }
                     <Typography variant="body1" sx={noWrap}>
                         <b>Booked By:</b><br /> {booking.basic.contactName}<br />
                         <a href={`mailto:${booking.basic.contactEmail}`}>{booking.basic.contactEmail}</a><br />
                         <a href={`tel:${booking.basic.contactPhone}`}>{booking.basic.contactPhone}</a>
                     </Typography>
-                    <Typography variant="body1" sx={noWrap}>
+                    { booking.emergency?.name || booking.emergency?.phone ? <Typography variant="body1" sx={noWrap}>
                         <b>Emergency Contact:</b><br /> {booking.emergency?.name}<br />
                         <a href={`tel:${booking.emergency?.phone}`}>{booking.emergency?.phone}</a>
+                    </Typography> : null }
+                    { event.bigCampMode ? <>
+                    <Typography variant="body1" sx={noWrap}>
+                        <b>Camp with:</b><br /> {booking.camping?.campWith } 
                     </Typography>
+                    <Typography variant="body1" sx={noWrap}>
+                        <b>Camping Equipment:</b><br /> {booking.camping?.canBringEquipment } 
+                    </Typography>
+                    <Typography variant="body1" sx={noWrap}>
+                        <b>Camping Accessibility:</b><br /> {booking.camping?.accessibilityNeeds } 
+                    </Typography>
+                    <Typography variant="body1" sx={noWrap}>
+                        <b>How heard:</b><br /> {booking.basic.howDidYouHear } 
+                    </Typography>
+                    </> : null }
+                    {customAnswers}
                 </Grid>
                 {chunks.map((c, i) => <Grid item xs={12} sm>
-                    {i == 0 ? <Typography key={i} variant="body1" sx={noWrap}><b>Attendees:</b></Typography> : null}
+                    {i == 0 ? <Typography key={i} variant="body1" sx={noWrap}><b>Attendees: ({booking.participants.length})</b></Typography> : null}
                     <ul>
                         {c}
                     </ul>

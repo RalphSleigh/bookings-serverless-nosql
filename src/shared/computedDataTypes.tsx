@@ -11,6 +11,7 @@ export type JsonParticipantWithExtraType = JsonParticipantType & {
 
 export type JsonBookingWithExtraType = Omit<JsonBookingType, "participants"> & {
     participants: JsonParticipantWithExtraType[];
+    town: string;
 };
 
 type AddPaymentType = {
@@ -30,7 +31,17 @@ type RemoveFeeItemType = {
     type: "removeFeeItem"
 }
 
-export type BookingOperationType = AddPaymentType | AddAdjustmentType | RemoveFeeItemType
+type AssignVillageType = {
+    type: "assignVillage",
+    village: string
+}
+
+type UnassignVillageType = {
+    type: "unassignVillage",
+    village: string
+}
+
+export type BookingOperationType = AddPaymentType | AddAdjustmentType | RemoveFeeItemType | AssignVillageType | UnassignVillageType
 
 type ApproveApplicationType = {
     type: "approveApplication"
@@ -43,3 +54,16 @@ type DeclineApplicationType = {
 }
 
 export type ApplicationOperationType = ApproveApplicationType | DeclineApplicationType
+
+type AddVillageType = {
+    type: "addVillage",
+    name: string
+    town: string
+}
+
+type RemoveVillageType = {
+    type: "removeVillage",
+    name: string
+}
+
+export type EventOperationType = AddVillageType | RemoveVillageType

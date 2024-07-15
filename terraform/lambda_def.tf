@@ -141,6 +141,12 @@ variable "lambda_definitions" {
       path   = "event/{id}/manage/booking/{userId}/operation"
       method = "post"
     },
+    event_operation = {
+      name   = "event_operation"
+      code   = "events/manage/eventOperation"
+      path   = "event/{id}/manage/operation"
+      method = "post"
+    },
     /*handlerSetup('/api/event/:id/manage/timeline', 'events/manage/getTimeline')
     handlerSetup('/api/event/:id/manage/booking/:userId/operation', 'events/manage/bookingOperation', "POST")
     events_delete = {

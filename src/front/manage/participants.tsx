@@ -10,9 +10,12 @@ import { UserContext } from "../user/userContext.js";
 import { format } from "date-fns";
 import { stringify } from 'csv-stringify/browser/esm/sync';
 import save from 'save-file'
-import { parseDate } from "../../shared/util.js";
+import { capitalizeWord, parseDate } from "../../shared/util.js";
 import { useStickyState } from "../util.js";
 import { ageGroups, groupParticipants } from "../../shared/woodcraft.js";
+import { getKP } from "../../shared/kp/kp.js";
+import { getConsent } from "../../shared/consents/consent.js";
+import { dataTagSymbol } from "@tanstack/react-query";
 
 export function Component() {
     const { event, bookings, displayDeleted } = useOutletContext<managePageContext>()
@@ -43,7 +46,7 @@ export function Component() {
 
     return <>
         <Grid xs={12} p={2} item>
-            <ParticipantModal selectedParticipant={selectedParticipant} participant={typeof selectedParticipant == "number" ? participants[selectedParticipant] : undefined} handleClose={() => setSelectedParticipant(undefined)} />
+            <ParticipantModal event={event} selectedParticipant={selectedParticipant} participant={typeof selectedParticipant == "number" ? participants[selectedParticipant] : undefined} handleClose={() => setSelectedParticipant(undefined)} />
             <Typography variant="body1"><b>Total: {participants.length}</b> {totalsString}</Typography>
             <DataGrid
                 rowSelection={false}
@@ -88,7 +91,7 @@ const CSVExportMenuItem: React.FC<GridExportMenuItemProps<{}> & { saveCSV: () =>
 }
 
 
-const ParticipantModal = ({ selectedParticipant, participant, handleClose }: { selectedParticipant: number | undefined, participant: JsonParticipantWithExtraType | undefined, handleClose: () => void }) => {
+const ParticipantModal = ({ event, selectedParticipant, participant, handleClose }: { event: JsonEventType, selectedParticipant: number | undefined, participant: JsonParticipantWithExtraType | undefined, handleClose: () => void }) => {
     const style = {
         position: 'absolute' as 'absolute',
         top: '50%',
@@ -101,9 +104,8 @@ const ParticipantModal = ({ selectedParticipant, participant, handleClose }: { s
     if (!participant) return null
 
     const noWrap = { whiteSpace: 'nowrap' as 'nowrap', mt: 1 }
-    const capitalizeWord = (word: string) => {
-        return word.charAt(0).toUpperCase() + word.slice(1);
-    };
+    const kp = getKP(event)
+    const consent = getConsent(event)
 
     return (<Modal
         open={selectedParticipant !== undefined}
@@ -122,15 +124,20 @@ const ParticipantModal = ({ selectedParticipant, participant, handleClose }: { s
                         <a href={`mailto:${participant.booking.basic.contactEmail}`}>{participant.booking.basic.contactEmail}</a><br />
                         <a href={`tel:${participant.booking.basic.contactPhone}`}>{participant.booking.basic.contactPhone}</a>
                     </Typography>
-                    <Typography variant="body1" sx={noWrap}>
+                    { participant.booking.emergency?.name || participant.booking.emergency?.phone ? <Typography variant="body1" sx={noWrap}>
                         <b>Emergency Contact:</b><br /> {participant.booking.emergency?.name}<br />
                         <a href={`tel:${participant.booking.emergency?.phone}`}>{participant.booking.emergency?.phone}</a>
-                    </Typography>
+                    </Typography> : null }
+                    <consent.PaticipantCardElement data={participant} />
+                    {event.bigCampMode && participant.medical && participant.age > 17 ? <Typography variant="body1" sx={noWrap}><b>First aid: </b> {participant.medical?.firstAid ? "✔️" : "❌"}</Typography> : null}
                 </Grid>
                 <Grid item xs={12} sm>
-                    <Typography variant="body1" sx={noWrap}><b>Diet: </b>{capitalizeWord(participant.kp?.diet!)}</Typography>
-                    <Typography variant="body1" sx={{ mt: 2 }}><b>Additional&nbsp;Dietary&nbsp;Requirements:</b><br />{participant.kp?.details}</Typography>
-                    <Typography variant="body1" sx={{ mt: 2 }}><b>Medical:</b><br />{participant.medical?.details}</Typography>
+                    <kp.PaticipantCardElement data={participant.kp!} />
+                    {participant.medical ? <>
+                        {participant.medical.details ? <Typography variant="body1" sx={{ mt: 2 }}><b>Medical:</b><br />{participant.medical?.details}</Typography> : null}
+                        {event.bigCampMode && participant.medical.accessibility ? <Typography variant="body1" sx={{ mt: 2 }}><b>Accessibility:</b><br />{participant.medical?.accessibility}</Typography> : null}
+                        {event.bigCampMode && participant.medical.contactMe ? <Typography variant="body1" sx={{ mt: 2 }}><b>Please contact me about accessibility.</b><br /></Typography> : null}
+                    </> : null}
                 </Grid>
             </Grid>
         </Paper>

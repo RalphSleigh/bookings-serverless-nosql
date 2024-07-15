@@ -2,7 +2,7 @@ import { differenceInYears, parseISO } from "date-fns"
 import React from "react"
 import { getAgeGroup } from "./woodcraft.js"
 import { JsonBookingWithExtraType, JsonParticipantWithExtraType } from "./computedDataTypes.js"
-import { JsonBookingType, JsonEventType, JsonParticipantType } from "../lambda-common/onetable.js"
+import { JsonBookingType, JsonEventType, JsonParticipantType, BookingType } from "../lambda-common/onetable.js"
 
 export function parseDate(date: Date | string | undefined): Date | null {
     if(!date) return null
@@ -16,10 +16,12 @@ const addComputedFieldToParticipant = (booking, startDate) => (p: JsonParticipan
     return {...p, dob: dateOfBirth!, age, ageGroup: getAgeGroup(age), booking}
 }
 
-export function addComputedFieldsToBookingsQueryResult(bookings: JsonBookingType[], event: JsonEventType): JsonBookingWithExtraType[] {
+export function addComputedFieldsToBookingsQueryResult(bookings: JsonBookingType[] | BookingType[], event: JsonEventType): JsonBookingWithExtraType[] {
     const startDate = parseDate(event.startDate)!
     return bookings.map(b => {
-        return {...b, participants: b.participants.map(addComputedFieldToParticipant(b, startDate))}
+        const newBooking = {...b, town: event.villages?.find(v => v.name === b.village)?.town }
+        newBooking.participants = newBooking.participants.map(addComputedFieldToParticipant(newBooking, startDate))
+        return newBooking
     }) as [JsonBookingWithExtraType]
 }
 
@@ -94,4 +96,8 @@ export function getMemoUpdateFunctions(update) {
             }
         },
     }), [])
+}
+
+export const capitalizeWord = (word: string = "") => {
+    return word.charAt(0).toUpperCase() + word.slice(1);
 }

@@ -3,11 +3,12 @@ import { BookingType, JsonBookingType, JsonEventType, JsonUserResponseType, Onet
 import { ReactNode } from 'react';
 import React from "react";
 import { Link } from "react-router-dom";
+import { capitalizeWord } from "./util.js";
 
 abstract class Field {
     event: JsonEventType | OnetableEventType;
     fieldName: string = ""
-    roles: string[] = ["Owner", "Manage", "View", "Money", "KP", "Comms", "Accessibility"]
+    roles: string[] = ["Owner", "Manage", "View", "Money", "KP", "Comms", "Accessibility", "View - Village"]
     defaultValue: string = "N/A"
 
     enabledCSV: boolean = true
@@ -51,6 +52,16 @@ abstract class Field {
     }
 
     abstract value(booking: JsonBookingType | BookingType): any | undefined
+}
+
+class BookingTypeField extends Field {
+    fieldName = "Type"
+    enabled(): boolean {
+        return this.event.bigCampMode
+    }
+    value(booking: JsonBookingType) {
+        return capitalizeWord(booking.basic.bookingType)
+    }
 }
 
 class BookingOrganisationField extends Field {
@@ -158,6 +169,22 @@ class CampingAccessibilityNeeds extends Field {
     }
 }
 
+class Village extends Field {
+    fieldName = "Village"
+    defaultValue = ""
+    value(booking: JsonBookingType) {
+        return this.event.villages?.find(v => v.name === booking.village) ? booking.village : ""
+    }
+}
+
+class Town extends Field {
+    fieldName = "Town"
+    defaultValue = ""
+    value(booking: JsonBookingType) {
+        return this.event.villages?.find(v => v.name === booking.village)?.town
+    }
+}
+
 class EditLink extends Field {
     fieldName = "Edit"
     roles = ["Owner", "Manage"]
@@ -201,6 +228,7 @@ export class BookingFields {
         this.event = event
 
         this.fields = [
+            new BookingTypeField(event),
             new BookingOrganisationField(event),
             new BookingDistrictField(event),
             new BookingContactName(event),
@@ -212,7 +240,9 @@ export class BookingFields {
             new BookingHowDidYouHear(event),
             new CampWith(event),
             new CanBringEquipemnt(event),
-            new CampingAccessibilityNeeds(event)
+            new CampingAccessibilityNeeds(event),
+            new Village(event),
+            new Town(event)
         ]
 
         event.customQuestions?.forEach((q, i) => {

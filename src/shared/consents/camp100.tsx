@@ -5,6 +5,7 @@ import { PartialDeep } from "type-fest";
 import { Box, FormControlLabel, FormLabel, Grid, Radio, RadioGroup, Typography } from "@mui/material";
 import { parseDate } from "../util.js";
 import { differenceInYears } from "date-fns";
+import { JsonParticipantWithExtraType } from "../computedDataTypes.js";
 
 export class Camp100 implements ConsentStructure {
     consentName = "Camp100"
@@ -71,5 +72,17 @@ export class Camp100 implements ConsentStructure {
             if (ageAtStart >= 12 && ageAtStart < 18 && typeof participant.consent?.sre !== "boolean") results.push(`Please answer RSE consent for ${participant.basic?.name}`)
         }
         return results
+    }
+
+    PaticipantCardElement({data}: {data: JsonParticipantWithExtraType}) {
+        if(!data.consent) return null
+
+        const noWrap = { whiteSpace: 'nowrap' as 'nowrap', mt: 1 }
+
+        return <>
+        <Typography variant="body1" sx={noWrap}><b>Consents</b></Typography>
+        <Typography variant="body1">📷{data.consent.photo ? "✔️" : "❌"}</Typography>
+        {data.age > 11 && data.age < 18 ? <Typography variant="body1">💑{data.consent.sre ? "✔️" : "❌"}</Typography> : null }
+        </>
     }
 }

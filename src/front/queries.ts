@@ -5,7 +5,7 @@ import { SnackBarContext } from './app/toasts.js';
 import { useContext } from 'react';
 import { set } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
-import { ApplicationOperationType, BookingOperationType } from '../shared/computedDataTypes.js';
+import { ApplicationOperationType, BookingOperationType, EventOperationType } from '../shared/computedDataTypes.js';
 import { HasSheetType } from '../lambda-common/sheets_input.js';
 import { onSpaceOrEnter } from '@mui/x-date-pickers/internals';
 
@@ -375,6 +375,23 @@ export function useApplicationOperation(eventId) {
                 })
                 queryClient.invalidateQueries({
                     queryKey: ['manage', eventId, 'roles']
+                })
+                setSnackbar({ message: data.message, severity: 'success' })
+            },
+            onError: snackbarError(setSnackbar)
+        }
+    );
+}
+
+export function useEventOperation(eventId) {
+    const queryClient = useQueryClient()
+    const setSnackbar = useContext(SnackBarContext)
+    return useMutation<{ message: string }, any, { operation: EventOperationType }, any>(
+        {
+            mutationFn: async data => (await axios.post(`/api/event/${eventId}/manage/operation`, { operation: data.operation })).data,
+            onSuccess: (data) => {
+                queryClient.invalidateQueries({
+                    queryKey: ['events']
                 })
                 setSnackbar({ message: data.message, severity: 'success' })
             },

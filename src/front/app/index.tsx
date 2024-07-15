@@ -127,6 +127,9 @@ const router = createBrowserRouter([{
                         path: "emails",
                         lazy: () => import('../manage/comms.js')
                     }, {
+                        path: "villages",
+                        lazy: () => import('../manage/villages.js')
+                    }, {
                         path: "birthdays",
                         lazy: () => import('../manage/birthdays.js')
                     }, {
@@ -218,6 +221,18 @@ export function App() {
                         },
                     }
                 },
+                MuiTableCell: {
+                    styleOverrides: {
+                        root: {
+                            "& .hidden-button": {
+                                opacity: 0
+                            },
+                            "&:hover .hidden-button": {
+                                opacity: 1
+                            }
+                        }
+                    }
+                }
             },
             spacing: 8,
         }),

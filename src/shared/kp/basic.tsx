@@ -1,8 +1,8 @@
 import React from "react";
 import { KpStructure, kpValidationResults } from "./kp_class.js";
 import { JsonParticipantType } from "../../lambda-common/onetable.js";
-import { FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material";
-import { getMemoUpdateFunctions } from "../util.js";
+import { FormControl, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
+import { capitalizeWord, getMemoUpdateFunctions } from "../util.js";
 
 export class Basic implements KpStructure {
     kpName = "Basic"
@@ -10,10 +10,6 @@ export class Basic implements KpStructure {
 
 
         const { updateField } = getMemoUpdateFunctions(update)
-
-        const capitalizeWord = (word: string) => {
-            return word.charAt(0).toUpperCase() + word.slice(1);
-        };
 
         const kpOptions = KpStructure.dietOptions.map(d => <MenuItem key={d} value={d}>
             {capitalizeWord(d)}
@@ -37,5 +33,16 @@ export class Basic implements KpStructure {
             if(!participant.kp?.diet) results.push(`Please select a diet for ${participant.basic?.name}`)
         }
         return results
+    }
+
+    PaticipantCardElement({data}) {
+        if(!data) return null
+
+        const noWrap = { whiteSpace: 'nowrap' as 'nowrap', mt: 1 }
+
+        return <>
+        <Typography variant="body1" sx={noWrap}><b>Diet: </b>{capitalizeWord(data.diet)}</Typography>
+        <Typography variant="body1" sx={{ mt: 2 }}><b>Additional&nbsp;Dietary&nbsp;Requirements:</b><br />{data.details}</Typography>
+        </>
     }
 }

@@ -4,10 +4,7 @@ import { JsonEventType, JsonUserResponseType } from "../../lambda-common/onetabl
 import { JsonBookingWithExtraType } from "../../shared/computedDataTypes.js";
 import { getFee } from "../../shared/fee/fee.js";
 import { Link } from "react-router-dom";
-
-const capitalizeWord = (word: string) => {
-    return word.charAt(0).toUpperCase() + word.slice(1);
-};
+import { capitalizeWord } from "../../shared/util.js";
 
 export function ThanksPage({ event, booking, user }: { event: JsonEventType, booking: JsonBookingWithExtraType, user: JsonUserResponseType }) {
 

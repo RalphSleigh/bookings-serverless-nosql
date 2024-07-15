@@ -4,14 +4,14 @@ import React from "react";
 import { GridColDef, GridColumnVisibilityModel, GridFilterOperator, getGridDateOperators } from "@mui/x-data-grid";
 import { JsonParticipantWithExtraType } from "./computedDataTypes.js";
 import { parseDate } from "./util.js";
-import { differenceInYears, format, formatDistanceToNow } from "date-fns";
+import { differenceInYears, format, formatDistanceToNow, formatISO9075 } from "date-fns";
 import { getAgeGroup } from "./woodcraft.js";
 import { useMediaQuery, useTheme } from "@mui/material";
 
 abstract class Field {
     event: JsonEventType | OnetableEventType;
     abstract fieldName: string
-    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "Money", "KP", "Comms", "Accessibility"]
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "Money", "KP", "Comms", "Accessibility", "View - Village"]
     defaultValue: string = "N/A"
 
     enabledCSV: boolean = true
@@ -101,8 +101,8 @@ class Age extends Field {
         return format(params.value.dob, "dd-MM-yyyy")
     }
 
-    csvCellValue(participant: JsonParticipantWithExtraType | ParticipantType) {
-        return participant.basic.dob
+    csvCellValue(participant: JsonParticipantWithExtraType) {
+        return format(participant.dob, "yyyy-MM-dd")
     }
 
     filterOperators = () => {
@@ -231,6 +231,10 @@ class DietNutAllergy extends Field {
         if(value === false) return ""
         return ""
     }
+
+    csvCellValue(participant: JsonParticipantWithExtraType) {
+        return this.value(participant) ? true : ""
+    }
 }
 
 class DietGlutenAllergy extends Field {
@@ -249,6 +253,9 @@ class DietGlutenAllergy extends Field {
         if(value === true) return "❌"
         if(value === false) return ""
         return ""
+    }
+    csvCellValue(participant: JsonParticipantWithExtraType) {
+        return this.value(participant) ? true : ""
     }
 }
 
@@ -269,6 +276,9 @@ class DietSoyaAllergy extends Field {
         if(value === false) return ""
         return ""
     }
+    csvCellValue(participant: JsonParticipantWithExtraType) {
+        return this.value(participant) ? true : ""
+    }
 }
 
 class DietDairyAllergy extends Field {
@@ -287,6 +297,9 @@ class DietDairyAllergy extends Field {
         if(value === true) return "❌"
         if(value === false) return ""
         return ""
+    }
+    csvCellValue(participant: JsonParticipantWithExtraType) {
+        return this.value(participant) ? true : ""
     }
 }
 
@@ -307,6 +320,9 @@ class DietEggAllergy extends Field {
         if(value === false) return ""
         return ""
     }
+    csvCellValue(participant: JsonParticipantWithExtraType) {
+        return this.value(participant) ? true : ""
+    }
 }
 
 class DietPorkAllergy extends Field {
@@ -325,6 +341,9 @@ class DietPorkAllergy extends Field {
         if(value === true) return "❌"
         if(value === false) return ""
         return ""
+    }
+    csvCellValue(participant: JsonParticipantWithExtraType) {
+        return this.value(participant) ? true : ""
     }
 }
 
@@ -345,6 +364,9 @@ class DietChickpeaAllergy extends Field {
         if(value === false) return ""
         return ""
     }
+    csvCellValue(participant: JsonParticipantWithExtraType) {
+        return this.value(participant) ? true : ""
+    }
 }
 
 class DietDiabetic extends Field {
@@ -363,6 +385,9 @@ class DietDiabetic extends Field {
         if(value === true) return "❌"
         if(value === false) return ""
         return ""
+    }
+    csvCellValue(participant: JsonParticipantWithExtraType) {
+        return this.value(participant) ? true : ""
     }
 }
 
@@ -383,6 +408,9 @@ class DietContactMe extends Field {
         if(value === false) return ""
         return ""
     }
+    csvCellValue(participant: JsonParticipantWithExtraType) {
+        return this.value(participant) ? true : ""
+    }
 }
 
 class PhotoConsent extends Field {
@@ -402,6 +430,9 @@ class PhotoConsent extends Field {
         if(value === false) return "❌"
         return ""
     }
+    csvCellValue(participant: JsonParticipantWithExtraType) {
+        return this.value(participant) ? true : ""
+    }
 }
 
 class RSEConsent extends Field {
@@ -420,6 +451,9 @@ class RSEConsent extends Field {
         if(value === true) return "✔️"
         if(value === false) return "❌"
         return ""
+    }
+    csvCellValue(participant: JsonParticipantWithExtraType) {
+        return this.value(participant) ? true : ""
     }
 }
 
@@ -464,6 +498,9 @@ class AccessbilityContactMe extends Field {
         if(value === false) return ""
         return ""
     }
+    csvCellValue(participant: JsonParticipantWithExtraType) {
+        return this.value(participant) ? true : ""
+    }
 }
 
 class FirstAid extends Field {
@@ -484,6 +521,9 @@ class FirstAid extends Field {
         if(value === false) return ""
         return ""
     }
+    csvCellValue(participant: JsonParticipantWithExtraType) {
+        return this.value(participant) ? true : ""
+    }
 }
 
 class Village extends Field {
@@ -492,7 +532,17 @@ class Village extends Field {
     visibleDesktop = false
     defaultValue = ""
     value (participant: JsonParticipantWithExtraType) {
-        return ""
+        return this.event.villages?.find(v => v.name === participant.booking.village) ? participant.booking.village : ""
+    }
+}
+
+class Town extends Field {
+    fieldName = "Town"
+    visbileMobile = false
+    visibleDesktop = false
+    defaultValue = ""
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.booking.town ? participant.booking.town : ""
     }
 }
 
@@ -508,6 +558,9 @@ class Created extends Field {
         const value = params.value
         return <>{formatDistanceToNow(value)} ago</>
     }
+    csvCellValue(participant: JsonParticipantWithExtraType) {
+        return formatISO9075(this.value(participant))
+    }
 }
 
 class Updated extends Field {
@@ -522,8 +575,10 @@ class Updated extends Field {
         const value = params.value
         return <>{formatDistanceToNow(value)} ago</>
     }
+    csvCellValue(participant: JsonParticipantWithExtraType) {
+        return formatISO9075(this.value(participant))
+    }
 }
-
 
 export class CSVCurrent extends Field {
     fieldName = "Current"
@@ -565,6 +620,7 @@ export class ParticipantFields {
             new PhotoConsent(event),
             new RSEConsent(event),
             new Village(event),
+            new Town(event),
             new Created(event),
             new Updated(event),
         ]    
