@@ -72,7 +72,7 @@ class ViewFilter extends RoleFilter {
 
 class MoneyFilter extends RoleFilter {
     filterBooking(bookings: BookingType | JsonBookingType): Boolean {
-        return false
+        return true
     }
 
     filterBookingFields<T extends BookingType | JsonBookingType>(booking: T): Partial<T> & Pick<T, "participants"> {

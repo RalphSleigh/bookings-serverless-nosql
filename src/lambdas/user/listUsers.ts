@@ -1,5 +1,5 @@
 import { EventType, UserType, table } from '../../lambda-common/onetable.js';
-import { CanCreateAnyRole } from '../../shared/permissions.js';
+import { CanCreateAnyRole, CanSeeMoneyPage, PermissionError } from '../../shared/permissions.js';
 import { lambda_wrapper_json } from '../../lambda-common/lambda_wrappers.js';
 
 /**
@@ -19,7 +19,7 @@ export const lambdaHandler = lambda_wrapper_json(
     async (lambda_event, config, current_user) => {
         const event = await EventModel.get({id: lambda_event.pathParameters?.eventId})
         if(event) {
-            CanCreateAnyRole.throw({user: current_user, event: event})
+            if(!(CanCreateAnyRole.if({user: current_user, event: event}) || CanSeeMoneyPage.if({user: current_user, event: event}))) throw new PermissionError("You don't have permission to list users")
             const users = await UserModel.scan()
             return { users }
         } else {
