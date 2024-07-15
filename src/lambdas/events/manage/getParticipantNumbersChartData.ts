@@ -24,6 +24,7 @@ export const lambdaHandler = lambda_wrapper_json(
         const timelineBookings = filteredBookings
         .filter(b => b.version !== "latest")
         .sort((a, b) => Date.parse(b.version) - Date.parse(a.version))
+        if(timelineBookings.length === 0) return { participantTotals: [] }
         const earliestBooking = timelineBookings[timelineBookings.length - 1]
         const latestBooking = timelineBookings[0]
         const participantTotals: { day: Date, total: number }[] = []
