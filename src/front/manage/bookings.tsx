@@ -35,7 +35,7 @@ export function Component() {
     }, [bookings])
 
     return <Grid xs={12} p={2} item>
-        <BookingsModal selectedBooking={selectedBooking} booking={typeof selectedBooking == "number" ? bookings[selectedBooking] : undefined} handleClose={() => setSelectedBooking(undefined)} />
+        <BookingsModal event={event} selectedBooking={selectedBooking} booking={typeof selectedBooking == "number" ? bookings[selectedBooking] : undefined} handleClose={() => setSelectedBooking(undefined)} />
         <DataGrid rowSelection={false}
             pageSizeOptions={[100]}
             rows={rows}
@@ -79,7 +79,7 @@ const CSVExportMenuItem: React.FC<GridExportMenuItemProps<{}> & { saveCSV: () =>
 }
 
 
-const BookingsModal = ({ selectedBooking, booking, handleClose }: { selectedBooking: number | undefined, booking: JsonBookingWithExtraType | undefined, handleClose: () => void }) => {
+const BookingsModal = ({ event, selectedBooking, booking, handleClose }: { event: JsonEventType, selectedBooking: number | undefined, booking: JsonBookingWithExtraType | undefined, handleClose: () => void }) => {
     if (!booking) return null
 
     const noWrap = { whiteSpace: 'nowrap' as 'nowrap', mt: 1 }
@@ -91,6 +91,10 @@ const BookingsModal = ({ selectedBooking, booking, handleClose }: { selectedBook
         chunks.push(participants.slice(i, i + chunkSize))
 
     }
+
+    const customAnswers = event.customQuestions.map((q, i) => <Typography key={i} variant="body1" sx={noWrap}>
+        <b>{q.questionLabel}</b><br /> {booking.customQuestions?.[i]}
+        </Typography>)
 
     return (<Modal
         open={selectedBooking !== undefined}
@@ -121,6 +125,7 @@ const BookingsModal = ({ selectedBooking, booking, handleClose }: { selectedBook
                         <b>Emergency Contact:</b><br /> {booking.emergency?.name}<br />
                         <a href={`tel:${booking.emergency?.phone}`}>{booking.emergency?.phone}</a>
                     </Typography> : null }
+                    { event.bigCampMode ? <>
                     <Typography variant="body1" sx={noWrap}>
                         <b>Camp with:</b><br /> {booking.camping?.campWith } 
                     </Typography>
@@ -133,6 +138,8 @@ const BookingsModal = ({ selectedBooking, booking, handleClose }: { selectedBook
                     <Typography variant="body1" sx={noWrap}>
                         <b>How heard:</b><br /> {booking.basic.howDidYouHear } 
                     </Typography>
+                    </> : null }
+                    {customAnswers}
                 </Grid>
                 {chunks.map((c, i) => <Grid item xs={12} sm>
                     {i == 0 ? <Typography key={i} variant="body1" sx={noWrap}><b>Attendees: ({booking.participants.length})</b></Typography> : null}
