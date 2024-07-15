@@ -93,7 +93,7 @@ const BookingsModal = ({ event, selectedBooking, booking, handleClose }: { event
     }
 
     const customAnswers = event.customQuestions.map((q, i) => <Typography key={i} variant="body1" sx={noWrap}>
-        <b>{q.questionLabel}</b><br /> {booking.customQuestions?.[i]}
+        <b>{q.questionLabel}</b><br /> {booking.customQuestions?.[i]?.toString()}
         </Typography>)
 
     return (<Modal
@@ -141,8 +141,8 @@ const BookingsModal = ({ event, selectedBooking, booking, handleClose }: { event
                     </> : null }
                     {customAnswers}
                 </Grid>
-                {chunks.map((c, i) => <Grid item xs={12} sm>
-                    {i == 0 ? <Typography key={i} variant="body1" sx={noWrap}><b>Attendees: ({booking.participants.length})</b></Typography> : null}
+                {chunks.map((c, i) => <Grid item xs={12} sm key={i}>
+                    {i == 0 ? <Typography variant="body1" sx={noWrap}><b>Attendees: ({booking.participants.length})</b></Typography> : null}
                     <ul>
                         {c}
                     </ul>
