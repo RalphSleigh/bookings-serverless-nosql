@@ -152,7 +152,7 @@ class VillageViewFilter extends RoleFilter {
 
 class NullFilter extends RoleFilter {
     filterBooking(booking: BookingType | JsonBookingType): Boolean {
-        return true
+        return false
     }
 
     filterBookingFields<T extends BookingType | JsonBookingType>(booking: T): Partial<T> & Pick<T, "participants"> {

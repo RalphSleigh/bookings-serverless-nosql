@@ -1,11 +1,12 @@
 import { Model } from 'dynamodb-onetable';
 import { lambda_wrapper_json } from '../../../lambda-common/lambda_wrappers.js';
-import { EventType, OnetableBookingType, RoleType, UserType, table } from '../../../lambda-common/onetable.js';
+import { BookingType, EventType, OnetableBookingType, RoleType, UserType, table } from '../../../lambda-common/onetable.js';
 import { CanCreateRole, CanManageVillages, CanWriteMoney } from '../../../shared/permissions.js';
 import { admin, auth } from '@googleapis/admin';
 import { BookingOperationType } from '../../../shared/computedDataTypes.js';
 import { Jsonify } from 'type-fest'
 import { postToDiscord } from '../../../lambda-common/discord.js';
+import { addVersionToBooking } from '../../../lambda-common/util.js';
 
 const EventModel = table.getModel<EventType>('Event')
 const RoleModel = table.getModel<RoleType>('Role')
@@ -57,12 +58,13 @@ export const lambdaHandler = lambda_wrapper_json(
                         return { message: "Fee removed" }
                     case "assignVillage":
                         CanManageVillages.throw({ user: current_user, event: event })
-                        await BookingModel.update({ eventId: booking.eventId, userId: booking.userId, version: "latest", village: operation.village })
+                        await addVersionToBooking(booking as BookingType, { village: operation.village })
                         return { message: "Village assigned" }
                     case "unassignVillage":
-                            CanManageVillages.throw({ user: current_user, event: event })
-                            await BookingModel.update({ eventId: booking.eventId, userId: booking.userId, version: "latest", village: null })
-                            return { message: "Village unassigned" }
+                        CanManageVillages.throw({ user: current_user, event: event })
+                        //@ts-ignore
+                        await addVersionToBooking(booking as BookingType, { village: null })
+                        return { message: "Village unassigned" }
                     default:
                         throw new Error("Invalid operation")
                 }
