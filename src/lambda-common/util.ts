@@ -1,11 +1,14 @@
 import _ from 'lodash';
-import { JsonParticipantType, OnetableEventType, ParticipantType, RoleType, UserType, UserWithRoles, table } from './onetable.js';
+import { BookingType, EventBookingTimelineType, EventType, JsonBookingType, JsonParticipantType, OnetableBookingType, OnetableEventType, ParticipantType, RoleType, UserType, UserWithRoles, table } from './onetable.js';
+import { Model } from 'dynamodb-onetable';
 //import { db } from './orm'
 
 const RoleModel = table.getModel<RoleType>('Role')
 const UserModel = table.getModel<UserType>('User')
+const BookingModel: Model<OnetableBookingType> = table.getModel<OnetableBookingType>('Booking')
+const EventBookingTimelineModel = table.getModel<EventBookingTimelineType>('EventBookingTimeline')
 
-export function updateParticipantsDates(existing: Array<ParticipantType>, incoming: Array<JsonParticipantType>) {
+export function updateParticipantsDates(existing: Array<ParticipantType>, incoming: Array<JsonParticipantType> | Array<ParticipantType>) {
     let now = new Date()
 
     incoming.forEach(p => {
@@ -27,6 +30,19 @@ export async function getUsersWithRolesForEvent(event: OnetableEventType, rolesN
         const userRoles = roles.filter(r => r.userId === u.id)
         return { roles: userRoles, ...u }
     })
+}
+
+export async function addVersionToBooking(existing: BookingType, newData: Partial<BookingType>) {
+    if(newData.participants) updateParticipantsDates(existing.participants, newData.participants!)
+    const newLatest = await BookingModel.update({ ...existing, ...newData, deleted: false }, { partial: false })
+    const newVersion = await BookingModel.create({ ...newLatest, version: newLatest.updated.toISOString() })
+
+    EventBookingTimelineModel.update({ eventId: newVersion.eventId }, {
+            set: { events: 'list_append(if_not_exists(events, @{emptyList}), @{newEvent})' },
+            substitutions: { newEvent: [{ userId: newVersion.userId, time: newLatest.updated.toISOString() }], emptyList: [] }
+        })
+
+    return newVersion
 }
 
 /* export function updateAssociation(db, instance, key, Association, values) {

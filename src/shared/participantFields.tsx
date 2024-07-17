@@ -175,7 +175,8 @@ class AttendanceOption extends Field {
         return this.event.attendanceStructure == "options"
     }
     value (participant: JsonParticipantWithExtraType) {
-        return this.event.attendanceData?.options?.[participant.attendance.option!]
+        if(typeof participant.attendance?.option === "number" && this.event.attendanceData?.options) return this.event.attendanceData?.options?.[participant.attendance.option!]
+        return this.defaultValue
     }
 }
 
