@@ -200,8 +200,8 @@ class EditLink extends Field {
 }
 
 class Deleted extends Field {
-    fieldName = "Deleted"
-    enabledCSV = false
+    fieldName = "Cancelled"
+    enabledCSV = true
     value(booking: JsonBookingType) {
         return booking.deleted
     }
