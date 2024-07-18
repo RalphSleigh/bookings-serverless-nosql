@@ -3,7 +3,8 @@ import { BookingType, JsonBookingType, JsonEventType, JsonUserResponseType, Onet
 import { ReactNode } from 'react';
 import React from "react";
 import { Link } from "react-router-dom";
-import { capitalizeWord } from "./util.js";
+import { capitalizeWord, parseDate } from "./util.js";
+import { formatDistanceToNow, formatISO9075 } from "date-fns";
 
 abstract class Field {
     event: JsonEventType | OnetableEventType;
@@ -60,7 +61,7 @@ class BookingTypeField extends Field {
         return this.event.bigCampMode
     }
     value(booking: JsonBookingType) {
-        return capitalizeWord(booking.basic.bookingType)
+        return capitalizeWord(booking.basic?.bookingType)
     }
 }
 
@@ -199,6 +200,39 @@ class EditLink extends Field {
     }
 }
 
+class Created extends Field {
+    fieldName = "Created"
+    visbileMobile = false
+    value (booking: JsonBookingType) {
+        return new Date(booking.created)
+    }
+
+    dataGridCellRenderer(params: any): ReactNode {
+        const value = this.value(params.value)
+        return <>{formatDistanceToNow(parseDate(value)!)} ago</>
+    }
+    csvCellValue(booking: JsonBookingType) {
+        return formatISO9075(this.value(booking))
+    }
+}
+
+class Updated extends Field {
+    fieldName = "Updated"
+    visbileMobile = false
+    value (booking: JsonBookingType) {
+        return new Date(booking.updated)
+    }
+
+    dataGridCellRenderer(params: any): ReactNode {
+        //const value = this.value(params.value)
+        const value = this.value(params.value)
+        return <>{formatDistanceToNow(parseDate(value)!)} ago</>
+    }
+    csvCellValue(booking: JsonBookingType) {
+        return formatISO9075(this.value(booking))
+    }
+}
+
 class Deleted extends Field {
     fieldName = "Cancelled"
     enabledCSV = true
@@ -242,13 +276,14 @@ export class BookingFields {
             new CanBringEquipemnt(event),
             new CampingAccessibilityNeeds(event),
             new Village(event),
-            new Town(event)
+            new Town(event),
         ]
 
         event.customQuestions?.forEach((q, i) => {
             this.fields.push(new CustomQuestionText(q, i, event))
         })
-
+        this.fields.push(new Created(event))
+        this.fields.push(new Updated(event))
         this.fields.push(new EditLink(event))
         this.fields.push(new Deleted(event))
     }
