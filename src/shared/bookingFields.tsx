@@ -41,9 +41,12 @@ abstract class Field {
     }
 
     sortComparator(a: JsonBookingType | BookingType, b: JsonBookingType | BookingType) {
-        if (this.value(a) === undefined) return 1
-        if (this.value(b) === undefined) return -1
-        return this.value(a).toString().localeCompare(this.value(b).toString())
+        if(a === undefined) return 1
+        if(b === undefined) return -1
+        const aValue = this.value(a)
+        const bValue = this.value(b)
+        if(aValue instanceof Date && bValue instanceof Date) return bValue.getTime() - aValue.getTime()
+        return aValue.toString().localeCompare(bValue.toString())
     }
 
     csvCellValue(booking: JsonBookingType | BookingType) {
