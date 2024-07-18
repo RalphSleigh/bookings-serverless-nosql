@@ -144,7 +144,9 @@ async function syncToDrive(event: OnetableEventType, user: UserWithRoles, partic
 
     const bookingsFields = new BookingFields(event)
     const bookingHeaders = bookingsFields.getCSVHeaders(user)
-    const bookings = bookingsData.map(b => bookingsFields.getCSVValues(b, user))
+    const bookings = bookingsData //@ts-ignore
+    .sort((a, b) => parseDate(a.created)! - parseDate(b.created)!)
+    .map(b => bookingsFields.getCSVValues(b, user))
 
     const sheetsData = await sheets_instance.spreadsheets.get({ spreadsheetId: sheetId, fields: 'sheets.properties' })
 
