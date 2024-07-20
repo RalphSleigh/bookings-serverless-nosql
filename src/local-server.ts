@@ -15,14 +15,14 @@ app.use(express.text())
 app.use(bodyParser.json());
 app.use(bodyParser.text({ type: 'application/x-www-form-urlencoded' }));
 
-const handlerSetup = (url: string, lambda_path: string, method: string = "GET") => {
+const handlerSetup = (url: string, lambda_path: string, method: string = "GET", ppath=undefined) => {
 
   const handler_func = method == "POST" ? app.post: app.get
 
   handler_func.bind(app)(url, async (req, res) => {
     try {
 
-      const pp = new path_parser(url)
+      const pp = new path_parser(ppath ? ppath : url)
       const bits = pp.test(req.url)
 
       const lambdaURL = urllib.pathToFileURL(path.join(__dirname, "lambdas", lambda_path)).toString()
@@ -99,7 +99,7 @@ handlerSetup('/api/booking/delete', 'bookings/deletebooking', "POST")
 handlerSetup('/api/event/:id/sheet', 'bookings/getBookingHasSheet')
 handlerSetup('/api/event/:id/createSheet', 'bookings/createSheetForBooking', "POST")
 handlerSetup('/api/event/:id/getParticipantsFromSheet', 'bookings/getParticipantsFromSheet')
-handlerSetup('/api/event/:id/redirectToStripe', 'bookings/redirectToStripe')
+handlerSetup('/api/event/:id/redirectToStripe', 'bookings/redirectToStripe',"GET", '/api/event/:id/redirectToStripe?donate')
 
 
 //handlerSetup('/api/village/create', 'village/create/handler', "POST")
