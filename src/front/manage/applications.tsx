@@ -52,7 +52,9 @@ export function Component() {
 
     let total = 0
 
-    const approvedApplicationRoles = approvedApplications.map((a, i) => {
+    const approvedApplicationRoles = approvedApplications
+    .sort((a, b) => b.predictedParticipants - a.predictedParticipants)
+    .map((a, i) => {
         total += a.predictedParticipants
         const booking = filteredBookings.find(b => b.userId === a.userId)
         return <TableRow key={i}>
