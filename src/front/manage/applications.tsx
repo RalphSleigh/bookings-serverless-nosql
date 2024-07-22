@@ -20,6 +20,8 @@ export function Component() {
     const approvedApplications = applicationsData.data.applications.filter(a => roleData.data.roles.find(r => (r.userId === a.userId && r.role === "Book")))
     const waitingApplications = applicationsData.data.applications.filter(a => !roleData.data.roles.find(r => (r.userId === a.userId && r.role === "Book")))
 
+    const filteredBookings = bookings.filter(b => !b.deleted)
+
     const approve = (userId: string) => {
         applicationOperation.mutate({ userId, operation: {type: "approveApplication", userId: userId }})
     }
@@ -30,6 +32,7 @@ export function Component() {
     }
 
     const applicationRows = waitingApplications.map((a, i) => {
+        
         return <TableRow key={i}>
             <TableCell>{applicationTypeIcon(a.bookingType)}</TableCell>
             <TableCell>{a.name}</TableCell>
@@ -51,12 +54,14 @@ export function Component() {
 
     const approvedApplicationRoles = approvedApplications.map((a, i) => {
         total += a.predictedParticipants
+        const booking = filteredBookings.find(b => b.userId === a.userId)
         return <TableRow key={i}>
             <TableCell>{applicationTypeIcon(a.bookingType)}</TableCell>
             <TableCell>{a.name}</TableCell>
             <TableCell>{a.email}</TableCell>
             <TableCell>{a.district}</TableCell>
             <TableCell>{a.predictedParticipants}</TableCell>
+            <TableCell>{booking ? booking.participants.length : ""}</TableCell>
         </TableRow>
     })
 
@@ -89,8 +94,7 @@ export function Component() {
                         <TableCell><strong>Email</strong></TableCell>
                         <TableCell><strong>Group/District</strong></TableCell>
                         <TableCell><strong>Predicted</strong></TableCell>
-                        <TableCell></TableCell>
-                        <TableCell></TableCell>
+                        <TableCell><strong>Booked</strong></TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
