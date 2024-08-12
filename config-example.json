@@ -1,0 +1,89 @@
+{
+    "pk": {
+      "S": "CONFIG"
+    },
+    "key": {
+      "S": "CURRENT"
+    },
+    "APPLE_CLIENT_ID": {
+      "S": ""
+    },
+    "APPLE_CLIENT_SECRET": {
+      "S": ""
+    },
+    "APPLE_KEY_ID": {
+      "S": ""
+    },
+    "APPLE_TEAM_ID": {
+      "S":""
+    },
+    "BASE_URL": {
+      "S": "https://localhost/"
+    },
+    "COOKIE_EXPIRY": {
+      "N": "12"
+    },
+    "DISCORD_BOT_TOKEN": {
+      "S": ""
+    },
+    "DISCORD_CHANNEL_ID": {
+      "S": ""
+    },
+    "DISCORD_ENABLED": {
+      "BOOL": false
+    },
+    "DISCORD_GUILD_ID": {
+      "S": ""
+    },
+    "DRIVE_SYNC_ENABLED": {
+      "BOOL": true
+    },
+    "EMAIL_CLIENT_EMAIL": {
+      "S": ""
+    },
+    "EMAIL_ENABLED": {
+      "BOOL": false
+    },
+    "EMAIL_FROM": {
+      "S": ""
+    },
+    "EMAIL_PRIVATE_KEY": {
+      "S": ""
+    },
+    "ENV": {
+      "S": "dev"
+    },
+    "FACEBOOK_CLIENT_ID": {
+      "S": ""
+    },
+    "FACEBOOK_CLIENT_SECRET": {
+      "S": ""
+    },
+    "GOOGLE_CLIENT_ID": {
+      "S": ""
+    },
+    "GOOGLE_CLIENT_SECRET": {
+      "S": ""
+    },
+    "JWT_SECRET": {
+      "S": "supercerealvalue"
+    },
+    "MICROSOFT_CLIENT_ID": {
+      "S": ""
+    },
+    "MICROSOFT_CLIENT_SECRET": {
+      "S": ""
+    },
+    "STRIPE_SECRET_KEY": {
+      "S": ""
+    },
+    "STRIPE_WEBHOOK_SECRET": {
+      "S": ""
+    },
+    "YAHOO_CLIENT_ID": {
+      "S": ""
+    },
+    "YAHOO_CLIENT_SECRET": {
+      "S": ""
+    }
+  }
