@@ -1,5 +1,6 @@
 import { DynamoDBClient, GetItemCommand, ScanCommand } from '@aws-sdk/client-dynamodb'
 import { unmarshall } from '@aws-sdk/util-dynamodb'
+import am_in_lambda from './am_in_lambda.js'
 
 export type ConfigType = {
   APPLE_CLIENT_ID: string,
@@ -38,9 +39,8 @@ let configData: ConfigType
 export async function get_config(): Promise<ConfigType> {
         try {
             if(!configData) {
-            const client = new DynamoDBClient({
-                region: 'eu-west-2',
-            })
+            const dynamodbClientOptions = am_in_lambda() ? { region: 'eu-west-2' } : { region: 'eu-west-2', endpoint: 'http://localhost:8000' }
+            const client = new DynamoDBClient(dynamodbClientOptions)
 
             const input = {
                 "Key": {
