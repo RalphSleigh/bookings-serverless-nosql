@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import Markdown from 'react-markdown'
-import { Box, Button, Grid, InputAdornment, List, ListItem, ListItemIcon, ListItemText, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from "@mui/material";
+import { Box, Button, FormControlLabel, FormGroup, Grid, InputAdornment, List, ListItem, ListItemIcon, ListItemText, Paper, Switch, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from "@mui/material";
 import { FeeLine, FeeStructure } from "./feeStructure.js";
 import { BookingType, EalingFeeEventType, EventType, JsonBookingType, JsonEventType, JsonParticipantType, LargeFeeEventType, ParticipantType } from "../../lambda-common/onetable.js";
 import { differenceInYears, format } from "date-fns";
@@ -291,6 +291,7 @@ export class Large extends FeeStructure {
 
     public StripeElement = ({ event, booking }: { event: JsonEventType, booking: JsonBookingType }) => {
         const env = useContext(EnvContext)
+        const [donation, setDonation] = React.useState(false)
         if (!env.stripe) return null
         if (booking.participants.length > 3) return null
         const outstanding = this.getFeeRemaining(event, booking)
@@ -298,7 +299,10 @@ export class Large extends FeeStructure {
         return <>
             <Box display="flex" alignItems="center" sx={{ mb: 2 }}>
                 <Typography variant="body2" mt={2} sx={{ flexGrow: 1, pr: 2, }}>As you are booking thee or fewer people you can pay by card now:</Typography>
-                <Button variant="contained" sx={{ mt: 2 }} onClick={() => window.location.href = `/api/event/${event.id}/redirectToStripe`}>Pay by card</Button>
+                <FormGroup>
+                    <FormControlLabel sx={{ mt: 2, ml:2 }} control={<Switch checked={donation} onChange={() => setDonation(!donation)}/>} label="Donate extra £5" />
+                </FormGroup>
+                <Button variant="contained" sx={{ mt: 2 }} onClick={() => window.location.href = `/api/event/${event.id}/redirectToStripe?donate=${donation.toString()}`}>Pay by card</Button>
             </Box>
         </>
     }

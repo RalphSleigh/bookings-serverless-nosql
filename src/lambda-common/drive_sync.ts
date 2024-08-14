@@ -10,6 +10,7 @@ import am_in_lambda from "./am_in_lambda.js"
 import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs"
 import { addComputedFieldsToBookingsQueryResult, parseDate } from "../shared/util.js"
 import _ from "lodash"
+import { BookingFields } from "../shared/bookingFields.js"
 
 const EventModel = table.getModel<OnetableEventType>('Event')
 const RoleModel = table.getModel<RoleType>('Role')
@@ -61,8 +62,9 @@ export async function syncEventToDrive(eventId, config) {
                 const filtered = filterDataByRoles(event, _.cloneDeep(bookings), fullUser)
                 const filteredAndEnhanced = addComputedFieldsToBookingsQueryResult(filtered, event)
                 const participants = getParticipantRecords(filteredAndEnhanced)
+                const bookingsData = filteredAndEnhanced.filter(b => b.version === "latest")
                 try {
-                    await syncToDrive(event, fullUser, participants, config)
+                    await syncToDrive(event, fullUser, participants, bookingsData, config)
                     console.log(JSON.stringify(fullUser))
                     console.log(`Synced drive for ${user.userName} event ${event.name}`)
                 } catch (e: any) {
@@ -104,7 +106,7 @@ function getParticipantRecords(bookings: BookingType[] | JsonBookingType[]): CSV
     return result.sort((a, b) => parseDate(a.created)!.getTime() - parseDate(b.created)!.getTime())
 }
 
-async function syncToDrive(event: OnetableEventType, user: UserWithRoles, data, config) {
+async function syncToDrive(event: OnetableEventType, user: UserWithRoles, participantsData, bookingsData, config) {
     const oauth2Client = new auth.OAuth2(
         config.GOOGLE_CLIENT_ID,
         config.GOOGLE_CLIENT_SECRET,
@@ -120,14 +122,14 @@ async function syncToDrive(event: OnetableEventType, user: UserWithRoles, data, 
     const name = `${event.name} - Synced Data`
 
     const list = await drive_instance.files.list({
-        q: `mimeType='application/vnd.google-apps.spreadsheet' and name='${name}'`,
+        q: `mimeType='application/vnd.google-apps.spreadsheet' and name='${name}' and trashed = false`,
         fields: 'files(id, name)'
     })
 
     let sheetId
 
     if (list.data.files?.length === 0) {
-        const sheet = await sheets_instance.spreadsheets.create({ requestBody: { properties: { title: name } }, fields: 'spreadsheetId' })
+        const sheet = await sheets_instance.spreadsheets.create({ requestBody: { properties: { title: name }, sheets: [{ properties: { title: "Campers" } }, { properties: { title: "Bookings" } }] }, fields: 'spreadsheetId' })
         sheetId = sheet.data.spreadsheetId
     } else {
         sheetId = list.data.files?.[0].id
@@ -138,9 +140,25 @@ async function syncToDrive(event: OnetableEventType, user: UserWithRoles, data, 
     fields.fields.push(new CSVCurrent(event))
 
     const headers = fields.getCSVHeaders(user)
-    const participants = data.map(p => fields.getCSVValues(p, user))
+    const participants = participantsData.map(p => fields.getCSVValues(p, user))
 
+    const bookingsFields = new BookingFields(event)
+    const bookingHeaders = bookingsFields.getCSVHeaders(user)
+    const bookings = bookingsData //@ts-ignore
+    .sort((a, b) => parseDate(a.created)! - parseDate(b.created)!)
+    .map(b => bookingsFields.getCSVValues(b, user))
 
-    await sheets_instance.spreadsheets.values.batchUpdate({ spreadsheetId: sheetId, requestBody: { valueInputOption: "USER_ENTERED", data: [{ range: "Sheet1!A1", values: [headers, ...participants] }] } })
+    const sheetsData = await sheets_instance.spreadsheets.get({ spreadsheetId: sheetId, fields: 'sheets.properties' })
+
+    if (!sheetsData.data.sheets?.find(s => s.properties?.title === "Campers")) {
+        await sheets_instance.spreadsheets.batchUpdate({ spreadsheetId: sheetId, requestBody: { requests: [{ addSheet: { properties: { title: "Campers" } } }] } })
+    }
+
+    if (!sheetsData.data.sheets?.find(s => s.properties?.title === "Bookings")) {
+        await sheets_instance.spreadsheets.batchUpdate({ spreadsheetId: sheetId, requestBody: { requests: [{ addSheet: { properties: { title: "Bookings" } } }] } })
+    }
+
+    await sheets_instance.spreadsheets.values.batchUpdate({ spreadsheetId: sheetId, requestBody: { valueInputOption: "USER_ENTERED", data: [{ range: "Campers!A1", values: [headers, ...participants] }] } })
+    await sheets_instance.spreadsheets.values.batchUpdate({ spreadsheetId: sheetId, requestBody: { valueInputOption: "USER_ENTERED", data: [{ range: "Bookings!A1", values: [bookingHeaders, ...bookings] }] } })
     //await sheets_instance.spreadsheets.values.batchUpdate({spreadsheetId: sheetId, requestBody: {data: {range:"Sheet1!A1", values:[headers]}}})
 }

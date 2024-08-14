@@ -19,6 +19,7 @@ export const lambdaHandler = lambda_wrapper_json(
     async (lambda_event, config, current_user) => {
         if (!current_user) throw new Error("User not found")
         const eventId = lambda_event.pathParameters?.id
+        const donate = lambda_event.queryStringParameters?.donate === "true"
         const event = await EventModel.get({ id: eventId })
         const booking = await BookingModel.get({ eventId: eventId, userId: current_user.id, version: "latest" }) as BookingType
 
@@ -40,7 +41,13 @@ export const lambdaHandler = lambda_wrapper_json(
             }
         }
 
+        if(donate) {
+            totalOutstanding += 5
+        }
+
         console.log(`Total outstanding: ${totalOutstanding}`)
+
+        const description = donate ? feeLines.map(f => f.description).join(", ") + `, extra £5 donation, ${fees.getPaymentReference(booking as unknown as JsonBookingType)}` : feeLines.map(f => f.description).join(", ") + `, ${fees.getPaymentReference(booking as unknown as JsonBookingType)}`
 
         const stripe = new Stripe(config.STRIPE_SECRET_KEY)
 
@@ -51,7 +58,7 @@ export const lambdaHandler = lambda_wrapper_json(
                         currency: 'gbp',
                         product_data: {
                             name: `${event.name} booking for ${booking.basic.contactName}`,
-                            description: feeLines.map(f => f.description).join(", ") + `, ${fees.getPaymentReference(booking as unknown as JsonBookingType)}`,
+                            description: description
                         },
                         unit_amount: totalOutstanding * 100,
                     },
@@ -65,6 +72,7 @@ export const lambdaHandler = lambda_wrapper_json(
                 metadata: {
                     eventId: event.id,
                     userId: current_user.id,
+                    donate: donate.toString()
                 }
             }
         });

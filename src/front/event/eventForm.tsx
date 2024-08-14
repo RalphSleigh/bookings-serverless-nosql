@@ -13,10 +13,13 @@ import { Close } from "@mui/icons-material";
 import { getMemoUpdateFunctions, parseDate } from "../../shared/util.js";
 import { DateTimePicker } from '@mui/x-date-pickers'
 import { consent } from "../../shared/consents/consent.js";
+import { useEvents } from "../queries.js";
 
 export function EventForm({ data: inputData, submit, mode }: { data: any, submit: (data) => void, mode: "create" | "edit" }) {
     const user = useContext(UserContext)
     const [data, setData] = useState<Partial<JsonEventType>>(inputData)
+
+    const { events } = useEvents().data
 
     const { updateField, updateDate, updateSwitch, updateSubField } = getMemoUpdateFunctions(setData)
 
@@ -48,6 +51,17 @@ export function EventForm({ data: inputData, submit, mode }: { data: any, submit
     const Fees = maybeGetFee(data)
     const FeeConfig = Fees?.ConfigurationElement ?? (() => <></>)
 
+    const eventsToCopyFrom  = events.map(e => <MenuItem key={e.id} value={e.id}>
+        {e.name}
+    </MenuItem>)
+
+    const copyFromEvent = e => {
+        const event = events.find(event => event.id == e.target.value) as Partial<JsonEventType>
+        if(!event) return
+        delete event.id
+        setData({...event})
+    }
+
     return <Grid container spacing={0}>
         <Grid xs={12} p={2} item>
             <Paper elevation={3}>
@@ -56,6 +70,13 @@ export function EventForm({ data: inputData, submit, mode }: { data: any, submit
                         <Grid container spacing={0}>
                             <Typography variant="h4">{mode == "create" ? "New Event" : `Editing - ${data.name}`}</Typography>
                             <Grid xs={12} item>
+                            <FormControl fullWidth sx={{ mt: 2 }}>
+                                    <InputLabel id="event-select-label">Copy From</InputLabel>
+                                    <Select label="Copy From" onChange={copyFromEvent} labelId="event-select-label">
+                                        <MenuItem key="default" value="default">Please select</MenuItem>
+                                        {eventsToCopyFrom}
+                                    </Select>
+                                </FormControl>
                                 <TextField fullWidth sx={{ mt: 2 }} required id="outlined-required" label="Name" value={data.name || ''} onChange={updateField('name')} />
                                 <TextField fullWidth sx={{ mt: 2 }} multiline minRows={3} id="outlined-required" label="Description" value={data.description || ''} onChange={updateField('description')} />
                                 <FormGroup>

@@ -29,6 +29,16 @@ export const lambdaHandler = async (lambda_event: APIGatewayProxyEvent): Promise
 
             const booking = await BookingModel.get({ eventId: paymentIntent.metadata.eventId, userId: paymentIntent.metadata.userId, version: "latest" }) as BookingType
             if(booking){
+
+                if(paymentIntent.metadata.donate === "true") {
+                    const adjustment = [{ type: "adjustment", value: 5, date: new Date().toISOString(), description: "Extra donation", userId: paymentIntent.metadata.userId }] as Jsonify<OnetableBookingType["fees"][0]>[]
+                    await BookingModel.update({ eventId: booking.eventId, userId: booking.userId, version: "latest" },
+                        {
+                            set: { fees: 'list_append(if_not_exists(fees, @{emptyList}), @{newFees})' },
+                            substitutions: { emptyList: [], newFees: adjustment }
+                        })
+                }
+
                 const fees = [{ type: "payment", value: paymentIntent.amount_received/100, date: new Date().toISOString(), description: "Payment from Stripe", userId: paymentIntent.metadata.userId }] as Jsonify<OnetableBookingType["fees"][0]>[]
                 await BookingModel.update({ eventId: booking.eventId, userId: booking.userId, version: "latest" },
                             {
