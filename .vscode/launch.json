@@ -15,6 +15,9 @@
             "outFiles": [
                 "${workspaceFolder}/dist-local/**/*.js"
             ],
+            "env": {
+                "LOCAL_SERVER": "true"
+            }
         }
     ]
 }

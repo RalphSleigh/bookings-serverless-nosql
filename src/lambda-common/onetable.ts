@@ -2,12 +2,13 @@ import { Dynamo } from 'dynamodb-onetable/Dynamo'
 import { Table, Entity } from 'dynamodb-onetable'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { Jsonify, SetOptional } from 'type-fest'
+import am_in_lambda from './am_in_lambda.js'
+
+
+const dynamodbClientOptions = am_in_lambda() ? { region: 'eu-west-2' } : { region: 'eu-west-2', endpoint: 'http://localhost:8000' }
 
 const client = new Dynamo({
-    client: new DynamoDBClient({
-        region: 'eu-west-2',
-        maxAttempts: 10
-    }),
+    client: new DynamoDBClient(dynamodbClientOptions),
     /*
     marshall: {
         convertClassInstanceToMap: true

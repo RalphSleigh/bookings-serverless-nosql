@@ -33,6 +33,7 @@ dist-lambda/
 node_modules
 terraform/files
 /config.js
+/config.json
 /node_modules
 database.sqlite
 database.sqlite-journal
@@ -61,3 +62,5 @@ public/bundle.vendor.js.map
 
 public/*.css
 public/*.css.map
+
+docker/*
