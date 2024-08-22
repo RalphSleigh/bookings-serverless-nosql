@@ -28,7 +28,7 @@ export const lambdaHandler = lambda_wrapper_json(
                 delete newData.fees
                 delete newData.village
                 const newLatest = await addVersionToBooking(existingLatestBooking, newData)
-                
+
                 console.log(`Edited booking ${newData.eventId}-${newData.userId}`);
                 if (isOwnBooking) {
                     console.log("BEGINNING EMAIL")
@@ -49,9 +49,9 @@ export const lambdaHandler = lambda_wrapper_json(
                     }, config)
 
                     console.log("END EMAIL BEGIN DISCORD")
-                    const existingLatestBookingDiscord = {...existingLatestBooking, participants: existingLatestBooking.participants.map(p => ({...p, name: p.basic.name}))}
+                    const existingLatestBookingDiscord = { ...existingLatestBooking, participants: existingLatestBooking.participants.map(p => ({ ...p, name: p.basic.name })) }
                     //@ts-ignore
-                    const newLatestBookingDiscord = {...newLatest, participants: newLatest.participants.map(p => ({...p, name: p.basic.name}))}
+                    const newLatestBookingDiscord = { ...newLatest, participants: newLatest.participants.map(p => ({ ...p, name: p.basic.name })) }
 
                     const diffOutput = newLatestBookingDiscord.participants.length < 200 ? diffString(existingLatestBookingDiscord, newLatestBookingDiscord, { outputKeys: ['name'], color: false, maxElisions: 1, excludeKeys: ['created', 'updated', 'version'] })
                         .split("\n")
@@ -62,9 +62,11 @@ export const lambdaHandler = lambda_wrapper_json(
 
                     console.log(diffOutput)
 
-                    await postToDiscord(config, `${newLatest.basic.contactName} (${newLatest.basic.district}) edited their booking for event ${event.name}, they have booked ${newLatest.participants.length} people (previously ${existingLatestBooking.participants.length})`)
-                    if (newLatest.participants.length === existingLatestBooking.participants.length) await postToDiscord(config, "```" + diffOutput + "```")
-                    console.log("END DISCORD")    
+                    if (diffOutput !== "") {
+                        await postToDiscord(config, `${newLatest.basic.contactName} (${newLatest.basic.district}) edited their booking for event ${event.name}, they have booked ${newLatest.participants.length} people (previously ${existingLatestBooking.participants.length})`)
+                        if (newLatest.participants.length === existingLatestBooking.participants.length) await postToDiscord(config, "```" + diffOutput + "```")
+                    }
+                    console.log("END DISCORD")
                 }
                 console.log("BEGINNING DRIVE SYNC")
                 await queueDriveSync(event.id, config)
