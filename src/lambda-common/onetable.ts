@@ -235,6 +235,7 @@ const schema = {
                     campWith: { type: String },
                     canBringEquipment: { type: String },
                     accessibilityNeeds: { type: String },
+                    travel: { type: String },
                 }
             },
             village: { type: String },

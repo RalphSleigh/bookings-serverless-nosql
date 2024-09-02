@@ -45,6 +45,8 @@ abstract class Field {
         if(b === undefined) return -1
         const aValue = this.value(a)
         const bValue = this.value(b)
+        if(aValue === undefined) return 1
+        if(bValue === undefined) return -1
         if(aValue instanceof Date && bValue instanceof Date) return bValue.getTime() - aValue.getTime()
         return aValue.toString().localeCompare(bValue.toString())
     }
@@ -173,6 +175,16 @@ class CampingAccessibilityNeeds extends Field {
     }
 }
 
+class CampingTravel extends Field {
+    fieldName = "Travel"
+    enabled(): boolean {
+        return this.event.bigCampMode
+    }
+    value(booking: BookingType | JsonBookingType) {
+        return booking.camping?.travel
+    }
+}
+
 class Village extends Field {
     fieldName = "Village"
     defaultValue = ""
@@ -278,6 +290,7 @@ export class BookingFields {
             new CampWith(event),
             new CanBringEquipemnt(event),
             new CampingAccessibilityNeeds(event),
+            new CampingTravel(event),
             new Village(event),
             new Town(event),
         ]

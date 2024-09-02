@@ -5,7 +5,7 @@ import e from "express"
 import { getMemoUpdateFunctions } from "../../../shared/util.js"
 import { PartialDeep } from "type-fest"
 
-function customQuestionFields({ event, data = [], basic, update }: { event: JsonEventType, data: PartialDeep<JsonBookingType>["customQuestions"], basic: PartialDeep<JsonBookingType>["basic"], update: any }) {
+function customQuestionFields({ event, data = [], basic, camping, update }: { event: JsonEventType, data: PartialDeep<JsonBookingType>["customQuestions"], basic: PartialDeep<JsonBookingType>["basic"], camping: PartialDeep<JsonBookingType>["camping"],update: any }) {
 
     if ((!event.customQuestions || event.customQuestions.length === 0) && !event.howDidYouHear) return null
 
@@ -26,6 +26,7 @@ function customQuestionFields({ event, data = [], basic, update }: { event: Json
         <Typography variant="h6" sx={{ mt: 2 }}>Other Stuff</Typography>
         {questions}
         {event.howDidYouHear ? <HowDidYouHear data={basic} update={update} /> : null}
+        {event.bigCampMode ? <TravelQuestion data={camping} update={update} /> : null}
     </>
 }
 
@@ -91,6 +92,16 @@ function HowDidYouHear({ data, update }: { data: PartialDeep<JsonBookingType>["b
             <MenuItem value="At Another Event">At Another Event</MenuItem>
         </Select>
     </FormControl>
+}
+
+function TravelQuestion({ data, update }: { data: PartialDeep<JsonBookingType>["camping"], update: any }) {
+    const { updateField } = getMemoUpdateFunctions(update('camping'))
+
+    return <Grid container spacing={2} mt={1} mb={1}>
+    <Grid item xs>
+        <TextField autoComplete={`section-travel answer`} name={`section-travel-answer`} id={`section-travel-answer`} inputProps={{'data-form-type': 'other'}} label={"Do you know how you will travel to camp? Will you need to use the shuttle bus?"} multiline minRows={3} fullWidth value={data?.travel || ''} onChange={updateField("travel")} placeholder="The shuttle bus will be available (with pre-booking) on the first and last day of camp between Kelmarsh and local train station. The sooner we know who would like to use the shuttle bus, the better."/>
+    </Grid>
+</Grid>
 }
 
 export const MemoCustomQuestionFields = React.memo(customQuestionFields)
