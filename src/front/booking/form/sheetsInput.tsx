@@ -79,8 +79,8 @@ const SheetExistsState: React.FC<{ event: JsonEventType, sheet: drive_v3.Schema$
 
     return <Alert severity="success" sx={{ mt: 2 }} icon={<ListAlt />}>
         <AlertTitle>Spreadsheet Input</AlertTitle>
-        Your sheet has been created and shared with your account. You can access it <a href={sheet.webViewLink!} target="_blank">here</a>. Once you have filled it in, click the button below to import your data.
-        {importProgress == 100 && getParticipantsDataMutation.isSuccess && <><br /><br />Data Imported, please resolve any validation errors and then submit the form.</>}
+        Your sheet has been created and shared with your account. You can access it <a href={sheet.webViewLink!} target="_blank">here</a>.<br /><br /> Once you have filled it in, please click the button below to import your campers to the form. This will overwrite any existing data you have entered.
+        {importProgress == 100 && getParticipantsDataMutation.isSuccess && <><br /><br />Data Imported, please resolve any validation issues and then <b>submit the form.</b></>}
         <Box
             mt={1}
             //margin
@@ -98,7 +98,7 @@ const SheetExistsState: React.FC<{ event: JsonEventType, sheet: drive_v3.Schema$
                 loadingPosition="end"
                 variant="outlined"
                 color="success">
-                <span>Import Data</span>
+                <span>Import Campers to Form</span>
             </LoadingButton>
         </Box>
     </Alert>
