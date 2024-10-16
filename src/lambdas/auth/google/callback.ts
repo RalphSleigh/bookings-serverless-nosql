@@ -21,35 +21,34 @@ import am_in_lambda from '../../../lambda-common/am_in_lambda.js';
 
 export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {//@ts-ignore
     return lambda_wrapper_raw(event, async (config) => {
-
-        const oauth2Client = new auth.OAuth2(
-            config.GOOGLE_CLIENT_ID,
-            config.GOOGLE_CLIENT_SECRET,
-            `${config.BASE_URL}api/auth/google/callback`
-        );
-
-        console.log(JSON.stringify(event))
-
-        if (!event.queryStringParameters?.code) throw new Error("well crap")
-
-        // Save these somewhere safe so they can be used at a later time.
-        const { tokens } = await oauth2Client.getToken(event.queryStringParameters.code)
-        /* oauth2Client.setCredentials(tokens);
-
-        const plus_instance = plus({ version: 'v1', auth: oauth2Client }); */
-
-        const id_token = jwt.decode(tokens.id_token!) as jwt.JwtPayload
-
-        /*  const profile_headers = new Headers()
-         profile_headers.set('Authorization', `Bearer ${tokens.access_token}`)
- 
-         const profile_response = await fetch("https://openidconnect.googleapis.com/v1/userinfo?scope=openid profile",{headers: profile_headers})
-         const profile = await profile_response.json() */
-        /* const res = await plus_instance.people.get({
-            // The ID of the person to get the profile for. The special value "me" can be used to indicate the authenticated user.
-            userId: 'me'}); */
-
         try {
+            const oauth2Client = new auth.OAuth2(
+                config.GOOGLE_CLIENT_ID,
+                config.GOOGLE_CLIENT_SECRET,
+                `${config.BASE_URL}api/auth/google/callback`
+            );
+
+            console.log(JSON.stringify(event))
+
+            if (!event.queryStringParameters?.code) throw new Error("well crap")
+
+            // Save these somewhere safe so they can be used at a later time.
+            const { tokens } = await oauth2Client.getToken(event.queryStringParameters.code)
+            /* oauth2Client.setCredentials(tokens);
+    
+            const plus_instance = plus({ version: 'v1', auth: oauth2Client }); */
+
+            const id_token = jwt.decode(tokens.id_token!) as jwt.JwtPayload
+
+            /*  const profile_headers = new Headers()
+             profile_headers.set('Authorization', `Bearer ${tokens.access_token}`)
+     
+             const profile_response = await fetch("https://openidconnect.googleapis.com/v1/userinfo?scope=openid profile",{headers: profile_headers})
+             const profile = await profile_response.json() */
+            /* const res = await plus_instance.people.get({
+                // The ID of the person to get the profile for. The special value "me" can be used to indicate the authenticated user.
+                userId: 'me'}); */
+
             const user_instance = await get_user_from_login(id_token.sub!, "google", config, id_token.name, id_token.picture)
 
             if (!user_instance) {
