@@ -52,7 +52,7 @@ export function BookingForm({ data, event, user, update, submit, mode, deleteBoo
                     <MemoParticipantsForm basic={data.basic as JsonBookingType["basic"]} event={event} attendanceConfig={attendanceConfig} participants={data.participants || [{}]} update={updateSubField} kp={kpConfig} consent={consentConfig} validation={validation}/>
                     <MemoCampingFields event={event} data={data.camping} update={updateSubField} />
                     <MemoEmergencyFields event={event} data={data.emergency} bookingType={data.basic?.bookingType || "individual"} update={updateSubField} />
-                    <MemoCustomQuestionFields event={event} data={data.customQuestions} basic={data.basic} update={updateSubField} />
+                    <MemoCustomQuestionFields event={event} data={data.customQuestions} basic={data.basic} camping={data.camping} update={updateSubField} />
                     <MemoBookingMoneySection fees={fee} event={event} data={data} />
                     <MemoBookingPermissionSection event={event} data={permission} update={updatePermission} />
                     <BookingValidationResults validationResults={validationResults} />

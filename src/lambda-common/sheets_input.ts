@@ -148,6 +148,18 @@ export async function createSheetForBooking(config: ConfigType, event: OnetableE
                     repeatCell: {
                         range: {
                             "sheetId": 0,
+                            "startRowIndex": 0,
+                            "startColumnIndex": 0,
+                            "endRowIndex": 1
+                        },
+                        cell: { userEnteredFormat: { textFormat: { bold: true }, borders: { bottom: { style: "SOLID" } } } },
+                        fields: "userEnteredFormat"
+                    }
+                },
+                {
+                    repeatCell: {
+                        range: {
+                            "sheetId": 0,
                             "startRowIndex": 1,
                             "startColumnIndex": 1,
                             "endColumnIndex": 2
@@ -230,6 +242,30 @@ export async function createSheetForBooking(config: ConfigType, event: OnetableE
                     },
                 },
                 {
+                    repeatCell: {
+                        range: {
+                            "sheetId": 0,
+                            "startRowIndex": 1,
+                            "startColumnIndex": 5,
+                            "endColumnIndex": 16
+                        },
+                        cell: { userEnteredFormat: { backgroundColor: { red: 0.93, blue: 0.93, green: 0.93, alpha: 1 } } },
+                        fields: "userEnteredFormat"
+                    },
+                },
+                {
+                    repeatCell: {
+                        range: {
+                            "sheetId": 0,
+                            "startRowIndex": 1,
+                            "startColumnIndex": 18,
+                            "endColumnIndex": 22
+                        },
+                        cell: { userEnteredFormat: { backgroundColor: { red: 0.93, blue: 0.93, green: 0.93, alpha: 1 } } },
+                        fields: "userEnteredFormat"
+                    },
+                },
+                {
                     addProtectedRange: {
                         protectedRange: {
                             range: {
@@ -285,6 +321,7 @@ export async function createSheetForBooking(config: ConfigType, event: OnetableE
 
         return newSheet.data
     } catch (e) {
+        console.log(e)
         return false
     }
 }
@@ -336,9 +373,9 @@ function getParticipantFromRow(row: NonNullable<sheets_v4.Schema$ValueRange["val
 
     let dob: string = ""
     try {
-        if(typeof row[2] !== "number") throw("Invalid date")
+        if (typeof row[2] !== "number") throw ("Invalid date")
         else
-        dob = toUtcDate(ValueToDate(row[2]))!.toISOString()
+            dob = toUtcDate(ValueToDate(row[2]))!.toISOString()
     } catch (e) { }
 
     const result: Partial<JsonParticipantType> = {
@@ -358,7 +395,7 @@ function getParticipantFromRow(row: NonNullable<sheets_v4.Schema$ValueRange["val
             soya: row[9] === "Yes",
             dairy: row[10] === "Yes" || row[4] === "vegan",
             egg: row[11] === "Yes" || row[4] === "vegan",
-            pork: row[12] === "Yes" || (typeof row[4] == "string" && row[4] !== "omnivore" && row[4] !== ""), 
+            pork: row[12] === "Yes" || (typeof row[4] == "string" && row[4] !== "omnivore" && row[4] !== ""),
             chickpea: row[13] === "Yes",
             diabetic: row[14] === "Yes",
             contactMe: row[15] === "Yes",
@@ -391,5 +428,5 @@ export function toUtcDate(date: Date | string | undefined): Date | null {
 }
 
 function ValueToDate(GoogleDateValue) {
-    return new Date(new Date(1899,11,30+Math.floor(GoogleDateValue),0,0,0,0).getTime()+(GoogleDateValue%1)*86400000) ;
-  }
+    return new Date(new Date(1899, 11, 30 + Math.floor(GoogleDateValue), 0, 0, 0, 0).getTime() + (GoogleDateValue % 1) * 86400000);
+}
