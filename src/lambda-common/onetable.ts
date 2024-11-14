@@ -79,7 +79,7 @@ const schema = {
                     }
                 },
             },
-            feeStructure: { type: String, required: true, enum: ['ealing', 'flat', 'free', 'large'] },
+            feeStructure: { type: String, required: true, enum: ['ealing', 'flat', 'free', 'large', 'ealingc100'] },
             feeData: {
                 type: Object, required: true, schema: {
                     fee: { type: Number },
@@ -101,6 +101,18 @@ const schema = {
                     },
                     regionalPrices: {
                         type: Object,
+                    },
+                    options: {
+                        type: Array,
+                        items: {
+                            type: Object,
+                            schema: {
+                                ealingAccompanied: { type: Number },
+                                ealingUnaccompanied: { type: Number },
+                                ealingDiscountAccompanied: { type: Number },
+                                ealingDiscountUnaccompanied: { type: Number },
+                            }
+                        }
                     }
                 }
             },
@@ -116,7 +128,7 @@ const schema = {
                 },
             },
             villages: {
-                type:Array,
+                type: Array,
                 items: {
                     type: Object,
                     schema: {
@@ -344,6 +356,18 @@ export interface EalingFeeEventType {
     }
 }
 
+export interface EalingC100FeeEventType {
+    feeStructure: "ealingc100"
+    feeData: {
+        options: {
+            ealingAccompanied: number
+            ealingUnaccompanied: number
+            ealingDiscountAccompanied: number
+            ealingDiscountUnaccompanied: number
+        }[]
+    }
+}
+
 export interface LargeFeeEventType {
     feeStructure: "large"
     feeData: {
@@ -369,7 +393,7 @@ export interface FreeFeeEventType {
     }
 }
 
-export type EventType = (OnetableEventType & EalingFeeEventType) | (OnetableEventType & FlatFeeEventType) | (OnetableEventType & FreeFeeEventType) | (OnetableEventType & LargeFeeEventType)
+export type EventType = (OnetableEventType & EalingFeeEventType) | (OnetableEventType & FlatFeeEventType) | (OnetableEventType & FreeFeeEventType) | (OnetableEventType & LargeFeeEventType) | (OnetableEventType & EalingC100FeeEventType)
 export type JsonEventType = Jsonify<EventType>
 
 export type ParticipantType = ParticipantFields & ParticipantBasicType & Partial<ParticipantKpType> & Partial<ParticipantConsentType> & Partial<ParticipantMedicalType>
