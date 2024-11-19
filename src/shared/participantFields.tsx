@@ -86,6 +86,16 @@ class BookedBy extends Field {
     }
 }
 
+class Organisation extends Field {
+    fieldName = "Organisation"
+    enabled(): boolean {
+        return this.event.bigCampMode
+    }
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.booking.basic.organisation
+    }
+}
+
 class Age extends Field {
     fieldName = "Age"
 
@@ -602,6 +612,7 @@ export class ParticipantFields {
             new Email(event),
             new AttendanceOption(event),
             new BookedBy(event),
+            new Organisation(event),
             new Diet(event),
             new AddtionalDiet(event),
             new DietPreferences(event),
