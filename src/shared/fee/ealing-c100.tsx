@@ -17,7 +17,7 @@ WOODCRAFT FOLK EALING DISTRICT RC1148195
 50491232  
 08-90-80  
   
-Please include a sensible reference and drop [NAME](mailto:email) an email to let me you have paid.`
+Please include a sensible reference and drop [ralph.sleigh@woodcraft.org.uk](mailto:ralph.sleigh@woodcraft.org.uk) an email to let us know you have paid.`
 
 
 export class EalingC100 extends FeeStructure {
