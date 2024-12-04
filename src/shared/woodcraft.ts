@@ -10,7 +10,7 @@ export abstract class AgeGroup {
     abstract filter: (age: number) => boolean
 
     public displayAgeGroup(age: number) {
-        return age > 21 ? this.singular : `${this.singular} (${age})`
+        return age > 20 ? this.singular : `${this.singular} (${age})`
     }
 }
 
