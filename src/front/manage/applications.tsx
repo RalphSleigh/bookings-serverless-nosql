@@ -55,8 +55,9 @@ export function Component() {
     const approvedApplicationRoles = approvedApplications
     .sort((a, b) => b.predictedParticipants - a.predictedParticipants)
     .map((a, i) => {
-        total += a.predictedParticipants
         const booking = filteredBookings.find(b => b.userId === a.userId)
+        total += Math.max(a.predictedParticipants, booking?.participants.length || 0)
+
         return <TableRow key={i}>
             <TableCell>{applicationTypeIcon(a.bookingType)}</TableCell>
             <TableCell>{a.name}</TableCell>
