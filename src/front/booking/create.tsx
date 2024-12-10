@@ -26,7 +26,9 @@ export function CreateBookingPage({ event, user, application }: { event: JsonEve
         }
     }
 
-    const emptyBooking: PartialDeep<JsonBookingType> = { eventId: event.id, userId: user.id, basic: { contactName: user!.userName, contactEmail: user?.email, bookingType: application?.bookingType, district: application?.district }}
+    const username = application?.name || (user.isisWoodcraftGroupUser ? "" : user!.userName)
+
+    const emptyBooking: PartialDeep<JsonBookingType> = { eventId: event.id, userId: user.id, basic: { contactName: username, contactEmail: user?.email, bookingType: application?.bookingType, district: application?.district }}
     
     const [bookingData, setBookingData] = useState<PartialDeep<JsonBookingType>>(existingBooking ?? emptyBooking)
     const setSnackbar = useContext(SnackBarContext)

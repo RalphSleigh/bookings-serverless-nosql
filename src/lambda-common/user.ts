@@ -52,6 +52,7 @@ export async function get_user_from_login(id: string, source: UserType["source"]
     }
 
     let isWoodcraft = false
+    let isisWoodcraftGroupUser = false
     if (source === "google") {
         const auth_client = new auth.JWT(
             config.EMAIL_CLIENT_EMAIL,
@@ -67,6 +68,7 @@ export async function get_user_from_login(id: string, source: UserType["source"]
                 userKey: id
             })
             isWoodcraft = true
+            isisWoodcraftGroupUser = !!user.data.orgUnitPath?.toLocaleLowerCase().includes("old-groups")
             displayName = user.data.name?.fullName ?? displayName
             email = user.data.primaryEmail || undefined
         } catch (e) {
@@ -74,7 +76,7 @@ export async function get_user_from_login(id: string, source: UserType["source"]
         }
     }
 
-    const newUser = await UserModel.create({ remoteId: combinedId, userName: displayName, source: source, picture, admin: config.ENV === "dev" ? isWoodcraft : false, isWoodcraft: isWoodcraft, email: email }) as UserType & { new: boolean }
+    const newUser = await UserModel.create({ remoteId: combinedId, userName: displayName, source: source, picture, admin: config.ENV === "dev" ? isWoodcraft : false, isWoodcraft: isWoodcraft, email: email, isisWoodcraftGroupUser: isisWoodcraftGroupUser }) as UserType & { new: boolean }
 
     log(`Creating new user ${newUser.userName}`)
 
