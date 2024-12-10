@@ -64,7 +64,8 @@ const MoneyTable = ({ event, bookings, onRowClick }: { event: JsonEventType, boo
             {fees.hasPaymentReference ? <TableCell>{fees.getPaymentReference(b)}</TableCell> : null}
             <TableCell>{contactName}</TableCell>
             {row.map((v, i) => <TableCell key={i}>{currency(v)}</TableCell>)}
-            <TableCell>{currency(paid)} {paidUp ? '✅' : ''}</TableCell>
+            <TableCell>{currency(paid)}</TableCell>
+            <TableCell>{currency(row[0] - paid)} {paidUp ? '✅' : ''}</TableCell>
         </TableRow>
     })
 
@@ -79,6 +80,7 @@ const MoneyTable = ({ event, bookings, onRowClick }: { event: JsonEventType, boo
                     <TableCell><strong>Booking</strong></TableCell>
                     {valueHeaders}
                     <TableCell><strong>Paid</strong></TableCell>
+                    <TableCell><strong>Outstanding</strong></TableCell>
                 </TableRow>
             </TableHead>
             <TableBody>
@@ -88,6 +90,7 @@ const MoneyTable = ({ event, bookings, onRowClick }: { event: JsonEventType, boo
                     {fees.hasPaymentReference ? <TableCell></TableCell> : null}
                     {totalsRow}
                     <TableCell><strong>{currency(totalPaid)}</strong></TableCell>
+                    <TableCell><strong>{currency(totals[0] - totalPaid)}</strong></TableCell>
                 </TableRow>
             </TableBody>
         </Table>
@@ -228,6 +231,7 @@ const MoneyModal = ({ selectedBooking, booking, event, users, handleClose }: { s
                                     <TableCell><strong>Totals</strong></TableCell>
                                     {totalsRow}
                                     <TableCell><strong>{currency(paymentTotal)}</strong></TableCell>
+                                    <TableCell><strong>{currency(totals[0] - paymentTotal)}</strong></TableCell>
                                 </TableRow>
                             </TableBody>
                         </Table>
