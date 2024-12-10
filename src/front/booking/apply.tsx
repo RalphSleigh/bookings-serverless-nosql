@@ -14,7 +14,7 @@ import { LoadingButton } from "@mui/lab";
 
 export function CreateApplicationPage({ event, user }: { event: JsonEventType, user: JsonUserResponseType }) {
     const createApplication = useCreateApplication(event)
-    const [applicationData, setApplicationData] = useState<PartialDeep<JsonApplicationType>>({ eventId: event.id, name: user!.userName, email: user?.email })
+    const [applicationData, setApplicationData] = useState<PartialDeep<JsonApplicationType>>({ eventId: event.id, name: user.isisWoodcraftGroupUser ? "" : user!.userName, email: user?.email })
     const setSnackbar = useContext(SnackBarContext)
 
     const { updateField, updateNumber } = getMemoUpdateFunctions(setApplicationData)

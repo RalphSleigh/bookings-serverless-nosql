@@ -30,6 +30,7 @@ const schema = {
             remoteId: { type: String, required: true },
             source: { type: String, required: true, enum: ['google', 'facebook', 'microsoft', 'yahoo', 'apple'] },
             isWoodcraft: { type: Boolean, required: true, default: 'false' },
+            isisWoodcraftGroupUser: { type: Boolean, required: true, default: 'false' },
             admin: { type: Boolean, required: true, default: 'false' },
             userName: { type: String },
             email: { type: String },
