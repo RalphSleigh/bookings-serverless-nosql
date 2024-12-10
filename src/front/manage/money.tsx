@@ -90,7 +90,7 @@ const MoneyTable = ({ event, bookings, onRowClick }: { event: JsonEventType, boo
                     {fees.hasPaymentReference ? <TableCell></TableCell> : null}
                     {totalsRow}
                     <TableCell><strong>{currency(totalPaid)}</strong></TableCell>
-                    <TableCell><strong>{currency(totalPaid - totals[0])}</strong></TableCell>
+                    <TableCell><strong>{currency(totals[0] - totalPaid)}</strong></TableCell>
                 </TableRow>
             </TableBody>
         </Table>
