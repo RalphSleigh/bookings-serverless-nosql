@@ -116,7 +116,7 @@ const MoneyModal = ({ selectedBooking, booking, event, users, handleClose }: { s
     const feeRows = fees.getFeeLines(event, booking).map((row, i) => {
         return <TableRow
             key={i}>
-            <TableCell component="th" scope="row">{row.description}</TableCell>
+            <TableCell component="th" scope="row"><Typography>{row.description}</Typography></TableCell>
             {row.values.map((v, i) => <TableCell key={i}>{currency(v)}</TableCell>)}
             <TableCell></TableCell>
             <TableCell>
