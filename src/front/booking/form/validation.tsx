@@ -28,6 +28,7 @@ export class Validation {
         const results: validationResults = []
         const bigCamp = this.event.bigCampMode
         const emailSet = new Set()
+        const nameAndDOBSet = new Set()
 
         if (bigCamp) {
 
@@ -45,6 +46,7 @@ export class Validation {
         if (data.participants) data.participants.forEach((participant, i) => {
             results.push(...this.validateParticipant(participant, i))
             emailSet.add(participant.basic?.email)
+            nameAndDOBSet.add(`${participant.basic?.name} ${participant.basic?.dob}`)
         })
 
         if (bigCamp && data.basic?.bookingType === "individual") {
@@ -62,6 +64,8 @@ export class Validation {
             const requiredUniqueEmails = Math.floor(Math.pow(Math.max(1, (data.participants?.length || 1) - 5), 0.75))
             if (emailSet.size < requiredUniqueEmails) results.push(`You appear to have entered the same email address for multiple campers.`)
         }
+
+        if (data.participants && data.participants?.length > 1 && nameAndDOBSet.size < data.participants.length) results.push(`You appear to have booked duplicate campers.`)
 
         if (permission !== true) results.push("Please tick the permission checkbox")
 
