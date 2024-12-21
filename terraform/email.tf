@@ -30,7 +30,7 @@ resource "aws_lambda_function" "email_lambda" {
 
   architectures = ["arm64"]
   memory_size   = 256
-  timeout       = 60
+  timeout       = 900
 
   layers = [resource.aws_lambda_layer_version.node_modules_layer.arn]
 
