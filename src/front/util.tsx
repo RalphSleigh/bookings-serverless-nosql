@@ -51,7 +51,7 @@ export function useDebounceState<T>(defaultValue: T, delay: number): [T, T, (T) 
 export function bookingsParticipantSearch(bookings: JsonBookingWithExtraType[], search: string): JsonBookingWithExtraType[] {
     return bookings
     .map(b => {
-        const filteredParicipants = b.participants.filter(p => p.basic.name.toLowerCase().includes(search.toLowerCase()))
+        const filteredParicipants = b.participants.filter(p => p.basic.name.toLowerCase().includes(search.toLowerCase()) || p.basic.email?.toLowerCase().includes(search.toLowerCase()))
         return {...b, participants: filteredParicipants}
     })
     .filter(b => b.participants.length > 0)

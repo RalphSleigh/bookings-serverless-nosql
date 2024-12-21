@@ -1,7 +1,7 @@
 import React from "react";
 import { KpStructure, kpValidationResults } from "./kp_class.js";
 import { JsonParticipantType } from "../../lambda-common/onetable.js";
-import { Checkbox, FormControl, FormControlLabel, FormGroup, Grid, IconButton, InputAdornment, InputLabel, MenuItem, Select, TextField, Tooltip, Typography } from "@mui/material";
+import { Alert, AlertTitle, Checkbox, FormControl, FormControlLabel, FormGroup, Grid, IconButton, InputAdornment, InputLabel, MenuItem, Select, TextField, Tooltip, Typography } from "@mui/material";
 import { capitalizeWord, getMemoUpdateFunctions } from "../util.js";
 import { HelpOutline } from '@mui/icons-material';
 
@@ -59,19 +59,24 @@ export class Large implements KpStructure {
                 </Grid>
             </Grid>
             <Grid item xs={12}>
-                <TextField 
-                autoComplete={`section-${index}-participant diet-restrictions`}
-                multiline 
-                fullWidth 
-                minRows={2} 
-                name={`${index}-participant-diet-restrictions`}
-                id={`${index}-participant-restrictions`}
-                inputProps={{'data-form-type': 'other'}} 
-                label="Any other dietary restrictions, allergies, intolerances, elimination diets and diet related medical conditions:" 
-                placeholder={`This is your everything else section for things that didn’t fit into the tick boxes above.`} 
-                value={data.details || ''} 
-                onChange={updateField('details')} />
+                <TextField
+                    autoComplete={`section-${index}-participant diet-restrictions`}
+                    multiline
+                    fullWidth
+                    minRows={2}
+                    name={`${index}-participant-diet-restrictions`}
+                    id={`${index}-participant-restrictions`}
+                    inputProps={{ 'data-form-type': 'other' }}
+                    label="Any other dietary restrictions, allergies, intolerances, elimination diets and diet related medical conditions:"
+                    placeholder={`This is your everything else section for things that didn’t fit into the tick boxes above. (leave blank if not applicable)`}
+                    value={data.details || ''}
+                    onChange={updateField('details')} />
             </Grid>
+            {["none", "n/a", "no", "nope"].includes(data.details?.trim().toLocaleLowerCase() || "") ? <Grid item xs={12}>
+                <Alert severity="warning" sx={{ mt: 2, pt: 2 }}>
+                    <AlertTitle>Please leave this blank if you have nothing to add here</AlertTitle>
+                </Alert>
+            </Grid> : null}
             <Grid item xs={12}>
                 <FormControlLabel checked={data.contactMe || false} onChange={updateSwitch('contactMe')} control={<Checkbox />} label=" My allergies or dietary needs are complicated and I would like to be contacted by the camp team" />
             </Grid>
@@ -83,14 +88,14 @@ export class Large implements KpStructure {
                     minRows={2}
                     name={`${index}-participant-diet-preferences`}
                     id={`${index}-participant-diet-preferences`}
-                    inputProps={{'data-form-type': 'other'}} 
+                    inputProps={{ 'data-form-type': 'other' }}
                     label={`Food dislikes/preferences:`}
-                    placeholder={`e.g. "I really hate mushrooms"`}
+                    placeholder={`e.g. "I really hate mushrooms" (leave blank if not applicable)`}
                     value={data.preferences || ''}
                     onChange={updateField('preferences')}
                     InputProps={{
                         endAdornment: <InputAdornment position="end">
-                            <Tooltip title={`Please only include dislikes and preferences that are important to you, e.g. "I really hate mushrooms"`}>
+                            <Tooltip title={`Please only include dislikes and preferences that are important to you, e.g. "I really hate mushrooms". Leave blank if not applicable.`}>
                                 <IconButton
                                     aria-label="toggle password visibility"
                                     edge="end"
@@ -103,6 +108,11 @@ export class Large implements KpStructure {
                     }}
                 />
             </Grid>
+            {["none", "n/a", "no", "nope"].includes(data.preferences?.trim().toLocaleLowerCase() || "") ? <Grid item xs={12}>
+                <Alert severity="warning" sx={{ mt: 2, pt: 2 }}>
+                    <AlertTitle>Please leave this blank if you have nothing to add here</AlertTitle>
+                </Alert>
+            </Grid> : null}
         </Grid >
     }
 
@@ -114,9 +124,9 @@ export class Large implements KpStructure {
         return results
     }
 
-    PaticipantCardElement({data}) {
+    PaticipantCardElement({ data }) {
 
-        if(!data) return null
+        if (!data) return null
 
         const noWrap = { whiteSpace: 'nowrap' as 'nowrap', mt: 1 }
 
@@ -129,12 +139,12 @@ export class Large implements KpStructure {
         [data.chickpea, "Chickpea"]].filter(i => i[0]).map(i => i[1]).join(", ")
 
         return <>
-        <Typography variant="body1" sx={noWrap}><b>Diet: </b>{capitalizeWord(data.diet)}</Typography>
-        {isNonEmptyString(data.details) ? <Typography variant="body1" sx={{ mt: 2 }}><b>Additional&nbsp;Dietary&nbsp;Requirements:</b><br />{data.details}</Typography> : null }
-        {isNonEmptyString(data.preferences) ? <Typography variant="body1" sx={{ mt: 2 }}><b>Food&nbsp;Dislikes/Preferences:</b><br />{data.preferences}</Typography> : null }
-        {no ? <Typography variant="body1" sx={{ mt: 2 }}><b>No:</b><br />{no}</Typography> : null }
-        {data.diabetic ? <Typography variant="body1" sx={{ mt: 2 }}><strong>Diabetic</strong></Typography> : null}
-        {data.contactMe ? <Typography variant="body1" sx={{ mt: 2 }}><strong>Needs are complex, please contact me</strong></Typography> : null}              
+            <Typography variant="body1" sx={noWrap}><b>Diet: </b>{capitalizeWord(data.diet)}</Typography>
+            {isNonEmptyString(data.details) ? <Typography variant="body1" sx={{ mt: 2 }}><b>Additional&nbsp;Dietary&nbsp;Requirements:</b><br />{data.details}</Typography> : null}
+            {isNonEmptyString(data.preferences) ? <Typography variant="body1" sx={{ mt: 2 }}><b>Food&nbsp;Dislikes/Preferences:</b><br />{data.preferences}</Typography> : null}
+            {no ? <Typography variant="body1" sx={{ mt: 2 }}><b>No:</b><br />{no}</Typography> : null}
+            {data.diabetic ? <Typography variant="body1" sx={{ mt: 2 }}><strong>Diabetic</strong></Typography> : null}
+            {data.contactMe ? <Typography variant="body1" sx={{ mt: 2 }}><strong>Needs are complex, please contact me</strong></Typography> : null}
         </>
     }
 }

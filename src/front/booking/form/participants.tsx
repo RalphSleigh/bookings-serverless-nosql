@@ -18,7 +18,7 @@ import { Validation } from "./validation.js";
 
 const COLLAPSE_DEFAULT_THRESHOLD = 20
 
-export function ParticipantsForm({ event, attendanceConfig, basic, participants, update, kp, consent, validation }: { event: JsonEventType, attendanceConfig: AttendanceStructure, basic: JsonBookingType["basic"], participants: Array<PartialDeep<JsonParticipantType>>, update: any, kp: KpStructure, consent: ConsentStructure, validation: Validation }) {
+export function ParticipantsForm({ event, attendanceConfig, basic, participants, update, kp, consent, validation, own }: { event: JsonEventType, attendanceConfig: AttendanceStructure, basic: JsonBookingType["basic"], participants: Array<PartialDeep<JsonParticipantType>>, update: any, kp: KpStructure, consent: ConsentStructure, validation: Validation, own: boolean }) {
 
     const { addEmptyObjectToArray, updateArrayItem, deleteArrayItem } = getMemoUpdateFunctions(update('participants'))
 
@@ -37,7 +37,7 @@ export function ParticipantsForm({ event, attendanceConfig, basic, participants,
     return <Grid container spacing={0} sx={{ mt: 2 }}>
         <Grid xs={12} p={0} item>
             <Typography variant="h6">Campers</Typography>
-            {event.bigCampMode ? <SuspenseElement><SheetsWidget event={event} update={update} basic={basic} setIncomingParticipants={setIncomingParticipants} /></SuspenseElement> : null}
+            {event.bigCampMode && own ? <SuspenseElement><SheetsWidget event={event} update={update} basic={basic} setIncomingParticipants={setIncomingParticipants} /></SuspenseElement> : null}
             {participantsList}
             <Button sx={{ mt: 2 }} variant="contained" onClick={addEmptyObjectToArray}>
                 Add person
