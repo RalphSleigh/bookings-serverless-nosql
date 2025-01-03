@@ -68,7 +68,7 @@ export async function get_user_from_login(id: string, source: UserType["source"]
                 userKey: id
             })
             isWoodcraft = true
-            isisWoodcraftGroupUser = !!user.data.orgUnitPath?.toLocaleLowerCase().includes("old-groups")
+            isisWoodcraftGroupUser = !!user.data.orgUnitPath?.toLocaleLowerCase().includes("groups-and-districts")
             displayName = user.data.name?.fullName ?? displayName
             email = user.data.primaryEmail || undefined
         } catch (e) {
