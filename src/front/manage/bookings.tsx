@@ -13,6 +13,7 @@ import save from "save-file";
 import format from "date-fns/format";
 import { useStickyState } from "../util.js";
 import { applicationTypeIcon } from "./utils.js";
+import { fees } from "../../shared/fee/fee.js";
 
 export function Component() {
     const { event, bookings, displayDeleted } = useOutletContext<managePageContext>()
@@ -137,6 +138,9 @@ const BookingsModal = ({ event, selectedBooking, booking, handleClose }: { event
                     </Typography>
                     <Typography variant="body1" sx={noWrap}>
                         <b>How heard:</b><br /> {booking.basic.howDidYouHear } 
+                    </Typography>
+                    <Typography variant="body1" sx={noWrap}>
+                        <b>Payment Reference:</b><br /> {fees.large.getPaymentReference(booking) } 
                     </Typography>
                     </> : null }
                     {customAnswers}

@@ -5,6 +5,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { capitalizeWord, parseDate } from "./util.js";
 import { formatDistanceToNow, formatISO9075 } from "date-fns";
+import { fees } from "./fee/fee.js";
 
 abstract class Field {
     event: JsonEventType | OnetableEventType;
@@ -188,6 +189,9 @@ class CampingTravel extends Field {
 class Village extends Field {
     fieldName = "Village"
     defaultValue = ""
+    enabled(): boolean {
+        return this.event.bigCampMode
+    }
     value(booking: JsonBookingType) {
         return this.event.villages?.find(v => v.name === booking.village) ? booking.village : ""
     }
@@ -196,6 +200,9 @@ class Village extends Field {
 class Town extends Field {
     fieldName = "Town"
     defaultValue = ""
+    enabled(): boolean {
+        return this.event.bigCampMode
+    }
     value(booking: JsonBookingType) {
         return this.event.villages?.find(v => v.name === booking.village)?.town
     }
@@ -212,6 +219,18 @@ class EditLink extends Field {
         const value = this.value(params.value)
         if (value === undefined) return this.defaultValue
         return <Link to={`/event/${this.event.id}/edit-booking/${value}`}>Edit</Link>
+    }
+}
+
+class PaymentReference extends Field {
+    fieldName = "Payment Reference"
+    roles = ["Owner", "Manage", "Money"]
+    defaultValue = ""
+    enabled(): boolean {
+        return this.event.feeStructure === "large"
+    }
+    value(booking: JsonBookingType) {
+        return fees.large.getPaymentReference(booking)
     }
 }
 
@@ -293,6 +312,7 @@ export class BookingFields {
             new CampingTravel(event),
             new Village(event),
             new Town(event),
+            new PaymentReference(event)
         ]
 
         event.customQuestions?.forEach((q, i) => {
