@@ -66,7 +66,7 @@ export function bookingsBookingSearch(event: JsonEventType, bookings: JsonBookin
         return b.basic.contactName.toLowerCase().includes(search.toLowerCase()) 
         || b.basic.contactEmail.toLowerCase().includes(search.toLowerCase()) 
         || b.basic.district?.toLowerCase().includes(search.toLowerCase())
-        || fees.large.getPaymentReference(b).includes(search.toLowerCase())
+        || fees.large.getPaymentReference(b).toLowerCase().includes(search.toLowerCase())
     })
 }
 
