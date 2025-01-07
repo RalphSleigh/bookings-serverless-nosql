@@ -6,6 +6,7 @@ import { JsonBookingType, JsonEventType, JsonParticipantType } from "../lambda-c
 import { getAgeGroup } from "../shared/woodcraft.js"
 import { JsonParticipantWithExtraType, JsonBookingWithExtraType } from "../shared/computedDataTypes.js"
 import { parseDate } from "../shared/util.js"
+import { fees } from "../shared/fee/fee.js"
 
 export function toUtcDate(date: Date | string | undefined): Date | null {
 
@@ -62,7 +63,10 @@ export function bookingsBookingSearch(event: JsonEventType, bookings: JsonBookin
     .filter(b => event.villages?.find(v => v.name === b.village)?.town === town || town === "All")
     .filter(b => village === "All" || b.village === village)
     .filter(b => {
-        return b.basic.contactName.toLowerCase().includes(search.toLowerCase()) || b.basic.contactEmail.toLowerCase().includes(search.toLowerCase()) || b.basic.district?.toLowerCase().includes(search.toLowerCase())
+        return b.basic.contactName.toLowerCase().includes(search.toLowerCase()) 
+        || b.basic.contactEmail.toLowerCase().includes(search.toLowerCase()) 
+        || b.basic.district?.toLowerCase().includes(search.toLowerCase())
+        || fees.large.getPaymentReference(b).includes(search.toLowerCase())
     })
 }
 
