@@ -102,8 +102,8 @@ const BookingsModal = ({ event, selectedBooking, booking, handleClose }: { event
         onClose={handleClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
-        sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-        <Paper elevation={6} sx={{ p: 2, outline: 'none' }}>
+        sx={{ display: "flex", justifyContent: "center", alignItems: "center"}}>
+        <Paper elevation={6} sx={{ p: 2, outline: 'none', maxWidth:"95vw"}}>
             <Grid container spacing={2}>
                 <Grid item xs={12} sm>
                     <Stack alignItems="center" gap={1} direction="row"><Typography id="modal-modal-title" variant="h6">
@@ -130,10 +130,10 @@ const BookingsModal = ({ event, selectedBooking, booking, handleClose }: { event
                     <Typography variant="body1" sx={noWrap}>
                         <b>Camp with:</b><br /> {booking.camping?.campWith } 
                     </Typography>
-                    <Typography variant="body1" sx={noWrap}>
+                    <Typography variant="body1">
                         <b>Camping Equipment:</b><br /> {booking.camping?.canBringEquipment } 
                     </Typography>
-                    <Typography variant="body1" sx={noWrap}>
+                    <Typography variant="body1">
                         <b>Camping Accessibility:</b><br /> {booking.camping?.accessibilityNeeds } 
                     </Typography>
                     <Typography variant="body1" sx={noWrap}>
