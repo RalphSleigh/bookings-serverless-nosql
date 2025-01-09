@@ -45,8 +45,10 @@ export class Validation {
 
         if (data.participants) data.participants.forEach((participant, i) => {
             results.push(...this.validateParticipant(participant, i))
+            if(participant.basic?.name) {
             emailSet.add(participant.basic?.email)
             nameAndDOBSet.add(`${participant.basic?.name} ${participant.basic?.dob}`)
+            }
         })
 
         if (bigCamp && data.basic?.bookingType === "individual") {
@@ -60,12 +62,16 @@ export class Validation {
             }
         })
 
-        if (bigCamp && this.event.allParticipantEmails) {
-            const requiredUniqueEmails = Math.floor(Math.pow(Math.max(1, (data.participants?.length || 1) - 5), 0.75))
+        const participantWithNames = data.participants?.filter(p => p.basic?.name)
+
+        if (bigCamp && this.event.allParticipantEmails && participantWithNames && participantWithNames?.length > 0) {
+            const requiredUniqueEmails = Math.floor(Math.pow(Math.max(1, (participantWithNames?.length || 1) - 5), 0.75))
             if (emailSet.size < requiredUniqueEmails) results.push(`You appear to have entered the same email address for multiple campers.`)
         }
 
-        if (data.participants && data.participants?.length > 1 && nameAndDOBSet.size < data.participants.length) results.push(`You appear to have booked duplicate campers.`)
+        if (participantWithNames && participantWithNames?.length > 1 && nameAndDOBSet.size < participantWithNames.length) results.push(`You appear to have booked duplicate campers.`)
+
+        if (!(data.participants && data.participants?.length > 0)) results.push("Please book at least one camper")
 
         if (permission !== true) results.push("Please tick the permission checkbox")
 
