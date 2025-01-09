@@ -68,7 +68,7 @@ export async function syncEventToDrive(eventId, config) {
                     console.log(JSON.stringify(fullUser))
                     console.log(`Synced drive for ${user.userName} event ${event.name}`)
                 } catch (e: any) {
-                    if (e.code === 401 || e.code === 400) {
+                    if (e.code === '401' || e.code === '400') {
                         console.log(`ERROR syncing drive for ${user.userName} event ${event?.name} - removing tokens`)
                         console.log(e)
                         await UserModel.update({ remoteId: user.remoteId }, { remove: ['tokens'] })
