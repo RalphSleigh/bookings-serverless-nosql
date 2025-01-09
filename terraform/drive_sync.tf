@@ -29,7 +29,7 @@ resource "aws_lambda_function" "drive_sync_lambda" {
   s3_key    = resource.aws_s3_object.drive_sync_lambda_code.key
 
   architectures = ["arm64"]
-  memory_size   = 256
+  memory_size   = 1024
   timeout       = 900
   reserved_concurrent_executions = 1
 
