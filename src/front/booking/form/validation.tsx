@@ -45,9 +45,9 @@ export class Validation {
 
         if (data.participants) data.participants.forEach((participant, i) => {
             results.push(...this.validateParticipant(participant, i))
-            if(participant.basic?.name) {
-            emailSet.add(participant.basic?.email)
-            nameAndDOBSet.add(`${participant.basic?.name} ${participant.basic?.dob}`)
+            if (participant.basic?.name) {
+                emailSet.add(participant.basic?.email)
+                nameAndDOBSet.add(`${participant.basic?.name} ${participant.basic?.dob}`)
             }
         })
 
