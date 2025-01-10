@@ -26,6 +26,8 @@ export const lambdaHandler = async (lambdaEvent: APIGatewayProxyEvent): Promise<
 
         const event = await EventModel.get({ id: lambdaEvent.pathParameters?.id })
 
+        if(!event.bigCampMode) throw new Error("Event is not a big camp")
+
         const bookings = await BookingModel.find({ sk: { begins: `event:${event!.id}:version:latest` } }) as BookingType[]
 
         const filtered = bookings.filter(b => b.deleted === false)
