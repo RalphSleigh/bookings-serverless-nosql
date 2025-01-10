@@ -88,6 +88,7 @@ handlerSetup('/api/event/:id/manage/roles/delete', 'events/manage/deleteRole', "
 handlerSetup('/api/event/:id/manage/booking/:userId/operation', 'events/manage/bookingOperation', "POST")
 handlerSetup('/api/event/:id/manage/application/:userId/operation', 'events/manage/applicationOperation', "POST")
 handlerSetup('/api/event/:id/manage/operation', 'events/manage/eventOperation', "POST")
+handlerSetup('/api/event/:id/widget', 'events/eventWidget', "GET", '/api/event/:id/widget?target')
 handlerSetup('/api/booking/user', 'bookings/getUsersBookings')
 handlerSetup('/api/booking/create', 'bookings/createBooking', "POST")
 //handlerSetup('/api/booking/:id', 'bookings/get/handler')
