@@ -26,6 +26,8 @@ export const lambdaHandler = async (lambdaEvent: APIGatewayProxyEvent): Promise<
 
         const event = await EventModel.get({ id: lambdaEvent.pathParameters?.id })
 
+        if(!event.bigCampMode) throw new Error("Event is not a big camp")
+
         const bookings = await BookingModel.find({ sk: { begins: `event:${event!.id}:version:latest` } }) as BookingType[]
 
         const filtered = bookings.filter(b => b.deleted === false)
@@ -46,27 +48,44 @@ export const lambdaHandler = async (lambdaEvent: APIGatewayProxyEvent): Promise<
     }
     .progress {
         width: 100%;
-        background-color: #a3a3a3;
-        height: 30px;
-        border-radius: 5px;
+        height: 20px;
+        background-color: rgb(238, 238, 238);
+        border-bottom-color: rgb(238, 238, 238);
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+        border-left-color: rgb(238, 238, 238);
+        border-right-color: rgb(238, 238, 238);
+        order-top-color: rgb(238, 238, 238);
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        box-shadow: rgb(192, 191, 188) 0px -1px 1px 0px inset;
+        box-sizing: border-box;
+        color: rgb(238, 238, 238)
     }
     .filled {
-        width: ${percent}%;
         height:100%;
         background-color: #000000;
         text-align: center;
         line-height: 30px;
         color: white;
-        border-radius: 5px;
+        border-radius: 10px;
+        box-shadow: rgb(51, 51, 51) 0px 2px 2px 0px;
+        animation: progressBar 3s ease-in-out;
+        animation-fill-mode:both; 
     }
+
+    @keyframes progressBar {
+    0% { width: 0; }
+    100% { width: ${percent}%; }
+}
 </style>
 </head>
 <body>
 <div class="progress">
 <div class="filled">
-${total}
 </div>
 </div>
+<p>${percent.toFixed(0)}%</p>
 </body>
 </html>`
 
