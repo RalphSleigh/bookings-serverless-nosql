@@ -21,6 +21,7 @@ export const userQuery = {
     queryFn: async () => (await axios.get("/api/user")).data,
     staleTime: 60 * 1000,
     cacheTime: 60 * 1000,
+    refetchInterval: 60 * 1000,
     refetchOnWindowFocus: true
 }
 
