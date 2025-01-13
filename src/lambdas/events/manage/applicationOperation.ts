@@ -23,6 +23,8 @@ export const lambdaHandler = lambda_wrapper_json(
             CanManageApplications.throw({ user: current_user, event: event })
             switch (operation.type) {
                 case "approveApplication":
+                    const maybeRole = await RoleModel.find({ userId: operation.userId, eventId: event.id, role: "Book" })
+                    if (maybeRole.length > 0) return { message: "Application Already Approved" }
                     const role = await RoleModel.create({ userId: operation.userId, eventId: event.id, role: "Book" })
                     const users = await UserModel.scan()
                     const user = users.find(u => u.id === operation.userId)
