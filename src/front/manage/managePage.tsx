@@ -142,7 +142,13 @@ export function Component() {
 }
 
 function shouldShowSearch(location) {
-    return location.pathname.endsWith("manage") || location.pathname.endsWith("participants") || location.pathname.endsWith("bookings") || location.pathname.endsWith("kp") || location.pathname.endsWith("emails") || location.pathname.endsWith("birthdays")
+    return location.pathname.endsWith("manage") 
+    || location.pathname.endsWith("participants") 
+    || location.pathname.endsWith("bookings") 
+    || location.pathname.endsWith("kp") 
+    || location.pathname.endsWith("emails") 
+    || location.pathname.endsWith("birthdays")
+    || location.pathname.endsWith("money")
 }
 
 export type managePageContext = manageLoaderContext & {
