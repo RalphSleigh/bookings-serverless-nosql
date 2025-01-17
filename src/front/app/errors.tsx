@@ -3,11 +3,12 @@ import { Navigate, isRouteErrorResponse, useLocation, useRouteError } from "reac
 import { SnackBarContext } from "./toasts.js";
 import { serializeError } from "serialize-error";
 
-function logError(message, stack) {
+function logError(message, stack, from="") {
     try {
         const jsonMessage = {
             message: message,
-            stack: stack
+            stack: stack,
+            from: from
         };
 
         const jsonString = JSON.stringify(jsonMessage);
@@ -35,7 +36,7 @@ export function RouterErrorBoundary() {
 
     useEffect(() => {
         console.log("LOGGING FROM ROUTER ERROR BOUNDARY")
-        logError(serializeError(error), "")
+        logError(serializeError(error), "", "Router Error Boundary")
     }, [error])
 
     if (location.pathname !== "/") {
@@ -74,7 +75,7 @@ export class ReactErrorBoundary extends React.Component<{ children }, { hasError
         //   in div (created by App)
         //   in App
         console.log("LOGGING FROM ERROR BOUNDARY")
-        logError(serializeError(error), info.componentStack);
+        logError(serializeError(error), info.componentStack, "React Error Boundary");
     }
 
     render() {

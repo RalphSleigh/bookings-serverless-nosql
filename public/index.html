@@ -6,6 +6,7 @@
         window.addEventListener('error', (message) => {
             try {
                 const jsonMessage = {
+                    from: "Window Event Listener",
                     message: message.message,
                     file: message.filename,
                     line: message.lineno,
