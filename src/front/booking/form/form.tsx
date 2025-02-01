@@ -22,9 +22,11 @@ import { consent } from "../../../shared/consents/consent.js";
 
 const MemoParticipantsForm = React.memo(ParticipantsForm)
 
-export function BookingForm({ data, event, user, update, submit, mode, deleteBooking, submitLoading, deleteLoading }: { data: PartialDeep<JsonBookingType>, event: JsonEventType, user: JsonUserResponseType, update: React.Dispatch<React.SetStateAction<PartialDeep<JsonBookingType>>>, submit: () => void, mode: "create" | "edit" | "rebook", deleteBooking: any, submitLoading: boolean, deleteLoading: boolean }) {
+export function BookingForm({ data, event, user, update, submit, mode, deleteBooking, submitLoading, deleteLoading }: { data: PartialDeep<JsonBookingType>, event: JsonEventType, user: JsonUserResponseType, update: React.Dispatch<React.SetStateAction<PartialDeep<JsonBookingType>>>, submit: () => void, mode: "create" | "edit" | "rebook" | "view", deleteBooking: any, submitLoading: boolean, deleteLoading: boolean }) {
 
-    const [permission, updatePermission] = useState({ permission: false })
+    const readOnly = mode === "view"
+
+    const [permission, updatePermission] = useState({ permission: readOnly})
     const [deleteLock, setDeleteLock] = useState(true)
     const { updateSubField } = getMemoUpdateFunctions(update)
 
@@ -47,14 +49,14 @@ export function BookingForm({ data, event, user, update, submit, mode, deleteBoo
             <Box p={2}>
                 <form>
                     <Typography variant="h4">{`Booking for ${event.name}`}</Typography>
-                    <BasicFields data={data.basic} update={updateSubField} />
-                    {event.bigCampMode ? <MemoBookingExtraContactFields data={data.extraContacts} update={updateSubField} /> : null}
-                    <MemoParticipantsForm basic={data.basic as JsonBookingType["basic"]} event={event} attendanceConfig={attendanceConfig} participants={data.participants || [{}]} update={updateSubField} kp={kpConfig} consent={consentConfig} validation={validation} own={data.userId === user.id}/>
-                    <MemoCampingFields event={event} data={data.camping} update={updateSubField} />
-                    <MemoEmergencyFields event={event} data={data.emergency} bookingType={data.basic?.bookingType || "individual"} update={updateSubField} />
-                    <MemoCustomQuestionFields event={event} data={data.customQuestions} basic={data.basic} camping={data.camping} update={updateSubField} />
+                    <BasicFields data={data.basic} update={updateSubField} readOnly={readOnly}/>
+                    {event.bigCampMode ? <MemoBookingExtraContactFields data={data.extraContacts} update={updateSubField} readOnly={readOnly}/> : null}
+                    <MemoParticipantsForm basic={data.basic as JsonBookingType["basic"]} event={event} attendanceConfig={attendanceConfig} participants={data.participants || [{}]} update={updateSubField} kp={kpConfig} consent={consentConfig} validation={validation} own={data.userId === user.id} readOnly={readOnly}/>
+                    <MemoCampingFields event={event} data={data.camping} update={updateSubField} readOnly={readOnly}/>
+                    <MemoEmergencyFields event={event} data={data.emergency} bookingType={data.basic?.bookingType || "individual"} update={updateSubField} readOnly={readOnly}/>
+                    <MemoCustomQuestionFields event={event} data={data.customQuestions} basic={data.basic} camping={data.camping} update={updateSubField} readOnly={readOnly}/>
                     <MemoBookingMoneySection fees={fee} event={event} data={data} />
-                    <MemoBookingPermissionSection event={event} data={permission} update={updatePermission} />
+                    <MemoBookingPermissionSection event={event} data={permission} update={updatePermission} readOnly={readOnly}/>
                     <BookingValidationResults validationResults={validationResults} />
                     <Stack direction="row" spacing={1} mt={2}>
                         <LoadingButton
@@ -63,7 +65,7 @@ export function BookingForm({ data, event, user, update, submit, mode, deleteBoo
                             loading={submitLoading}
                             loadingPosition="end"
                             variant="contained"
-                            disabled={validationResults.length > 0}
+                            disabled={validationResults.length > 0 || readOnly}
                         >
                             <span>Submit</span>
                         </LoadingButton>
@@ -77,7 +79,7 @@ export function BookingForm({ data, event, user, update, submit, mode, deleteBoo
     </Grid>
 }
 
-function bookingIndvidualContactFields({ data, update }: { data: PartialDeep<JsonBookingType>["basic"], update: any }) {
+function bookingIndvidualContactFields({ data, update, readOnly }: { data: PartialDeep<JsonBookingType>["basic"], update: any, readOnly: boolean }) {
 
     const { updateField } = getMemoUpdateFunctions(update('basic'))
 
@@ -92,7 +94,7 @@ function bookingIndvidualContactFields({ data, update }: { data: PartialDeep<Jso
     </>
 }
 
-function bookingGroupContactFields({ data, update }: { data: PartialDeep<JsonBookingType>["basic"], update: any }) {
+function bookingGroupContactFields({ data, update, readOnly }: { data: PartialDeep<JsonBookingType>["basic"], update: any, readOnly: boolean }) {
 
     const { updateField } = getMemoUpdateFunctions(update('basic'))
 
@@ -117,7 +119,7 @@ function bookingGroupContactFields({ data, update }: { data: PartialDeep<JsonBoo
             <Grid xs={6} item>
                 <Card variant="outlined" sx={{ display: 'flex', flexDirection: 'column', height: '100%', ...groupStyle }} onClick={() => update('basic')(data => { return { ...data, bookingType: 'group' } })}>
                     <CardContent>
-                        <Checkbox checked={data?.bookingType == "group"} sx={{ float: 'right', mt: -1, mr: -1 }} />
+                        <Checkbox checked={data?.bookingType == "group"} sx={{ float: 'right', mt: -1, mr: -1 }} disabled={readOnly}/>
                         <Typography variant="h5">Group Booking</Typography>
                         <Typography variant="body1">If you are booking for a Woodcraft Folk District, Group, or other large booking, please select this option.</Typography>
                     </CardContent>
@@ -126,7 +128,7 @@ function bookingGroupContactFields({ data, update }: { data: PartialDeep<JsonBoo
             <Grid xs={6} item>
                 <Card variant="outlined" sx={{ display: 'flex', flexDirection: 'column', height: '100%', ...individualStyle }} onClick={() => update('basic')(data => { return { ...data, bookingType: 'individual' } })}>
                     <CardContent>
-                        <Checkbox checked={data?.bookingType == "individual"} sx={{ float: 'right', mt: -1, mr: -1 }} />
+                        <Checkbox checked={data?.bookingType == "individual"} sx={{ float: 'right', mt: -1, mr: -1 }} disabled={readOnly}/>
                         <Typography variant="h5">Individual Booking</Typography>
                         <Typography variant="body1">If you are booking just yourself or your family members, please select this option.</Typography>
                     </CardContent>
@@ -140,19 +142,20 @@ function bookingGroupContactFields({ data, update }: { data: PartialDeep<JsonBoo
                 id="organisation-select"
                 label="Organisation"
                 value={data?.organisation || "select"}
-                onChange={updateField("organisation")}>
+                onChange={updateField("organisation")}
+                disabled={readOnly}>
                 {!data?.organisation ? <MenuItem key="select" value="select">Please select</MenuItem> : null}
                 {organsationItems}
             </Select>
         </FormControl>
-        <TextField autoComplete="group" name="group" id="group" inputProps={{'data-form-type': 'other'}} fullWidth sx={{ mt: 2 }} required={districtRequired} label="District" value={data?.district || ''} onChange={updateField('district')} />
+        <TextField autoComplete="group" name="group" id="group" inputProps={{'data-form-type': 'other'}} fullWidth sx={{ mt: 2 }} required={districtRequired} label="District" value={data?.district || ''} onChange={updateField('district')} disabled={readOnly}/>
         <Typography variant="h6" mt={2}>{`Your details`}</Typography>
-        <TextField autoComplete="name" name="name" id="name" inputProps={{'data-form-type': 'name'}} fullWidth sx={{ mt: 2 }} required label="Your Name" value={data?.contactName || ''} onChange={updateField('contactName')} />
-        <TextField autoComplete="email" name="email" id="email" inputProps={{'data-form-type': 'email'}} fullWidth sx={{ mt: 2 }} required type="email" label="Your email" value={data?.contactEmail || ''} onChange={updateField('contactEmail')} />
+        <TextField autoComplete="name" name="name" id="name" inputProps={{'data-form-type': 'name'}} fullWidth sx={{ mt: 2 }} required label="Your Name" value={data?.contactName || ''} onChange={updateField('contactName')} disabled={readOnly}/>
+        <TextField autoComplete="email" name="email" id="email" inputProps={{'data-form-type': 'email'}} fullWidth sx={{ mt: 2 }} required type="email" label="Your email" value={data?.contactEmail || ''} onChange={updateField('contactEmail')} disabled={readOnly}/>
         {data?.contactEmail?.includes("privaterelay.appleid.com") ? <Alert severity="warning" sx={{ mt: 2, pt: 2 }}>
             <AlertTitle>This appears to be an Apple private relay address, we recommend you provide your actual email address, otherwise we may be unable to contact you. This will not be shared outside the camp team.</AlertTitle>
         </Alert> : null}
-        <TextField autoComplete="tel" name="telephone" id="telephone" inputProps={{'data-form-type': 'phone'}} fullWidth sx={{ mt: 2 }} required type="tel" label="Phone Number" value={data?.contactPhone || ''} onChange={updateField('contactPhone')} />
+        <TextField autoComplete="tel" name="telephone" id="telephone" inputProps={{'data-form-type': 'phone'}} fullWidth sx={{ mt: 2 }} required type="tel" label="Phone Number" value={data?.contactPhone || ''} onChange={updateField('contactPhone')} disabled={readOnly}/>
     </>
 }
 

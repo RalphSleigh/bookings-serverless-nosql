@@ -111,9 +111,13 @@ export const CanBookIntoEvent = new LoggedInPermission<"event">(data => {
 }, "User can't book into event")
 
 export const CanEditOwnBooking = new LoggedInPermission<"event" | "booking">(data => {
-    if (IsGlobalAdmin.if(data)) return true
-    return data.booking.userId === data.user!.id
+    if (data.booking.userId !== data.user!.id) return false
+    return (Date.now() < parseDate(data.event.bookingDeadline)!.getTime() || hasRoleOnEvent(data.user, data.event, ["Amend"]))
 }, "User can't edit their booking")
+
+export const CanViewOwnBooking = new LoggedInPermission<"event" | "booking">(data => {
+    return data.booking.userId === data.user!.id
+}, "User can't view their booking")
 
 export const CanEditBooking = new LoggedInPermission<"event" | "booking">(data => {
     if (IsGlobalAdmin.if(data)) return true

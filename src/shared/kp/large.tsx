@@ -7,7 +7,7 @@ import { HelpOutline } from '@mui/icons-material';
 
 export class Large implements KpStructure {
     kpName = "Large"
-    ParticipantFormElement({ index, data = {}, update }: { index: number, data: Partial<Required<JsonParticipantType>["kp"]>, update: any }) {
+    ParticipantFormElement({ index, data = {}, update, readOnly }: { index: number, data: Partial<Required<JsonParticipantType>["kp"]>, update: any, readOnly: boolean }) {
 
 
         const { updateField, updateSwitch } = getMemoUpdateFunctions(update)
@@ -30,7 +30,7 @@ export class Large implements KpStructure {
             <Grid item sm={4} xs={12}>
                 <FormControl required fullWidth>
                     <InputLabel id="diet-select-label">Diet</InputLabel>
-                    <Select fullWidth value={data.diet || "default"} label="Diet" required onChange={updateDietSelect} labelId="diet-select-label">
+                    <Select fullWidth value={data.diet || "default"} label="Diet" required onChange={updateDietSelect} labelId="diet-select-label" disabled={readOnly}>
                         {data.diet ? null : <MenuItem key="default" value="default">Please select</MenuItem>}
                         {kpOptions}
                     </Select>
@@ -40,21 +40,21 @@ export class Large implements KpStructure {
                 <Typography variant="subtitle1"><strong>Dietary Requirements:</strong> Please include any known allergies even if the diet you have selected would exclude them:</Typography>
                 <Grid container>
                     <Grid item xs={12} sm={6} md={4} xl={3}>
-                        <FormControlLabel checked={data.nuts || false} onChange={updateSwitch('nuts')} control={<Checkbox />} label="Nut Free" />
+                        <FormControlLabel checked={data.nuts || false} onChange={updateSwitch('nuts')} control={<Checkbox />} label="Nut Free" disabled={readOnly}/>
                     </Grid><Grid item xs={12} sm={6} md={4} xl={3}>
-                        <FormControlLabel checked={data.gluten || false} onChange={updateSwitch('gluten')} control={<Checkbox />} label="Gluten Free" />
+                        <FormControlLabel checked={data.gluten || false} onChange={updateSwitch('gluten')} control={<Checkbox />} label="Gluten Free" disabled={readOnly}/>
                     </Grid><Grid item xs={12} sm={6} md={4} xl={3}>
-                        <FormControlLabel checked={data.soya || false} onChange={updateSwitch('soya')} control={<Checkbox />} label="Soya Free" />
+                        <FormControlLabel checked={data.soya || false} onChange={updateSwitch('soya')} control={<Checkbox />} label="Soya Free" disabled={readOnly}/>
                     </Grid><Grid item xs={12} sm={6} md={4} xl={3}>
-                        <FormControlLabel checked={data.dairy || false} onChange={updateSwitch('dairy')} disabled={data.diet == "vegan"} control={<Checkbox />} label="Dairy/Lactose Free" />
+                        <FormControlLabel checked={data.dairy || false} onChange={updateSwitch('dairy')} disabled={data.diet == "vegan" || readOnly} control={<Checkbox />} label="Dairy/Lactose Free" />
                     </Grid><Grid item xs={12} sm={6} md={4} xl={3}>
-                        <FormControlLabel checked={data.egg || false} onChange={updateSwitch('egg')} disabled={data.diet == "vegan"} control={<Checkbox />} label="Egg Free" />
+                        <FormControlLabel checked={data.egg || false} onChange={updateSwitch('egg')} disabled={data.diet == "vegan" || readOnly} control={<Checkbox />} label="Egg Free" />
                     </Grid><Grid item xs={12} sm={6} md={4} xl={3}>
-                        <FormControlLabel checked={data.pork || false} onChange={updateSwitch('pork')} disabled={data.diet && data.diet !== "omnivore"} control={<Checkbox />} label="Pork Free" />
+                        <FormControlLabel checked={data.pork || false} onChange={updateSwitch('pork')} disabled={(data.diet && data.diet !== "omnivore") || readOnly} control={<Checkbox />} label="Pork Free" />
                     </Grid><Grid item xs={12} sm={6} md={4} xl={3}>
-                        <FormControlLabel checked={data.chickpea || false} onChange={updateSwitch('chickpea')} control={<Checkbox />} label="Chickpea Free" />
+                        <FormControlLabel checked={data.chickpea || false} onChange={updateSwitch('chickpea')} control={<Checkbox />} label="Chickpea Free" disabled={readOnly}/>
                     </Grid><Grid item xs={12} sm={6} md={4} xl={3}>
-                        <FormControlLabel checked={data.diabetic || false} onChange={updateSwitch('diabetic')} control={<Checkbox />} label="Diabetic" />
+                        <FormControlLabel checked={data.diabetic || false} onChange={updateSwitch('diabetic')} control={<Checkbox />} label="Diabetic" disabled={readOnly}/>
                     </Grid>
                 </Grid>
             </Grid>
@@ -68,9 +68,10 @@ export class Large implements KpStructure {
                     id={`${index}-participant-restrictions`}
                     inputProps={{ 'data-form-type': 'other' }}
                     label="Any other dietary restrictions, allergies, intolerances, elimination diets and diet related medical conditions:"
-                    placeholder={`This is your everything else section for things that didn’t fit into the tick boxes above. (leave blank if not applicable)`}
+                    placeholder={`This is your everything else sion for things that didn’t fit into the tick boxes above. (leave blank if not applicable)`}
                     value={data.details || ''}
-                    onChange={updateField('details')} />
+                    onChange={updateField('details')} 
+                    disabled={readOnly}/>
             </Grid>
             {["none", "n/a", "no", "nope"].includes(data.details?.trim().toLocaleLowerCase() || "") ? <Grid item xs={12}>
                 <Alert severity="warning" sx={{ mt: 2, pt: 2 }}>
@@ -78,7 +79,7 @@ export class Large implements KpStructure {
                 </Alert>
             </Grid> : null}
             <Grid item xs={12}>
-                <FormControlLabel checked={data.contactMe || false} onChange={updateSwitch('contactMe')} control={<Checkbox />} label=" My allergies or dietary needs are complicated and I would like to be contacted by the camp team" />
+                <FormControlLabel checked={data.contactMe || false} onChange={updateSwitch('contactMe')} control={<Checkbox />} label="My allergies or dietary needs are complicated and I would like to be contacted by the camp team" disabled={readOnly}/>
             </Grid>
             <Grid item xs={12}>
                 <TextField
@@ -106,6 +107,7 @@ export class Large implements KpStructure {
                         </InputAdornment>,
                         sx: { alignItems: "flex-start" }
                     }}
+                    disabled={readOnly}
                 />
             </Grid>
             {["none", "n/a", "no", "nope"].includes(data.preferences?.trim().toLocaleLowerCase() || "") ? <Grid item xs={12}>
@@ -144,7 +146,7 @@ export class Large implements KpStructure {
             {isNonEmptyString(data.preferences) ? <Typography variant="body1" sx={{ mt: 2 }}><b>Food&nbsp;Dislikes/Preferences:</b><br />{data.preferences}</Typography> : null}
             {no ? <Typography variant="body1" sx={{ mt: 2 }}><b>No:</b><br />{no}</Typography> : null}
             {data.diabetic ? <Typography variant="body1" sx={{ mt: 2 }}><strong>Diabetic</strong></Typography> : null}
-            {data.contactMe ? <Typography variant="body1" sx={{ mt: 2 }}><strong>Needs are complex, please contact me</strong></Typography> : null}
+            {data.contactMe ? <Typography variant="body1" sx={{ mt: 2 }}><strong>Needs are compleectx, please contact me</strong></Typography> : null}
         </>
     }
 }

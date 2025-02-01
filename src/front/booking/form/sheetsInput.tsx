@@ -8,13 +8,13 @@ import { HasSheetType } from "../../../lambda-common/sheets_input.js";
 import { drive_v3 } from "@googleapis/drive";
 import { getMemoUpdateFunctions } from "../../../shared/util.js";
 
-export const SheetsWidget: React.FC<{ event: JsonEventType, basic: JsonBookingType["basic"], update: any, setIncomingParticipants: any }> = ({ event, basic, update, setIncomingParticipants }) => {
+export const SheetsWidget: React.FC<{ event: JsonEventType, basic: JsonBookingType["basic"], update: any, setIncomingParticipants: any, readOnly: boolean }> = ({ event, basic, update, setIncomingParticipants, readOnly }) => {
 
     const sheet = useHasSheet(event.id).data
 
-    if (sheet.sheet === false) return <CreateSheetState event={event} basic={basic} />
+    if (sheet.sheet === false) return <CreateSheetState event={event} basic={basic} readOnly={readOnly}/>
 
-    return <SheetExistsState event={event} sheet={sheet.sheet as drive_v3.Schema$File} update={update} setIncomingParticipants={setIncomingParticipants} />
+    return <SheetExistsState event={event} sheet={sheet.sheet as drive_v3.Schema$File} update={update} setIncomingParticipants={setIncomingParticipants} readOnly={readOnly}/>
 }
 
 const chunk = (arr: any[], size: number) =>
@@ -22,7 +22,7 @@ const chunk = (arr: any[], size: number) =>
         arr.slice(i * size, i * size + size)
     );
 
-const SheetExistsState: React.FC<{ event: JsonEventType, sheet: drive_v3.Schema$File, update: any, setIncomingParticipants: any }> = ({ event, sheet, update, setIncomingParticipants }) => {
+const SheetExistsState: React.FC<{ event: JsonEventType, sheet: drive_v3.Schema$File, update: any, setIncomingParticipants: any, readOnly: boolean }> = ({ event, sheet, update, setIncomingParticipants, readOnly }) => {
 
     const getParticipantsDataMutation = useGetParticipantsFromSheet(event.id)
     const [importProgress, setImportProgress] = useState(0)
@@ -97,14 +97,15 @@ const SheetExistsState: React.FC<{ event: JsonEventType, sheet: drive_v3.Schema$
                 loading={getParticipantsDataMutation.isPending || (getParticipantsDataMutation.isSuccess && importProgress < 100)}
                 loadingPosition="end"
                 variant="outlined"
-                color="success">
+                color="success"
+                disabled={readOnly}>
                 <span>Import Campers to Form</span>
             </LoadingButton>
         </Box>
     </Alert>
 }
 
-const CreateSheetState: React.FC<{ event: JsonEventType, basic: JsonBookingType["basic"] }> = ({ event, basic }) => {
+const CreateSheetState: React.FC<{ event: JsonEventType, basic: JsonBookingType["basic"], readOnly: boolean }> = ({ event, basic, readOnly }) => {
     const createSheet = useCreateSheet(event.id)
 
     const createSheetFunction = e => {
@@ -129,7 +130,7 @@ const CreateSheetState: React.FC<{ event: JsonEventType, basic: JsonBookingType[
             justifyContent="flex-end"
             alignItems="flex-end">
             <LoadingButton
-                disabled={notGotNeededData}
+                disabled={notGotNeededData || readOnly}
                 sx={{ mt: 1 }}
                 onClick={createSheetFunction}
                 endIcon={<PostAdd />}

@@ -31,7 +31,7 @@ export class OptionsAttendance extends AttendanceStructure {
         </Paper>
     }
 
-    ParticipantElementNonMemo = ({ configuration, data, update }: { configuration: JsonEventType["attendanceData"], data: ParticipantAttendanceType | undefined, update: any }) => {
+    ParticipantElementNonMemo = ({ configuration, data, update, readOnly }: { configuration: JsonEventType["attendanceData"], data: ParticipantAttendanceType | undefined, update: any, readOnly: boolean }) => {
 
         const { updateField } = getMemoUpdateFunctions(update("attendance"))
 
@@ -41,7 +41,7 @@ export class OptionsAttendance extends AttendanceStructure {
 
         return <FormControl required fullWidth>
             <InputLabel id="attendance-select-label">Attendance</InputLabel>
-            <Select value={typeof data?.option == "number" ? data?.option : "default"} label="Attendance" required onChange={updateField("option")} labelId="attendance-select-label">
+            <Select value={typeof data?.option == "number" ? data?.option : "default"} label="Attendance" required onChange={updateField("option")} labelId="attendance-select-label" disabled={readOnly}>
                 {data?.option ? null : <MenuItem key="default" value="default">Please select</MenuItem>}
                 {attendanceOptions}
             </Select>
