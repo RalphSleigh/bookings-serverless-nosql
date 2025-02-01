@@ -18,7 +18,7 @@ import { Validation } from "./validation.js";
 
 const COLLAPSE_DEFAULT_THRESHOLD = 20
 
-export function ParticipantsForm({ event, attendanceConfig, basic, participants, update, kp, consent, validation, own }: { event: JsonEventType, attendanceConfig: AttendanceStructure, basic: JsonBookingType["basic"], participants: Array<PartialDeep<JsonParticipantType>>, update: any, kp: KpStructure, consent: ConsentStructure, validation: Validation, own: boolean }) {
+export function ParticipantsForm({ event, attendanceConfig, basic, participants, update, kp, consent, validation, own, readOnly = false }: { event: JsonEventType, attendanceConfig: AttendanceStructure, basic: JsonBookingType["basic"], participants: Array<PartialDeep<JsonParticipantType>>, update: any, kp: KpStructure, consent: ConsentStructure, validation: Validation, own: boolean, readOnly: boolean }) {
 
     const { addEmptyObjectToArray, updateArrayItem, deleteArrayItem } = getMemoUpdateFunctions(update('participants'))
 
@@ -32,14 +32,14 @@ export function ParticipantsForm({ event, attendanceConfig, basic, participants,
     const [incomingParticipants, setIncomingParticipants] = useState(0)
     const defaultCollapse = Math.max(participants.length, incomingParticipants) > COLLAPSE_DEFAULT_THRESHOLD
 
-    const participantsList = participants.map((p, i) => (<MemoParticipantForm key={i} index={i} event={event} attendanceConfig={attendanceConfig} participant={p} kp={kp} consent={consent} updateArrayItem={updateArrayItem} deleteParticipant={deleteParticipant} defaultCollapse={defaultCollapse} validation={validation} />))
+    const participantsList = participants.map((p, i) => (<MemoParticipantForm key={i} index={i} event={event} attendanceConfig={attendanceConfig} participant={p} kp={kp} consent={consent} updateArrayItem={updateArrayItem} deleteParticipant={deleteParticipant} defaultCollapse={defaultCollapse} validation={validation} readOnly={readOnly}/>))
 
     return <Grid container spacing={0} sx={{ mt: 2 }}>
         <Grid xs={12} p={0} item>
             <Typography variant="h6">Campers</Typography>
-            {event.bigCampMode && own ? <SuspenseElement><SheetsWidget event={event} update={update} basic={basic} setIncomingParticipants={setIncomingParticipants} /></SuspenseElement> : null}
+            {event.bigCampMode && own ? <SuspenseElement><SheetsWidget event={event} update={update} basic={basic} setIncomingParticipants={setIncomingParticipants} readOnly={readOnly}/></SuspenseElement> : null}
             {participantsList}
-            <Button sx={{ mt: 2 }} variant="contained" onClick={addEmptyObjectToArray}>
+            <Button sx={{ mt: 2 }} variant="contained" onClick={addEmptyObjectToArray} disabled={readOnly}>
                 Add person
             </Button>
         </Grid>
@@ -55,7 +55,8 @@ function ParticipantForm({ index,
     updateArrayItem,
     deleteParticipant,
     defaultCollapse = false,
-    validation }:
+    validation,
+    readOnly }:  
     {
         index: number,
         event: JsonEventType,
@@ -66,7 +67,8 @@ function ParticipantForm({ index,
         updateArrayItem: any,
         deleteParticipant: any,
         defaultCollapse: boolean,
-        validation: Validation
+        validation: Validation,
+        readOnly: boolean
     }) {
 
     const { updateSubField } = getMemoUpdateFunctions(updateArrayItem(index))
@@ -97,21 +99,21 @@ function ParticipantForm({ index,
         if (event.allParticipantEmails) {
             emailAndOptionsAttendance = <>
                 <Grid sm={8} xs={12} item>
-                    <MemoEmailField index={index} email={participant.basic?.email} event={event} dob={participant.basic?.dob} update={basicUpdates} />
+                    <MemoEmailField index={index} email={participant.basic?.email} event={event} dob={participant.basic?.dob} update={basicUpdates} readOnly={readOnly}/>
                 </Grid>
                 <Grid sm={4} xs={12} item>
-                    <attendanceConfig.ParticipantElement configuration={event.attendanceData} data={participant.attendance} update={updateSubField} />
+                    <attendanceConfig.ParticipantElement configuration={event.attendanceData} data={participant.attendance} update={updateSubField} readOnly={readOnly}/>
                 </Grid>
             </>
         } else {
             emailAndOptionsAttendance = <Grid xs={12} item>
-                <attendanceConfig.ParticipantElement configuration={event.attendanceData} data={participant.attendance} update={updateSubField} />
+                <attendanceConfig.ParticipantElement configuration={event.attendanceData} data={participant.attendance} update={updateSubField} readOnly={readOnly}/>
             </Grid>
         }
     } else {
         if (event.allParticipantEmails) {
             emailAndOptionsAttendance = <Grid xs={12} item>
-                <MemoEmailField index={index} email={participant.basic?.email} event={event} dob={participant.basic?.dob} update={basicUpdates} />
+                <MemoEmailField index={index} email={participant.basic?.email} event={event} dob={participant.basic?.dob} update={basicUpdates} readOnly={readOnly}/>
             </Grid>
         } else {
             emailAndOptionsAttendance = null
@@ -133,7 +135,8 @@ function ParticipantForm({ index,
                         id={`${index}-participant-name`}
                         label="Name"
                         value={participant.basic?.name || ''}
-                        onChange={basicUpdates.updateField('name')} />
+                        onChange={basicUpdates.updateField('name')}
+                        disabled={readOnly}/>
                 </Grid>
                 <Grid sm={4} xs={12} item>
                     <UtcDatePicker
@@ -141,23 +144,24 @@ function ParticipantForm({ index,
                         value={participant.basic?.dob}
                         onChange={basicUpdates.updateDate('dob')}
                         slotProps={{ field: { autoComplete: "off" } }}
+                        disabled={readOnly}
                     />
                 </Grid>
                 {emailAndOptionsAttendance}
                 <Grid xs={12} item>
                     <Divider >Diet</Divider>
-                    <kp.ParticipantFormElement index={index} data={participant.kp || {}} update={updateSubField('kp')} />
+                    <kp.ParticipantFormElement index={index} data={participant.kp || {}} update={updateSubField('kp')} readOnly={readOnly}/>
                 </Grid>
                 <Grid xs={12} item>
                     <Divider>Medical & Accessbility</Divider>
-                    <ParicipantMedicalForm index={index} event={event} data={participant.medical || {}} update={updateSubField('medical')} />
+                    <ParicipantMedicalForm index={index} event={event} data={participant.medical || {}} update={updateSubField('medical')} readOnly={readOnly}/>
                 </Grid>
                 <Grid xs={12} item>
                     <Divider>Consent</Divider>
-                    <consent.ParticipantFormElement event={event} data={participant.consent || {}} basic={participant.basic || {}} update={updateSubField('consent')} />
+                    <consent.ParticipantFormElement event={event} data={participant.consent || {}} basic={participant.basic || {}} update={updateSubField('consent')} readOnly={readOnly}/>
                 </Grid>
                 {event.bigCampMode && dob && differenceInYears(parseDate(event.startDate)!, parseDate(dob)!) >= 18 ? <Grid xs={12} item>
-                    <FormControlLabel checked={participant.medical?.firstAid || false} onChange={updateSwitch('firstAid')} control={<Checkbox />} label="First Aider (18+ only)" />
+                    <FormControlLabel checked={participant.medical?.firstAid || false} onChange={updateSwitch('firstAid')} control={<Checkbox />} label="First Aider (18+ only)" disabled={readOnly}/>
                 </Grid>
                     : null}
                 {/*}Grid xs={12} item>
@@ -177,7 +181,7 @@ function ParticipantForm({ index,
 
 const MemoParticipantForm = React.memo(ParticipantForm)
 
-function ParicipantMedicalForm({ index, event, data, update }: { index: number, event: JsonEventType, data: PartialDeep<JsonParticipantType>["medical"], update: any }) {
+function ParicipantMedicalForm({ index, event, data, update, readOnly }: { index: number, event: JsonEventType, data: PartialDeep<JsonParticipantType>["medical"], update: any, readOnly: boolean }) {
 
     const { updateField, updateSwitch } = getMemoUpdateFunctions(update)
 
@@ -208,6 +212,7 @@ function ParicipantMedicalForm({ index, event, data, update }: { index: number, 
                     </InputAdornment>,
                     sx: { alignItems: "flex-start" }
                 } : {}}
+                disabled={readOnly}
             />
         </>
     } else {
@@ -224,6 +229,7 @@ function ParicipantMedicalForm({ index, event, data, update }: { index: number, 
                 label="Medical conditions, medication or additional needs:"
                 value={data?.details || ''}
                 onChange={updateField('details')}
+                disabled={readOnly}
             />
             <Typography variant="body2" sx={{ mt: 2 }}>Please provide us with details of any accessibility requirements, this may include mobility issues, a requirement for power or other access requirements</Typography>
             <TextField
@@ -251,13 +257,14 @@ function ParicipantMedicalForm({ index, event, data, update }: { index: number, 
                     </InputAdornment>,
                     sx: { alignItems: "flex-start" }
                 } : {}}
+                disabled={readOnly}
             />
-            <FormControlLabel checked={data?.contactMe || false} onChange={updateSwitch('contactMe')} control={<Checkbox />} label="I would like to talk to the accessibility team about my accessibility requirements" />
+            <FormControlLabel checked={data?.contactMe || false} onChange={updateSwitch('contactMe')} control={<Checkbox />} label="I would like to talk to the accessibility team about my accessibility requirements" disabled={readOnly}/>
         </>
     }
 }
 
-const EmailField = ({ index, email, dob, event, update }: { index: number, email: Partial<Required<JsonParticipantType>["basic"]>["email"], dob: string | undefined, event: JsonEventType, update: any }) => {
+const EmailField = ({ index, email, dob, event, update, readOnly }: { index: number, email: Partial<Required<JsonParticipantType>["basic"]>["email"], dob: string | undefined, event: JsonEventType, update: any, readOnly: boolean }) => {
     const inputProps = {
         endAdornment: <InputAdornment position="end">
             <Tooltip title={`We will use this email address to contact campers with updates about camp and verify Woodcraft Folk membership.`}>
@@ -283,7 +290,8 @@ const EmailField = ({ index, email, dob, event, update }: { index: number, email
             label="Parent/Guardian email"
             value={email || ''}
             onChange={update.updateField('email')}
-            InputProps={inputProps} />
+            InputProps={inputProps} 
+            disabled={readOnly}/>
     } else {
         return <TextField
             autoComplete={`section-${index}-participant email`}
@@ -296,7 +304,8 @@ const EmailField = ({ index, email, dob, event, update }: { index: number, email
             label="Email"
             value={email || ''}
             onChange={update.updateField('email')}
-            InputProps={inputProps} />
+            InputProps={inputProps} 
+            disabled={readOnly}/>
     }
 }
 

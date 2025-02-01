@@ -6,12 +6,12 @@ import { PartialDeep } from "type-fest"
 
 let key = 1
 
-function bookingExtraContactFields({ data, update }: { data: PartialDeep<JsonBookingType>["extraContacts"], update: any }) {
+function bookingExtraContactFields({ data, update, readOnly }: { data: PartialDeep<JsonBookingType>["extraContacts"], update: any, readOnly: boolean }) {
 
     const { updateArrayItem } = getMemoUpdateFunctions(update('extraContacts'))
 
     const contacts = (Array.isArray(data) ? [...data, {}] : [{}] ).map((d, i) => {
-        return <ExtraContactPerson key={i} i={i} data={d} update={updateArrayItem(i)} last={!Array.isArray(data) || i == data.length} />
+        return <ExtraContactPerson key={i} i={i} data={d} update={updateArrayItem(i)} last={!Array.isArray(data) || i == data.length} readOnly={readOnly}/>
     })
 
     return <>
@@ -22,7 +22,7 @@ function bookingExtraContactFields({ data, update }: { data: PartialDeep<JsonBoo
 }
 
 
-const ExtraContactPerson = ({ i, data, update, last }: { i: number, data: Partial<NonNullable<JsonBookingType["extraContacts"]>[0]>, update: any, last: boolean }) => {
+const ExtraContactPerson = ({ i, data, update, last, readOnly }: { i: number, data: Partial<NonNullable<JsonBookingType["extraContacts"]>[0]>, update: any, last: boolean, readOnly: boolean }) => {
 
     if (!data.email && !data.name && !last) return null
 
@@ -38,7 +38,8 @@ const ExtraContactPerson = ({ i, data, update, last }: { i: number, data: Partia
                 fullWidth
                 label="Name"
                 value={data?.name || ''}
-                onChange={updateField('name')} />
+                onChange={updateField('name')} 
+                disabled={readOnly} />
         </Grid>
         <Grid item xs={12} sm={6}>
             <TextField
@@ -50,7 +51,8 @@ const ExtraContactPerson = ({ i, data, update, last }: { i: number, data: Partia
                 type="email"
                 label="Email"
                 value={data?.email || ''}
-                onChange={updateField('email')} />
+                onChange={updateField('email')} 
+                disabled={readOnly} />
         </Grid>
     </Grid>
 

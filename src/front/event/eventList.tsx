@@ -16,7 +16,8 @@ import { addComputedFieldsToBookingsQueryResult, parseDate } from "../../shared/
 
 export function EventList(props) {
     const { events } = useEvents().data
-    const { bookings } = useUsersBookings().data
+    const bookingsQuery = useUsersBookings()
+    const bookings = bookingsQuery.data.bookings
     const user = useContext(UserContext)
 
     const futureEvents = events.filter(e => parseISO(e.endDate) > new Date())
@@ -33,18 +34,18 @@ export function EventList(props) {
 
     return <>
         <Grid container justifyContent="center">
-        <Grid item xs={12} lg={10} xl={8}>
-        <Grid container spacing={2} p={2}>
-            {cards}
-            {manageCards.length > 0 ? <Typography sx={{mt: 2, ml: 2}}variant="h5">Past Events</Typography> : null}
-            {manageCards}
-        </Grid>
-        <IfHasPermission permission={IsGlobalAdmin}>
-            <Fab sx={fabStyle} size="small" color="secondary" aria-label="add" href="/event/create">
-                <Add />
-            </Fab>
-        </IfHasPermission>
-        </Grid>
+            <Grid item xs={12} lg={10} xl={8}>
+                <Grid container spacing={2} p={2}>
+                    {cards}
+                    {manageCards.length > 0 ? <Typography sx={{ mt: 2, ml: 2 }} variant="h5">Past Events</Typography> : null}
+                    {manageCards}
+                </Grid>
+                <IfHasPermission permission={IsGlobalAdmin}>
+                    <Fab sx={fabStyle} size="small" color="secondary" aria-label="add" href="/event/create">
+                        <Add />
+                    </Fab>
+                </IfHasPermission>
+            </Grid>
         </Grid>
     </>
 }
@@ -79,7 +80,7 @@ function BookingButton({ event, booking }: { event: JsonEventType, booking?: Jso
     const user = useContext(UserContext)
     if (!user) return <Button variant="contained" sx={{ float: "right" }} component={RouterLink} to="/login">Log in to Book</Button>
 
-    if (Date.now() > parseDate(event.bookingDeadline)!.getTime()) return <Button variant="contained" sx={{ float: "right" }} disabled>Deadline Passed</Button>
+    if (!event.bigCampMode && Date.now() > parseDate(event.bookingDeadline)!.getTime()) return <Button variant="contained" sx={{ float: "right" }} disabled>Deadline Passed</Button>
 
     if (booking && booking.deleted && CanEditOwnBooking.if({ user, event, booking })) return <Button variant="contained" sx={{ float: "right" }} component={RouterLink} to={`/event/${event.id}/edit-my-booking`}>Re-book
     </Button>
@@ -87,12 +88,14 @@ function BookingButton({ event, booking }: { event: JsonEventType, booking?: Jso
     if (booking && CanEditOwnBooking.if({ user, event, booking })) return <Button variant="contained" sx={{ float: "right" }} component={RouterLink} to={`/event/${event.id}/edit-my-booking`}>Edit my booking
     </Button>
 
+    if (booking && !booking.deleted && event.bigCampMode && Date.now() > parseDate(event.bookingDeadline)!.getTime()) return <Button variant="outlined" sx={{ float: "right" }} component={RouterLink} to={`/event/${event.id}/view-my-booking`}>View Booking</Button>
+
     if (CanBookIntoEvent.if({ user, event })) return <Button variant="contained" sx={{ float: "right" }} component={RouterLink} to={`/event/${event.id}/book`}>Book
     </Button>
 
-    if(event.applicationsRequired && user.applications.find(a => a.eventId === event.id)) return <Button variant="contained" sx={{ float: "right" }} disabled>Application Pending</Button>
+    if (event.applicationsRequired && user.applications.find(a => a.eventId === event.id)) return <Button variant="contained" sx={{ float: "right" }} disabled>Application Pending</Button>
 
-    if(event.applicationsRequired) return <Button variant="contained" sx={{ float: "right" }} component={RouterLink} to={`/event/${event.id}/apply`}>Apply to book</Button>
+    if (event.applicationsRequired) return <Button variant="contained" sx={{ float: "right" }} component={RouterLink} to={`/event/${event.id}/apply`}>Apply to book</Button>
 
     return <Button variant="contained" sx={{ float: "right" }}>Dunno</Button>
 }
@@ -119,6 +122,6 @@ function YourBooking({ event, booking }: { event: JsonEventType, booking: JsonBo
             </Table>
         </TableContainer>
         <fee.DescriptionElement event={event} booking={enhancedBooking} />
-        <fee.StripeElement event={event} booking={booking}/>
+        <fee.StripeElement event={event} booking={booking} />
     </>
 }

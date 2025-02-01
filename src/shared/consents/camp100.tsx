@@ -9,7 +9,7 @@ import { JsonParticipantWithExtraType } from "../computedDataTypes.js";
 
 export class Camp100 implements ConsentStructure {
     consentName = "Camp100"
-    ParticipantFormElement({ data = {}, basic, event, update }: { data: PartialDeep<Required<JsonParticipantType>["consent"]>, basic: PartialDeep<Required<JsonParticipantType>["basic"]>, event: JsonEventType, update: any }) {
+    ParticipantFormElement({ data = {}, basic, event, update, readOnly }: { data: PartialDeep<Required<JsonParticipantType>["consent"]>, basic: PartialDeep<Required<JsonParticipantType>["basic"]>, event: JsonEventType, update: any, readOnly: boolean }) {
 
         const updateRadio = consent => e => {
             update(consentData => ({ ...consentData, [consent]: e.target.value === "yes" ? true : e.target.value === "no" ? false : undefined }))
@@ -31,8 +31,8 @@ export class Camp100 implements ConsentStructure {
                         name={`consent-photo`}
                         value={data.photo === true ? "yes" : data.photo === false ? "no" : ""}
                         onChange={updateRadio('photo')}>
-                        <FormControlLabel value="yes" control={<Radio sx={{ '& .MuiSvgIcon-root': { fontSize: 18, } }} />} label="Yes" />
-                        <FormControlLabel value="no" control={<Radio sx={{ '& .MuiSvgIcon-root': { fontSize: 18, } }} />} label="No" />
+                        <FormControlLabel value="yes" control={<Radio sx={{ '& .MuiSvgIcon-root': { fontSize: 18, } }} />} label="Yes" disabled={readOnly}/>
+                        <FormControlLabel value="no" control={<Radio sx={{ '& .MuiSvgIcon-root': { fontSize: 18, } }} />} label="No" disabled={readOnly}/>
                     </RadioGroup>
                 </Grid>
             </Grid>
@@ -51,8 +51,8 @@ export class Camp100 implements ConsentStructure {
                             name={`consent-sre`}
                             value={data.sre === true ? "yes" : data.sre === false ? "no" : ""}
                             onChange={updateRadio('sre')}>
-                            <FormControlLabel value="yes" control={<Radio sx={{ '& .MuiSvgIcon-root': { fontSize: 18, } }} />} label="Yes" />
-                            <FormControlLabel value="no" control={<Radio sx={{ '& .MuiSvgIcon-root': { fontSize: 18, } }} />} label="No" />
+                            <FormControlLabel value="yes" control={<Radio sx={{ '& .MuiSvgIcon-root': { fontSize: 18, } }} />} label="Yes" disabled={readOnly}/>
+                            <FormControlLabel value="no" control={<Radio sx={{ '& .MuiSvgIcon-root': { fontSize: 18, } }} />} label="No" disabled={readOnly}/>
                         </RadioGroup>
                     </Grid>
                 </Grid> : <Grid container spacing={2}>
