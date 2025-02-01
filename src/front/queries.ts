@@ -159,9 +159,9 @@ export function useEditBooking(user, event) {
     const queryClient = useQueryClient()
     const setSnackbar = useContext(SnackBarContext)
     const navigate = useNavigate()
-    return useMutation<{}, any, JsonBookingType, any>(
+    return useMutation<{}, any, {booking: JsonBookingType, notify: Boolean}, any>(
         {
-            mutationFn: async data => (await axios.post('/api/booking/edit', { booking: data })).data,
+            mutationFn: async data => (await axios.post('/api/booking/edit', { booking: data.booking, notify: data.notify })).data,
             onSuccess: (data, variables, context) => {
                 queryClient.invalidateQueries({
                     queryKey: ['user', 'bookings']
@@ -170,7 +170,7 @@ export function useEditBooking(user, event) {
                     queryKey: ['manage']
                 })
                 setSnackbar({ message: "Booking Updated", severity: 'success' })
-                const target = user.id === variables.userId ? `/event/${event.id}/thanks` : `/event/${event.id}/manage`
+                const target = user.id === variables.booking.userId ? `/event/${event.id}/thanks` : `/event/${event.id}/manage`
                 navigate(target)
             },
             onError: snackbarError(setSnackbar)

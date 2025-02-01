@@ -17,6 +17,7 @@ export const lambdaHandler = lambda_wrapper_json(
     async (lambda_event, config, current_user) => {
 
         const newData = lambda_event.body.booking as Partial<BookingType>
+        const notify = lambda_event.body.notify
         const existingLatestBooking = await BookingModel.get({ eventId: newData.eventId, userId: newData.userId, version: "latest" }) as BookingType
         const event = await EventModel.get({ id: existingLatestBooking?.eventId })
 
@@ -31,7 +32,7 @@ export const lambdaHandler = lambda_wrapper_json(
                 const newLatest = await addVersionToBooking(existingLatestBooking, newData)
 
                 console.log(`Edited booking ${newData.eventId}-${newData.userId}`);
-                if (isOwnBooking) {
+                if (isOwnBooking || notify) {
                     console.log("BEGINNING EMAIL")
                     await queueEmail({
                         template: "edited",
@@ -64,6 +65,8 @@ export const lambdaHandler = lambda_wrapper_json(
                         console.error("Error in discord posting")
                         console.error(e)
                     }
+                } else {
+                    console.log("Not notifying user or discord")
                 }
 
                 console.log("BEGINNING DRIVE SYNC")
