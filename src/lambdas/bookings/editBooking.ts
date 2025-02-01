@@ -34,7 +34,7 @@ export const lambdaHandler = lambda_wrapper_json(
                 console.log(`Edited booking ${newData.eventId}-${newData.userId}`);
                 if (isOwnBooking || notify) {
                     console.log("BEGINNING EMAIL")
-                    if(isOwnBooking) {
+                    if (isOwnBooking) {
                         await queueEmail({
                             template: "edited",
                             recipient: current_user,
@@ -69,7 +69,12 @@ export const lambdaHandler = lambda_wrapper_json(
                         console.log(discordDiffString)
 
                         if (discordDiffString !== "") {
-                            await postToDiscord(config, `${newLatest.basic.contactName} (${newLatest.basic.district}) edited their booking for event ${event.name}, they have booked ${newLatest.participants.length} people (previously ${existingLatestBooking.participants.length})`)
+                            if (isOwnBooking) {
+                                await postToDiscord(config, `${newLatest.basic.contactName} (${newLatest.basic.district}) edited their booking for event ${event.name}, they have booked ${newLatest.participants.length} people (previously ${existingLatestBooking.participants.length})`)
+                            } else {
+                                await postToDiscord(config, `${current_user.userName} edited booking ${newLatest.basic.contactName} (${newLatest.basic.district}) for event ${event.name}, they have booked ${newLatest.participants.length} people (previously ${existingLatestBooking.participants.length})`)
+                            }
+
                             await postToDiscord(config, "```" + discordDiffString + "```")
                         }
                         console.log("END DISCORD")
@@ -105,11 +110,11 @@ const generateDiscordDiff: (oldBooking: BookingType, newBooking: BookingType) =>
         if (["version", "created", "updated"].includes(updateItem.key)) return
 
 
-        const capitalise = (string)  => {
+        const capitalise = (string) => {
             return string[0].toUpperCase() + string.slice(1).toLowerCase()
-          }
+        }
 
-        const updateType = typeof(updateItem.value) === "boolean" ? "Update" : capitalise(updateItem.type)
+        const updateType = typeof (updateItem.value) === "boolean" ? "Update" : capitalise(updateItem.type)
         const chain = [...stack, updateItem].map(u => u.key).join(" -> ")
         const string = `${updateType}: ${chain}`
         updateStrings.push(string)
