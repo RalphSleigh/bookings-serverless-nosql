@@ -112,6 +112,7 @@ export const CanBookIntoEvent = new LoggedInPermission<"event">(data => {
 
 export const CanEditOwnBooking = new LoggedInPermission<"event" | "booking">(data => {
     if (data.booking.userId !== data.user!.id) return false
+    if(!data.event.bigCampMode) return true
     return (Date.now() < parseDate(data.event.bookingDeadline)!.getTime() || hasRoleOnEvent(data.user, data.event, ["Amend"]))
 }, "User can't edit their booking")
 
