@@ -22,18 +22,20 @@ import { consent } from "../../../shared/consents/consent.js";
 
 const MemoParticipantsForm = React.memo(ParticipantsForm)
 
-export function BookingForm({ data, event, user, update, submit, mode, deleteBooking, submitLoading, deleteLoading }: { data: PartialDeep<JsonBookingType>, event: JsonEventType, user: JsonUserResponseType, update: React.Dispatch<React.SetStateAction<PartialDeep<JsonBookingType>>>, submit: () => void, mode: "create" | "edit" | "rebook" | "view", deleteBooking: any, submitLoading: boolean, deleteLoading: boolean }) {
+export function BookingForm({ data, event, user, update, submit, mode, deleteBooking, submitLoading, deleteLoading }: { data: PartialDeep<JsonBookingType>, event: JsonEventType, user: JsonUserResponseType, update: React.Dispatch<React.SetStateAction<PartialDeep<JsonBookingType>>>, submit: (notify) => void, mode: "create" | "edit" | "rebook" | "view", deleteBooking: any, submitLoading: boolean, deleteLoading: boolean }) {
 
     const readOnly = mode === "view"
+    const own = data.userId === user.id
 
     const [permission, updatePermission] = useState({ permission: readOnly})
     const [deleteLock, setDeleteLock] = useState(true)
+    const [notify, setNotify] = useState(false)
     const { updateSubField } = getMemoUpdateFunctions(update)
 
     const create = useCallback(e => {
-        submit()
+        submit(notify)
         e.preventDefault()
-    }, [submit])
+    }, [submit, notify])
 
     const fee = getFee(event)
 
@@ -51,7 +53,7 @@ export function BookingForm({ data, event, user, update, submit, mode, deleteBoo
                     <Typography variant="h4">{`Booking for ${event.name}`}</Typography>
                     <BasicFields data={data.basic} update={updateSubField} readOnly={readOnly}/>
                     {event.bigCampMode ? <MemoBookingExtraContactFields data={data.extraContacts} update={updateSubField} readOnly={readOnly}/> : null}
-                    <MemoParticipantsForm basic={data.basic as JsonBookingType["basic"]} event={event} attendanceConfig={attendanceConfig} participants={data.participants || [{}]} update={updateSubField} kp={kpConfig} consent={consentConfig} validation={validation} own={data.userId === user.id} readOnly={readOnly}/>
+                    <MemoParticipantsForm basic={data.basic as JsonBookingType["basic"]} event={event} attendanceConfig={attendanceConfig} participants={data.participants || [{}]} update={updateSubField} kp={kpConfig} consent={consentConfig} validation={validation} own={own} readOnly={readOnly}/>
                     <MemoCampingFields event={event} data={data.camping} update={updateSubField} readOnly={readOnly}/>
                     <MemoEmergencyFields event={event} data={data.emergency} bookingType={data.basic?.bookingType || "individual"} update={updateSubField} readOnly={readOnly}/>
                     <MemoCustomQuestionFields event={event} data={data.customQuestions} basic={data.basic} camping={data.camping} update={updateSubField} readOnly={readOnly}/>
@@ -71,6 +73,7 @@ export function BookingForm({ data, event, user, update, submit, mode, deleteBoo
                         </LoadingButton>
                         {mode === "edit" ? <><LoadingButton loading={deleteLoading} variant="contained" color="error" disabled={deleteLock} onClick={deleteBooking} startIcon={<Delete />}>Cancel Booking</LoadingButton>
                             <IconButton color="warning" onClick={() => setDeleteLock(!deleteLock)}>{deleteLock ? <Lock /> : <LockOpen />}</IconButton></> : null}
+                        {mode === "edit" && !own ? <FormControlLabel sx={{ mt: 2 }} control={<Switch checked={notify} onChange={() => setNotify(!notify)} />} label="Notify Booking Owner" /> : null}
                     </Stack>
                 </form>
             </Box>
