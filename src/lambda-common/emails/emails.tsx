@@ -7,6 +7,7 @@ import { ManagerConfirmationEmail } from "./managerBookingCreated.js";
 import { ManagerBookingDeletedEmail } from "./managerBookingDeleted.js";
 import { ManagerBookingUpdatedEmail } from "./managerBookingUpdated.js";
 import { ManagerDataAccessEmail } from "./managerDataAccess.js";
+import { ManagerManagerBookingEdited } from "./managerManagerBookingEdited.js";
 
 const emails = {
     applicationReceived: new ApplicationReceivedEmail(),
@@ -18,7 +19,8 @@ const emails = {
     managerBookingUpdated: new ManagerBookingUpdatedEmail(),
     managerBookingCancelled: new ManagerBookingDeletedEmail(),
     managerDataAccess: new ManagerDataAccessEmail(),
-    managerApplicationReceived: new ManagerApplicationReceivedEmail()
+    managerApplicationReceived: new ManagerApplicationReceivedEmail(),
+    managerManagerBookingEdited: new ManagerManagerBookingEdited()
 }
 
 export type EmailsType = typeof emails

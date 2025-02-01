@@ -42,6 +42,14 @@ export const lambdaHandler = lambda_wrapper_json(
                             booking: newLatest as BookingType,
                             bookingOwner: current_user,
                         }, config)
+                        console.log("END INDIVIUAL EMAIL BEGIN MANAGERS")
+                        await queueManagerEmails({
+                            template: "managerBookingUpdated",
+                            recipient: current_user,
+                            event: event as EventType,
+                            booking: newLatest as BookingType,
+                            bookingOwner: current_user,
+                        }, config)
                     } else {
                         const users = await table.getModel('User').scan()
                         const bookingOwner = users.find(u => u.id === newLatest.userId)
@@ -52,15 +60,16 @@ export const lambdaHandler = lambda_wrapper_json(
                             booking: newLatest as BookingType,
                             bookingOwner: bookingOwner,
                         }, config)
+                        console.log("END INDIVIUAL EMAIL BEGIN MANAGERS")
+                        await queueManagerEmails({
+                            template: "managerManagerBookingEdited",
+                            recipient: bookingOwner,
+                            event: event as EventType,
+                            booking: newLatest as BookingType,
+                            bookingOwner: bookingOwner,
+                            bookingEditor: current_user,
+                        }, config)
                     }
-                    console.log("END INDIVIUAL EMAIL BEGIN MANAGERS")
-                    await queueManagerEmails({
-                        template: "managerBookingUpdated",
-                        recipient: current_user,
-                        event: event as EventType,
-                        booking: newLatest as BookingType,
-                        bookingOwner: current_user,
-                    }, config)
 
                     console.log("END EMAIL BEGIN DISCORD")
                     try {

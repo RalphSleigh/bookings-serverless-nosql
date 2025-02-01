@@ -9,7 +9,7 @@ import { ConfigType } from "./config.js";
 import { backOff } from 'exponential-backoff';
 import { render } from '@react-email/render';
 import { getUsersWithRolesForEvent } from "./util.js";
-import { EmailsType } from "./emails/emails.js";
+
 
 const RoleModel = table.getModel<RoleType>('Role')
 const UserModel = table.getModel<UserType>('User')
@@ -35,7 +35,16 @@ export type BookingEmailData = {
     bookingOwner: UserType
 }
 
-export type EmailData = BasicEmailData | BookingEmailData | ApplicationEmailData
+export type BookingManagerEmailData = {
+    template: "managerManagerBookingEdited",
+    recipient: UserType
+    event: EventType
+    booking: BookingType
+    bookingOwner: UserType
+    bookingEditor: UserType
+}
+
+export type EmailData = BasicEmailData | BookingEmailData | ApplicationEmailData | BookingManagerEmailData
 
 export async function queueEmail(data: EmailData, config: ConfigType) {
     console.log("queueing emails")
