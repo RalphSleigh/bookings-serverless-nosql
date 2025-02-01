@@ -34,13 +34,25 @@ export const lambdaHandler = lambda_wrapper_json(
                 console.log(`Edited booking ${newData.eventId}-${newData.userId}`);
                 if (isOwnBooking || notify) {
                     console.log("BEGINNING EMAIL")
-                    await queueEmail({
-                        template: "edited",
-                        recipient: current_user,
-                        event: event as EventType,
-                        booking: newLatest as BookingType,
-                        bookingOwner: current_user,
-                    }, config)
+                    if(isOwnBooking) {
+                        await queueEmail({
+                            template: "edited",
+                            recipient: current_user,
+                            event: event as EventType,
+                            booking: newLatest as BookingType,
+                            bookingOwner: current_user,
+                        }, config)
+                    } else {
+                        const users = await table.getModel('User').scan()
+                        const bookingOwner = users.find(u => u.id === newLatest.userId)
+                        await queueEmail({
+                            template: "edited",
+                            recipient: bookingOwner,
+                            event: event as EventType,
+                            booking: newLatest as BookingType,
+                            bookingOwner: bookingOwner,
+                        }, config)
+                    }
                     console.log("END INDIVIUAL EMAIL BEGIN MANAGERS")
                     await queueManagerEmails({
                         template: "managerBookingUpdated",
