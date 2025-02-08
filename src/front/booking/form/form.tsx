@@ -22,7 +22,7 @@ import { consent } from "../../../shared/consents/consent.js";
 
 const MemoParticipantsForm = React.memo(ParticipantsForm)
 
-export function BookingForm({ data, event, user, update, submit, mode, deleteBooking, submitLoading, deleteLoading }: { data: PartialDeep<JsonBookingType>, event: JsonEventType, user: JsonUserResponseType, update: React.Dispatch<React.SetStateAction<PartialDeep<JsonBookingType>>>, submit: (notify) => void, mode: "create" | "edit" | "rebook" | "view", deleteBooking: any, submitLoading: boolean, deleteLoading: boolean }) {
+export function BookingForm({ data, originalData, event, user, update, submit, mode, deleteBooking, submitLoading, deleteLoading }: { data: PartialDeep<JsonBookingType>, originalData: PartialDeep<JsonBookingType>, event: JsonEventType, user: JsonUserResponseType, update: React.Dispatch<React.SetStateAction<PartialDeep<JsonBookingType>>>, submit: (notify) => void, mode: "create" | "edit" | "rebook" | "view", deleteBooking: any, submitLoading: boolean, deleteLoading: boolean }) {
 
     const readOnly = mode === "view"
     const own = data.userId === user.id
@@ -57,7 +57,7 @@ export function BookingForm({ data, event, user, update, submit, mode, deleteBoo
                     <MemoCampingFields event={event} data={data.camping} update={updateSubField} readOnly={readOnly}/>
                     <MemoEmergencyFields event={event} data={data.emergency} bookingType={data.basic?.bookingType || "individual"} update={updateSubField} readOnly={readOnly}/>
                     <MemoCustomQuestionFields event={event} data={data.customQuestions} basic={data.basic} camping={data.camping} update={updateSubField} readOnly={readOnly}/>
-                    <MemoBookingMoneySection fees={fee} event={event} data={data} />
+                    <MemoBookingMoneySection fees={fee} event={event} data={data} originalData={originalData}/>
                     <MemoBookingPermissionSection event={event} data={permission} update={updatePermission} readOnly={readOnly}/>
                     <BookingValidationResults validationResults={validationResults} />
                     <Stack direction="row" spacing={1} mt={2}>

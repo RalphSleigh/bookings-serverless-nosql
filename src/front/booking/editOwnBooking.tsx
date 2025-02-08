@@ -24,6 +24,7 @@ export function EditOwnBookingPage({ event, booking, user }) {
 
     return <BookingForm
         data={bookingData}
+        originalData={booking}
         user={user}
         event={event}
         update={setBookingData}

@@ -9,6 +9,7 @@ import { postToDiscord } from '../../lambda-common/discord.js';
 import { diffString } from 'json-diff';
 import { log } from '../../lambda-common/logging.js';
 import { diff } from 'json-diff-ts';
+import { getFee } from '../../shared/fee/fee.js';
 
 const BookingModel: Model<OnetableBookingType> = table.getModel<OnetableBookingType>('Booking')
 const EventModel = table.getModel<OnetableEventType>('Event')
@@ -29,7 +30,8 @@ export const lambdaHandler = lambda_wrapper_json(
 
                 delete newData.fees
                 delete newData.village
-                const newLatest = await addVersionToBooking(existingLatestBooking, newData)
+
+                const newLatest = await addVersionToBooking(event, existingLatestBooking, newData)
 
                 console.log(`Edited booking ${newData.eventId}-${newData.userId}`);
                 if (isOwnBooking || notify) {

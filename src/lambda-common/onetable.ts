@@ -252,6 +252,11 @@ const schema = {
                 }
             },
             village: { type: String },
+            extraFeeData: { type: Object,
+                schema: {
+                    participantsAtDeadline: { type: Array },
+                }
+            },
             created: { type: Date, required: true },
             updated: { type: Date, required: true },
         },

@@ -45,6 +45,7 @@ export function CreateBookingPage({ event, user, application }: { event: JsonEve
 
     return <BookingForm
         data={bookingData}
+        originalData={bookingData}
         user={user}
         event={event}
         update={setBookingData}
