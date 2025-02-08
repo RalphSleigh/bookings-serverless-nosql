@@ -13,6 +13,7 @@ import { JsonBookingWithExtraType } from "../computedDataTypes.js";
 import { organisations } from "../ifm.js";
 import { EnvContext } from "../../front/app/envContext.js";
 import { Description } from "@mui/icons-material";
+import { create } from "@mui/material/styles/createTransitions.js";
 
 const paymentInstructions = `Please make bank transfers to:  
 
@@ -102,6 +103,32 @@ export class Large extends FeeStructure {
                 }
             }
 
+            let totalsBeforeDeadline: Record<string, Record<number, { count: number, band: typeof computedBands[0] }>> = {}
+
+            for (const participant of booking.extraFeeData?.participantsAtDeadline || []) {
+                participant.created = parseDate(participant.created)
+                if (differenceInYears(startDate!, participant.basic.dob) < 5) {
+                    free++
+                } else {
+                    for (const band of computedBands) {
+                        if (band.beforeDate! > participant.created) {
+                            if (!totalsBeforeDeadline[band.beforeString]) totalsBeforeDeadline[band.beforeString] = {}
+                            if (!totalsBeforeDeadline[band.beforeString][participant.attendance!.option!]) totalsBeforeDeadline[band.beforeString][participant.attendance!.option!] = { count: 0, band: band }
+                            totalsBeforeDeadline[band.beforeString][participant.attendance!.option!].count++
+                            break
+                        }
+                    }
+                }
+            }
+
+            const totalNow = Object.entries(totals).reduce((a, c) => {
+                return a + Object.entries(c[1]).reduce((a, c) => a + c[1].count * c[1].band.fees[c[0]], 0)
+            }, 0)
+
+            const totalBeforeDeadline = Object.entries(totalsBeforeDeadline).reduce((a, c) => {
+                return a + Object.entries(c[1]).reduce((a, c) => a + c[1].count * c[1].band.fees[c[0]], 0)
+            }, 0)
+
             const results: FeeLine[] = []
 
             const region = organisations.find(o => o[0] === booking.basic?.organisation)?.[1]
@@ -123,6 +150,9 @@ export class Large extends FeeStructure {
                     })
                 }
             }
+
+            if (totalNow < totalBeforeDeadline) results.push({ description: "Cancellation Fees", values: [(totalBeforeDeadline - totalNow)/2], tooltip: `50% of the difference between the total fees at the booking deadline(${currency(totalBeforeDeadline)}) and now (${currency(totalNow)})` })
+
             return results
         } else {
             return []
@@ -305,6 +335,18 @@ export class Large extends FeeStructure {
                 <Button variant="contained" sx={{ mt: 2 }} onClick={() => window.location.href = `/api/event/${event.id}/redirectToStripe?donate=${donation.toString()}`}>Pay by card</Button>
             </Box>
         </>
+    }
+
+    public processBookingUpdate(event: JsonEventType | EventType, existingBooking: BookingType | Partial<BookingType> | PartialDeep<JsonBookingType>, newBooking: BookingType | Partial<BookingType> | PartialDeep<JsonBookingType>) {
+        const eventDeadlineTime = parseDate(event.bookingDeadline)!.getTime()
+
+        if(Date.now() < eventDeadlineTime) {
+            newBooking.extraFeeData = newBooking.extraFeeData || {}
+            newBooking.extraFeeData.participantsAtDeadline = newBooking.participants!.map(p => { return {basic: p.basic, attendance: p.attendance, created: p.created, updated: p.updated}})
+        } else {
+            newBooking.extraFeeData = newBooking.extraFeeData || {}
+            newBooking.extraFeeData.participantsAtDeadline = newBooking.extraFeeData.participantsAtDeadline || existingBooking.participants!.map(p => { return {basic: p.basic, attendance: p.attendance, created: p.created, updated: p.updated}})
+        }
     }
 }
 

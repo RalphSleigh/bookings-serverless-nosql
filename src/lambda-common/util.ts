@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import { BookingType, EventBookingTimelineType, EventType, JsonBookingType, JsonParticipantType, OnetableBookingType, OnetableEventType, ParticipantType, RoleType, UserType, UserWithRoles, table } from './onetable.js';
 import { Model } from 'dynamodb-onetable';
+import { getFee } from '../shared/fee/fee.js';
 //import { db } from './orm'
 
 const RoleModel = table.getModel<RoleType>('Role')
@@ -32,8 +33,12 @@ export async function getUsersWithRolesForEvent(event: OnetableEventType, rolesN
     })
 }
 
-export async function addVersionToBooking(existing: BookingType, newData: Partial<BookingType>) {
+export async function addVersionToBooking(event: EventType, existing: BookingType, newData: Partial<BookingType>) {
     if(newData.participants) updateParticipantsDates(existing.participants, newData.participants!)
+
+    const fees = getFee(event)
+    fees.processBookingUpdate(event, existing, newData)
+
     const newLatest = await BookingModel.update({ ...existing, ...newData, deleted: false }, { partial: false })
     const newVersion = await BookingModel.create({ ...newLatest, version: newLatest.updated.toISOString() })
 
