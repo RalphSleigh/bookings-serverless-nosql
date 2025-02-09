@@ -10,7 +10,7 @@ import { Close } from "@mui/icons-material";
 import { JsonUserType, RoleType } from "../../lambda-common/onetable.js";
 
 const manageRoles = ["Owner", "Manage", "View", "Money", "KP", "Comms", "Accessibility"]
-const bookRoles = ["Book"]
+const bookRoles = ["Book", "Amend"]
 const villageRoles = ["View - Village"]
 
 export function Component() {
