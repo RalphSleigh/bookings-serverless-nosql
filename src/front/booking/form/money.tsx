@@ -9,7 +9,7 @@ function bookingMoneySection({ fees, event, data, originalData }: { fees: FeeStr
     fees.processBookingUpdate(event, originalData, data)
     return <>
         <Typography variant="h6" mt={2}>Pricing</Typography>
-        <fees.DescriptionElement event={event} booking={data} originalData={originalData}/>
+        <fees.DescriptionElement event={event} booking={data}/>
     </>
 }
 

@@ -10,7 +10,7 @@ const EventModel = table.getModel<EventType>('Event')
 const RoleModel: Model<RoleType> = table.getModel<RoleType>('Role')
 const UserModel: Model<UserType> = table.getModel<UserType>('User')
 
-const exemptRoles: RoleType["role"][] = ["Book", "View - Village"]
+const exemptRoles: RoleType["role"][] = ["Book", "Amend", "View - Village"]
 
 export const lambdaHandler = lambda_wrapper_json(
     async (lambda_event, config, current_user) => {
