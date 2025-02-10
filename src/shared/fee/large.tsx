@@ -329,7 +329,7 @@ export class Large extends FeeStructure {
         if (outstanding <= 0) return null
         return <>
             <Box display="flex" alignItems="center" sx={{ mb: 2 }}>
-                <Typography variant="body2" mt={2} sx={{ flexGrow: 1, pr: 2, }}>As you are booking thee or fewer people you can pay by card now:</Typography>
+                <Typography variant="body2" mt={2} sx={{ flexGrow: 1, pr: 2, }}>As you are booking three or fewer people you can pay by card now:</Typography>
                 <FormGroup>
                     <FormControlLabel sx={{ mt: 2, ml: 2 }} control={<Switch checked={donation} onChange={() => setDonation(!donation)} />} label="Donate extra £5" />
                 </FormGroup>
