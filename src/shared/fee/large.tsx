@@ -105,8 +105,9 @@ export class Large extends FeeStructure {
 
             let totalsBeforeDeadline: Record<string, Record<number, { count: number, band: typeof computedBands[0] }>> = {}
 
-            for (const participant of booking.extraFeeData?.participantsAtDeadline || []) {
-                participant.created = parseDate(participant.created)
+            const validPrevParticipants = (booking.extraFeeData?.participantsAtDeadline || []).filter(filterParticipants).map(validateParticipant)
+
+            for (const participant of validPrevParticipants) {
                 if (differenceInYears(startDate!, participant.basic.dob) < 5) {
                     free++
                 } else {
