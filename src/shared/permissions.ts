@@ -106,6 +106,7 @@ export const CanBookIntoEvent = new LoggedInPermission<"event">(data => {
     if (data.event.applicationsRequired && hasRoleOnEvent(data.user, data.event, ["Book"])) {
         return true
     }
+    if(data.event.applicationsRequired) return false
     if (isPast(parseDate(data.event.bookingDeadline)!)) return false
     return true
 }, "User can't book into event")
