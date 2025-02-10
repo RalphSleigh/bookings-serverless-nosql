@@ -103,10 +103,10 @@ export const CanApplyToEvent = new LoggedInPermission<"event">(data => {
 
 export const CanBookIntoEvent = new LoggedInPermission<"event">(data => {
     if (IsGlobalAdmin.if(data)) return true
-    if (isPast(parseDate(data.event.bookingDeadline)!)) return false
-    if (data.event.applicationsRequired) {
-        return hasRoleOnEvent(data.user, data.event, ["Book"])
+    if (data.event.applicationsRequired && hasRoleOnEvent(data.user, data.event, ["Book"])) {
+        return true
     }
+    if (isPast(parseDate(data.event.bookingDeadline)!)) return false
     return true
 }, "User can't book into event")
 

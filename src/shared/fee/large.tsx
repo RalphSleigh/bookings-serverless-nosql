@@ -109,7 +109,7 @@ export class Large extends FeeStructure {
 
             for (const participant of validPrevParticipants) {
                 if (differenceInYears(startDate!, participant.basic.dob) < 5) {
-                    free++
+                    continue
                 } else {
                     for (const band of computedBands) {
                         if (band.beforeDate! > participant.created) {
@@ -341,15 +341,15 @@ export class Large extends FeeStructure {
     public processBookingUpdate(event: JsonEventType | EventType, existingBooking: BookingType | Partial<BookingType> | PartialDeep<JsonBookingType>, newBooking: BookingType | Partial<BookingType> | PartialDeep<JsonBookingType>) {
         const eventDeadlineTime = parseDate(event.bookingDeadline)!.getTime()
 
-        if (!newBooking.participants) newBooking.participants = []
-        if (!existingBooking.participants) existingBooking.participants = []
+        const newParticipants = newBooking.participants || []
+        const existingParticipants = existingBooking.participants || []
 
         if (Date.now() < eventDeadlineTime) {
             newBooking.extraFeeData = newBooking.extraFeeData || {}
-            newBooking.extraFeeData.participantsAtDeadline = newBooking.participants.map(p => { return { basic: p.basic, attendance: p.attendance, created: p.created, updated: p.updated } })
+            newBooking.extraFeeData.participantsAtDeadline = newParticipants.map(p => { return { basic: p.basic, attendance: p.attendance, created: p.created, updated: p.updated } })
         } else {
             newBooking.extraFeeData = newBooking.extraFeeData || {}
-            newBooking.extraFeeData.participantsAtDeadline = newBooking.extraFeeData.participantsAtDeadline || existingBooking.participants.map(p => { return { basic: p.basic, attendance: p.attendance, created: p.created, updated: p.updated } })
+            newBooking.extraFeeData.participantsAtDeadline = newBooking.extraFeeData.participantsAtDeadline || existingParticipants.map(p => { return { basic: p.basic, attendance: p.attendance, created: p.created, updated: p.updated } })
         }
     }
 }
