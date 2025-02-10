@@ -151,7 +151,7 @@ export class Large extends FeeStructure {
                 }
             }
 
-            if (totalNow < totalBeforeDeadline) results.push({ description: "Cancellation Fees", values: [(totalBeforeDeadline - totalNow)/2], tooltip: `50% of the difference between the total fees at the booking deadline(${currency(totalBeforeDeadline)}) and now (${currency(totalNow)})` })
+            if (totalNow < totalBeforeDeadline) results.push({ description: "Cancellation Fees", values: [(totalBeforeDeadline - totalNow) / 2], tooltip: `50% of the difference between the total fees at the booking deadline(${currency(totalBeforeDeadline)}) and now (${currency(totalNow)})` })
 
             return results
         } else {
@@ -217,16 +217,16 @@ export class Large extends FeeStructure {
             </Typography >
             <List dense={true}>
                 <ListItem>
-                  <ListItemIcon>
-                    <Description/>
-                  </ListItemIcon>
-                  <ListItemText><a href="https://camp100.org.uk/wp-content/uploads/2024/06/payment_policy_v1.pdf" target="_blank">Payment Policy</a></ListItemText>
+                    <ListItemIcon>
+                        <Description />
+                    </ListItemIcon>
+                    <ListItemText><a href="https://camp100.org.uk/wp-content/uploads/2024/06/payment_policy_v1.pdf" target="_blank">Payment Policy</a></ListItemText>
                 </ListItem>
                 <ListItem>
-                  <ListItemIcon>
-                    <Description/>
-                  </ListItemIcon>
-                  <ListItemText><a href="https://camp100.org.uk/wp-content/uploads/2024/06/how_to_pay_v1.pdf" target="_blank">How To Pay</a></ListItemText>
+                    <ListItemIcon>
+                        <Description />
+                    </ListItemIcon>
+                    <ListItemText><a href="https://camp100.org.uk/wp-content/uploads/2024/06/how_to_pay_v1.pdf" target="_blank">How To Pay</a></ListItemText>
                 </ListItem>
             </List>
             <TableContainer component={Paper} sx={{ mt: 2, p: 1 }}>
@@ -330,7 +330,7 @@ export class Large extends FeeStructure {
             <Box display="flex" alignItems="center" sx={{ mb: 2 }}>
                 <Typography variant="body2" mt={2} sx={{ flexGrow: 1, pr: 2, }}>As you are booking thee or fewer people you can pay by card now:</Typography>
                 <FormGroup>
-                    <FormControlLabel sx={{ mt: 2, ml:2 }} control={<Switch checked={donation} onChange={() => setDonation(!donation)}/>} label="Donate extra £5" />
+                    <FormControlLabel sx={{ mt: 2, ml: 2 }} control={<Switch checked={donation} onChange={() => setDonation(!donation)} />} label="Donate extra £5" />
                 </FormGroup>
                 <Button variant="contained" sx={{ mt: 2 }} onClick={() => window.location.href = `/api/event/${event.id}/redirectToStripe?donate=${donation.toString()}`}>Pay by card</Button>
             </Box>
@@ -340,12 +340,15 @@ export class Large extends FeeStructure {
     public processBookingUpdate(event: JsonEventType | EventType, existingBooking: BookingType | Partial<BookingType> | PartialDeep<JsonBookingType>, newBooking: BookingType | Partial<BookingType> | PartialDeep<JsonBookingType>) {
         const eventDeadlineTime = parseDate(event.bookingDeadline)!.getTime()
 
-        if(Date.now() < eventDeadlineTime) {
+        if (!newBooking.participants) newBooking.participants = []
+        if (!existingBooking.participants) existingBooking.participants = []
+
+        if (Date.now() < eventDeadlineTime) {
             newBooking.extraFeeData = newBooking.extraFeeData || {}
-            newBooking.extraFeeData.participantsAtDeadline = newBooking.participants!.map(p => { return {basic: p.basic, attendance: p.attendance, created: p.created, updated: p.updated}})
+            newBooking.extraFeeData.participantsAtDeadline = newBooking.participants.map(p => { return { basic: p.basic, attendance: p.attendance, created: p.created, updated: p.updated } })
         } else {
             newBooking.extraFeeData = newBooking.extraFeeData || {}
-            newBooking.extraFeeData.participantsAtDeadline = newBooking.extraFeeData.participantsAtDeadline || existingBooking.participants!.map(p => { return {basic: p.basic, attendance: p.attendance, created: p.created, updated: p.updated}})
+            newBooking.extraFeeData.participantsAtDeadline = newBooking.extraFeeData.participantsAtDeadline || existingBooking.participants.map(p => { return { basic: p.basic, attendance: p.attendance, created: p.created, updated: p.updated } })
         }
     }
 }
