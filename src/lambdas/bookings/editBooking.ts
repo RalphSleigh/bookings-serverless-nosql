@@ -112,13 +112,14 @@ export const lambdaHandler = lambda_wrapper_json(
 
 const generateDiscordDiff: (oldBooking: BookingType, newBooking: BookingType) => string = (oldBooking, newBooking) => {
     const updateString = (updateItem, stack) => {
+        if (["extraFeeData"].includes(updateItem.key)) return
         if (updateItem.changes) {
             updateItem.changes.forEach(c => {
                 updateString(c, [...stack, updateItem])
             })
             return
         }
-        if (["version", "created", "updated", "extraFeeData"].includes(updateItem.key)) return
+        if (["version", "created", "updated"].includes(updateItem.key)) return
 
 
         const capitalise = (string) => {
