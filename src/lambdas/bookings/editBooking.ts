@@ -118,7 +118,7 @@ const generateDiscordDiff: (oldBooking: BookingType, newBooking: BookingType) =>
             })
             return
         }
-        if (["version", "created", "updated"].includes(updateItem.key)) return
+        if (["version", "created", "updated", "extraFeeData"].includes(updateItem.key)) return
 
 
         const capitalise = (string) => {
