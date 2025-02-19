@@ -13,7 +13,9 @@ export function updateParticipantsDates(existing: Array<ParticipantType>, incomi
     let now = new Date()
 
     incoming.forEach(p => {
-        const existingParticipant = existing.find(ep => ep.basic.name === p.basic.name && ep.created.toISOString() === p.created)
+        const existingParticipants = existing.filter(ep => ep.basic.name === p.basic.name && ep.basic.dob === p.basic.dob)
+        if(existingParticipants.length > 1) throw new Error(`Multiple participants with name ${p.basic.name} and dob ${p.basic.dob}`)
+        const existingParticipant = existingParticipants[0]
         const existingToCompare = {..._.cloneDeep(existingParticipant), created: null, updated: null}
         const newToCompare = {..._.cloneDeep(p), created: null, updated: null}
         const updated = existingParticipant && !_.isEqual(existingToCompare, newToCompare)
