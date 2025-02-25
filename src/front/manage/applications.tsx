@@ -66,7 +66,7 @@ export function Component() {
             <TableCell>{a.district}</TableCell>
             <TableCell>{a.predictedParticipants}</TableCell>
             <TableCell>{booking ? booking.participants.length : ""}</TableCell>
-            <TableCell>{applicationSheetsNumbers.isSuccess ? applicationSheetsNumbers.data[a.userId] : "Loading"}</TableCell>
+            <TableCell>{applicationSheetsNumbers.isSuccess ? applicationSheetsNumbers.data[a.userId] === 0 ? "" : applicationSheetsNumbers.data[a.userId]  : "Loading"}</TableCell>
         </TableRow>
     })
 
