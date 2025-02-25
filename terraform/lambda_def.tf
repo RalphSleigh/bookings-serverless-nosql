@@ -117,7 +117,7 @@ variable "lambda_definitions" {
       path   = "event/{id}/manage/applications"
       method = "get"
     },
-    event_applications = {
+    event_applications_sheets_numbers = {
       name   = "event_applications_sheets_numbers"
       code   = "events/manage/getApplicationsSheetsNumbers"
       path   = "event/{id}/manage/applicationsSheetNumbers"
