@@ -1,20 +1,21 @@
 import React, { useMemo, useState } from "react";
 import { useOutletContext } from "react-router-dom";
-import { allUsersQueryType, eventRolesQueryType, allUsersQuery, eventRolesQuery, useCreateRole, useDeleteRole, useEventApplications, eventApplicationsQueryType, eventApplicationsQuery, useApplicationOperation } from "../queries.js";
+import { allUsersQueryType, eventRolesQueryType, allUsersQuery, eventRolesQuery, useCreateRole, useDeleteRole, useEventApplications, eventApplicationsQueryType, eventApplicationsQuery, useApplicationOperation, useEventApplicationsSheetsNumberQuery } from "../queries.js";
 import { managePageContext } from "./managePage.js";
-import { useQueries, useSuspenseQueries } from "@tanstack/react-query";
+import { useQueries, useQuery, useSuspenseQueries } from "@tanstack/react-query";
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
 import { Avatar, AvatarGroup, Badge, Box, Button, FormControl, FormControlLabel, Grid, IconButton, InputLabel, MenuItem, Paper, Select, SelectChangeEvent, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography, useTheme } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import { JsonUserType, RoleType } from "../../lambda-common/onetable.js";
 import { applicationTypeIcon } from "./utils.js";
+import { application } from "express";
 
 export function Component() {
     const { event, bookings } = useOutletContext<managePageContext>()
 
     const [roleData, applicationsData] = useSuspenseQueries<[eventRolesQueryType, eventApplicationsQueryType]>({ queries: [eventRolesQuery(event.id), eventApplicationsQuery(event.id)] })
-
+    const applicationSheetsNumbers = useEventApplicationsSheetsNumberQuery(event.id)
     const applicationOperation = useApplicationOperation(event.id)
 
     const approvedApplications = applicationsData.data.applications.filter(a => roleData.data.roles.find(r => (r.userId === a.userId && r.role === "Book")))
@@ -65,6 +66,7 @@ export function Component() {
             <TableCell>{a.district}</TableCell>
             <TableCell>{a.predictedParticipants}</TableCell>
             <TableCell>{booking ? booking.participants.length : ""}</TableCell>
+            <TableCell>{applicationSheetsNumbers.isSuccess ? applicationSheetsNumbers.data[a.userId] : "Loading"}</TableCell>
         </TableRow>
     })
 
@@ -98,6 +100,7 @@ export function Component() {
                         <TableCell><strong>Group/District</strong></TableCell>
                         <TableCell><strong>Predicted</strong></TableCell>
                         <TableCell><strong>Booked</strong></TableCell>
+                        <TableCell><strong>In Sheet</strong></TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
