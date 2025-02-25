@@ -18,16 +18,19 @@ export const lambdaHandler = lambda_wrapper_json(
 
             const participantsInSheet = {}
 
-            for (const application of applications) {
+            const promises = applications.map(async a => {
                 try {
-                    //@ts-expect-error
-                    const participants = await getParticipantsFromSheet(config, event, { id: application.userId })
-                    participantsInSheet[application.userId] = participants.length
+                //@ts-expect-error
+                const participants = await getParticipantsFromSheet(config, event, { id: a.userId })
+                participantsInSheet[a.userId] = participants.length
                 } catch (e) {
-                    participantsInSheet[application.userId] = 0
+                    participantsInSheet[a.userId] = 0
                 }
-            }
-            
+
+            })
+
+            await Promise.all(promises)
+
             return participantsInSheet
         } else {
             throw new Error("Can't find event")
