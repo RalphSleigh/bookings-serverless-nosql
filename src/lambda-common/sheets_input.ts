@@ -326,22 +326,31 @@ export async function createSheetForBooking(config: ConfigType, event: OnetableE
     }
 }
 
+const promiseCache = {}
+
+const cachedPromise = (key, fn) => {
+    if (!promiseCache[key]) {
+        promiseCache[key] = fn()
+    }
+    return promiseCache[key]
+}
+
 export async function getParticipantsFromSheet(config, event: OnetableEventType, user: UserType): Promise<Partial<JsonParticipantType>[]> {
-    const drive_instance = await getDriveClient(config)
+    const drive_instance = await cachedPromise("client", () => getDriveClient(config))
 
     let sheet: drive_v3.Schema$File
 
     try {
-        const rootFolder = await drive_instance.files.list({ q: `name = 'shared_sheets' and mimeType = 'application/vnd.google-apps.folder' and trashed = false` })
+        const rootFolder = await cachedPromise("root", () => drive_instance.files.list({ q: `name = 'shared_sheets' and mimeType = 'application/vnd.google-apps.folder' and trashed = false` }))
         if (!rootFolder.data?.files?.[0]) throw new Error("Root folder not found")
 
-        const eventFolder = await drive_instance.files.list({ q: `name contains '${event.id}' and mimeType = 'application/vnd.google-apps.folder' and '${rootFolder.data.files[0].id}' in parents and trashed = false` })
+        const eventFolder = await cachedPromise(event.id, () => drive_instance.files.list({ q: `name contains '${event.id}' and mimeType = 'application/vnd.google-apps.folder' and '${rootFolder.data.files[0].id}' in parents and trashed = false` }))
         if (!eventFolder.data?.files?.[0]) throw new Error("Event folder not found")
 
-        const userFolder = await drive_instance.files.list({ q: `name contains '${user.id}' and mimeType = 'application/vnd.google-apps.folder' and '${eventFolder.data.files[0].id}' in parents and trashed = false` })
+        const userFolder = await cachedPromise(`${event.id}${user.id}`, () => drive_instance.files.list({ q: `name contains '${user.id}' and mimeType = 'application/vnd.google-apps.folder' and '${eventFolder.data.files[0].id}' in parents and trashed = false` }))
         if (!userFolder.data?.files?.[0]) throw new Error("Event folder not found")
 
-        const userFile = await drive_instance.files.list({ q: `'${userFolder.data.files[0].id}' in parents and trashed = false`, fields: 'files(id, name, webViewLink)' })
+        const userFile = await cachedPromise( `${event.id}${user.id}files`, () => drive_instance.files.list({ q: `'${userFolder.data.files[0].id}' in parents and trashed = false`, fields: 'files(id, name, webViewLink)' }))
         if (!userFile.data?.files?.[0]) throw new Error("Sheet not found")
 
         sheet = userFile.data.files[0]
@@ -352,11 +361,11 @@ export async function getParticipantsFromSheet(config, event: OnetableEventType,
 
     const sheets_instance = await getSheetsClient(config)
 
-    const response = await sheets_instance.spreadsheets.values.get({
+    const response = await cachedPromise( `${event.id}${user.id}sheet`, () => sheets_instance.spreadsheets.values.get({
         spreadsheetId: sheet.id!,
         range: 'Sheet1',
         valueRenderOption: 'UNFORMATTED_VALUE',
-    })
+    }))
 
     if (!response.data.values) throw new Error("No data found")
 
