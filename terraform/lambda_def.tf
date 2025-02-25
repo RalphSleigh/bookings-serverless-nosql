@@ -117,6 +117,12 @@ variable "lambda_definitions" {
       path   = "event/{id}/manage/applications"
       method = "get"
     },
+    event_applications = {
+      name   = "event_applications_sheets_numbers"
+      code   = "events/manage/getApplicationsSheetsNumbers"
+      path   = "event/{id}/manage/applicationsSheetNumbers"
+      method = "get"
+    },
     event_roles_create = {
       name   = "event_roles_create"
       code   = "events/manage/createRole"

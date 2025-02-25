@@ -15,7 +15,7 @@ app.use(express.text())
 app.use(bodyParser.json());
 app.use(bodyParser.text({ type: 'application/x-www-form-urlencoded' }));
 
-const handlerSetup = (url: string, lambda_path: string, method: string = "GET", ppath=undefined) => {
+const handlerSetup = (url: string, lambda_path: string, method: string = "GET", ppath: string | undefined = undefined) => {
 
   const handler_func = method == "POST" ? app.post: app.get
 
@@ -83,6 +83,7 @@ handlerSetup('/api/event/:id/manage/getParticipantNumbersChartData', 'events/man
 handlerSetup('/api/event/:id/manage/timeline', 'events/manage/getEventTimeline')
 handlerSetup('/api/event/:id/manage/roles', 'events/manage/getRoles')
 handlerSetup('/api/event/:id/manage/applications', 'events/manage/getApplications')
+handlerSetup('/api/event/:id/manage/applicationsSheetNumbers', 'events/manage/getApplicationsSheetsNumbers')
 handlerSetup('/api/event/:id/manage/roles/create', 'events/manage/createRole', "POST")
 handlerSetup('/api/event/:id/manage/roles/delete', 'events/manage/deleteRole', "POST")
 handlerSetup('/api/event/:id/manage/booking/:userId/operation', 'events/manage/bookingOperation', "POST")

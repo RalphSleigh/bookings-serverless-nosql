@@ -1,4 +1,4 @@
-import { QueryObserverSuccessResult, UseQueryOptions, useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
+import { QueryObserverResult, QueryObserverSuccessResult, UseQueryOptions, useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import axios from 'axios'
 import { BookingType, EventBookingTimelineType, EventType, JsonApplicationType, JsonBookingType, JsonEventBookingTimelineType, JsonEventType, JsonRoleType, JsonUserResponseType, JsonUserType } from '../lambda-common/onetable.js'
 import { SnackBarContext } from './app/toasts.js';
@@ -272,6 +272,25 @@ export const eventApplicationsQuery = eventId => {
 export function useEventApplications(eventId) {
     return useSuspenseQuery(eventApplicationsQuery(eventId)) as QueryObserverSuccessResult<{ "applications": [JsonApplicationType] }>
 }
+
+
+
+
+export type eventApplicationsSheetsNumbersQueryType = UseQueryOptions<Record<string, number>, any>
+
+export const eventApplicationsSheetsNumberQuery = eventId => {
+    return {
+        queryKey: ['manage', eventId, 'applications', 'numbers'],
+        queryFn: async () => (await axios.get(`/api/event/${eventId}/manage/applicationsSheetNumbers`)).data
+    }
+}
+
+export function useEventApplicationsSheetsNumberQuery(eventId) {
+    return useQuery(eventApplicationsSheetsNumberQuery(eventId)) as QueryObserverResult<Record<string, number>>
+}
+
+
+
 
 export type eventRolesQueryType = UseQueryOptions<{ "roles": [JsonRoleType] }, any>
 
