@@ -64,7 +64,7 @@ export const lambdaHandler = async (lambdaEvent: APIGatewayProxyEvent): Promise<
     }
     .filled {
         height:100%;
-        background-color: #000000;
+        background-color: #087F5C;
         text-align: center;
         line-height: 30px;
         color: white;
