@@ -558,14 +558,21 @@ class Town extends Field {
     }
 }
 
-export class ComputedAttendace extends Field {
-    fieldName = "Combined Attendance"
+export class ComputedAttendaceFirstThree extends Field {
+    fieldName = "First Three Days"
     visbileMobile = false
     visibleDesktop = false
     value (participant: JsonParticipantWithExtraType) {
-        if(participant.attendance?.option ===  0 || participant.attendance?.option === 1) return "First Half"
-        if(participant.attendance?.option ===  0 || participant.attendance?.option === 2) return "Second Half"
-        return "unknown"
+        return participant.attendance?.option ===  0 || participant.attendance?.option === 1
+    }
+}
+
+export class ComputedAttendaceLastSeven extends Field {
+    fieldName = "Last Seven Days"
+    visbileMobile = false
+    visibleDesktop = false
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.attendance?.option ===  0 || participant.attendance?.option === 2
     }
 }
 
