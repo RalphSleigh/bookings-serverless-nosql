@@ -8,7 +8,7 @@ import { queueManagerEmails } from '../../lambda-common/email.js';
 
 import { verify } from "discord-verify/node";
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { formatDuration, intervalToDuration } from 'date-fns';
+import { differenceInDays, formatDuration, intervalToDuration } from 'date-fns';
 
 const EventModel: Model<OnetableEventType> = table.getModel<OnetableEventType>('Event')
 const BookingModel:Model<BookingType> = table.getModel<BookingType>('Booking')
@@ -45,14 +45,15 @@ export const lambdaHandler = async (lambda_event: APIGatewayProxyEvent): Promise
 
         if (body.data.name === "campstarts") {
 
-            const result = formatDuration(intervalToDuration({ start: new Date(), end: new Date(2025, 6, 27, 12, 0, 0) }), { delimiter: ', ' }).replace("minutes,", "minutes and")
+            const result = differenceInDays(new Date(2025, 6, 27, 12, 0, 0), new Date())
+            // const result = formatDuration(intervalToDuration({ start: new Date(), end: new Date(2025, 6, 27, 12, 0, 0) }), { delimiter: ', ' }).replace("minutes,", "minutes and")
 
             return {
                 statusCode: 200, body: JSON.stringify({
                     "type": 4,
                     "data": {
                         "tts": false,
-                        "content": `🌞⛺⛺⛺🌲  Camp 100 begins in ${result}!  🌲⛺⛺⛺🌞`,
+                        "content": `🌞⛺⛺⛺🌲  Camp 100 begins in ${result} days!  🌲⛺⛺⛺🌞`,
                         "embeds": [],
                         "allowed_mentions": { "parse": [] }
                     }
