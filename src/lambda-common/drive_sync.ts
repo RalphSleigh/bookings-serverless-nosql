@@ -2,7 +2,7 @@ import { sheets, auth } from "@googleapis/sheets"
 import { drive } from '@googleapis/drive'
 import { BookingType, EventType, FoundUserResponseType, JsonBookingType, JsonParticipantType, OnetableEventType, ParticipantType, RoleType, UserType, UserWithRoles, table } from "./onetable.js"
 import { filterDataByRoles } from "./roles.js"
-import { ParticipantFields, CSVCurrent, ComputedAttendace } from "../shared/participantFields.js"
+import { ParticipantFields, CSVCurrent, ComputedAttendace, ComputedAttendaceFirstThree, ComputedAttendaceLastSeven } from "../shared/participantFields.js"
 import { User } from "discord.js"
 import { ConfigType } from "./config.js"
 import { log } from "./logging.js"
@@ -140,7 +140,8 @@ async function syncToDrive(event: OnetableEventType, user: UserWithRoles, partic
 
     const fields = new ParticipantFields(event)
     fields.fields.push(new CSVCurrent(event))
-    fields.fields.push(new ComputedAttendace(event))
+    fields.fields.push(new ComputedAttendaceFirstThree(event))
+    fields.fields.push(new ComputedAttendaceLastSeven(event))
 
     const headers = fields.getCSVHeaders(user)
     const participants = participantsData.map(p => fields.getCSVValues(p, user))
