@@ -69,7 +69,7 @@ export const lambdaHandler = async (lambdaEvent: APIGatewayProxyEvent): Promise<
         line-height: 30px;
         color: white;
         border-radius: 10px;
-        box-shadow: rgb(51, 51, 51) 0px 2px 2px 0px;
+        box-shadow: rgb(167, 167, 167) 0px 2px 2px 0px;
         animation: progressBar 3s ease-in-out;
         animation-fill-mode:both; 
     }
