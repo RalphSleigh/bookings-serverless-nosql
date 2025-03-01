@@ -425,6 +425,12 @@ function getParticipantFromRow(row: NonNullable<sheets_v4.Schema$ValueRange["val
     if (row[16]) result.consent!.photo = row[16] === "Yes"
     if (row[17]) result.consent!.sre = row[17] === "Yes"
 
+    const removeEmpty = obj => Object.fromEntries(Object.keys(obj).filter(k => obj[k] !== '').map(k => [k, obj[k]]));
+
+    result.kp = removeEmpty(result.kp)
+    result.medical = removeEmpty(result.medical)
+
+
     return result
 }
 
