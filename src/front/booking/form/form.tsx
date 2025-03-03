@@ -27,7 +27,7 @@ export function BookingForm({ data, originalData, event, user, update, submit, m
     const readOnly = mode === "view"
     const own = data.userId === user.id
 
-    const [permission, updatePermission] = useState({ permission: readOnly})
+    const [permission, updatePermission] = useState({ permission: readOnly })
     const [deleteLock, setDeleteLock] = useState(true)
     const [notify, setNotify] = useState(false)
     const { updateSubField } = getMemoUpdateFunctions(update)
@@ -46,19 +46,24 @@ export function BookingForm({ data, originalData, event, user, update, submit, m
     const validation = React.useMemo(() => new Validation(event), [event]);
 
     const validationResults = validation.validate(data, permission.permission)
+
     return <Grid container spacing={2} p={2} justifyContent="center">
         <Grid xl={6} lg={7} md={8} sm={9} xs={12} item>
             <Box p={2}>
                 <form>
                     <Typography variant="h4">{`Booking for ${event.name}`}</Typography>
-                    <BasicFields data={data.basic} update={updateSubField} readOnly={readOnly}/>
-                    {event.bigCampMode ? <MemoBookingExtraContactFields data={data.extraContacts} update={updateSubField} readOnly={readOnly}/> : null}
-                    <MemoParticipantsForm basic={data.basic as JsonBookingType["basic"]} event={event} attendanceConfig={attendanceConfig} participants={data.participants || [{}]} update={updateSubField} kp={kpConfig} consent={consentConfig} validation={validation} own={own} readOnly={readOnly}/>
-                    <MemoCampingFields event={event} data={data.camping} update={updateSubField} readOnly={readOnly}/>
-                    <MemoEmergencyFields event={event} data={data.emergency} bookingType={data.basic?.bookingType || "individual"} update={updateSubField} readOnly={readOnly}/>
-                    <MemoCustomQuestionFields event={event} data={data.customQuestions} basic={data.basic} camping={data.camping} update={updateSubField} readOnly={readOnly}/>
-                    <MemoBookingMoneySection fees={fee} event={event} data={data} originalData={originalData}/>
-                    <MemoBookingPermissionSection event={event} data={permission} update={updatePermission} readOnly={readOnly}/>
+                    {readOnly ? <Alert variant="outlined" severity="warning" sx={{ mt: 2, pt: 2 }}>
+                        <AlertTitle>This view read-only</AlertTitle>
+                        As the deadline has passed you can no longer update your booking. If you need to make changes please contact the camp team at <a href="mailto:info@camp100.org.uk">info@camp100.org.uk</a> and they can make the changes or allow you to edit it yourself.
+                    </Alert> : null}
+                    <BasicFields data={data.basic} update={updateSubField} readOnly={readOnly} />
+                    {event.bigCampMode ? <MemoBookingExtraContactFields data={data.extraContacts} update={updateSubField} readOnly={readOnly} /> : null}
+                    <MemoParticipantsForm basic={data.basic as JsonBookingType["basic"]} event={event} attendanceConfig={attendanceConfig} participants={data.participants || [{}]} update={updateSubField} kp={kpConfig} consent={consentConfig} validation={validation} own={own} readOnly={readOnly} />
+                    <MemoCampingFields event={event} data={data.camping} update={updateSubField} readOnly={readOnly} />
+                    <MemoEmergencyFields event={event} data={data.emergency} bookingType={data.basic?.bookingType || "individual"} update={updateSubField} readOnly={readOnly} />
+                    <MemoCustomQuestionFields event={event} data={data.customQuestions} basic={data.basic} camping={data.camping} update={updateSubField} readOnly={readOnly} />
+                    <MemoBookingMoneySection fees={fee} event={event} data={data} originalData={originalData} />
+                    <MemoBookingPermissionSection event={event} data={permission} update={updatePermission} readOnly={readOnly} />
                     <BookingValidationResults validationResults={validationResults} />
                     <Stack direction="row" spacing={1} mt={2}>
                         <LoadingButton
@@ -88,12 +93,12 @@ function bookingIndvidualContactFields({ data, update, readOnly }: { data: Parti
 
     return <>
         <Typography variant="h6" mt={2}>{`Your details`}</Typography>
-        <TextField autoComplete="name" name="name" id="name" inputProps={{'data-form-type': 'name'}} fullWidth sx={{ mt: 2 }} required label="Your Name" value={data?.contactName || ''} onChange={updateField('contactName')} />
-        <TextField autoComplete="email" name="email" id="email" inputProps={{'data-form-type': 'email'}} fullWidth sx={{ mt: 2 }} required type="email" label="Your email" value={data?.contactEmail || ''} onChange={updateField('contactEmail')} />
+        <TextField autoComplete="name" name="name" id="name" inputProps={{ 'data-form-type': 'name' }} fullWidth sx={{ mt: 2 }} required label="Your Name" value={data?.contactName || ''} onChange={updateField('contactName')} />
+        <TextField autoComplete="email" name="email" id="email" inputProps={{ 'data-form-type': 'email' }} fullWidth sx={{ mt: 2 }} required type="email" label="Your email" value={data?.contactEmail || ''} onChange={updateField('contactEmail')} />
         {data?.contactEmail?.includes("privaterelay.appleid.com") ? <Alert severity="warning" sx={{ mt: 2, pt: 2 }}>
             <AlertTitle>This appears to be an Apple private relay address, we recommend you provide your actual email address, otherwise we may be unable to contact you. This will not be shared outside the camp team.</AlertTitle>
         </Alert> : null}
-        <TextField autoComplete="tel" name="telephone" id="telephone" inputProps={{'data-form-type': 'phone'}} fullWidth sx={{ mt: 2 }} required type="tel" label="Phone Number" value={data?.contactPhone || ''} onChange={updateField('contactPhone')} />
+        <TextField autoComplete="tel" name="telephone" id="telephone" inputProps={{ 'data-form-type': 'phone' }} fullWidth sx={{ mt: 2 }} required type="tel" label="Phone Number" value={data?.contactPhone || ''} onChange={updateField('contactPhone')} />
     </>
 }
 
@@ -122,7 +127,7 @@ function bookingGroupContactFields({ data, update, readOnly }: { data: PartialDe
             <Grid xs={6} item>
                 <Card variant="outlined" sx={{ display: 'flex', flexDirection: 'column', height: '100%', ...groupStyle }} onClick={() => update('basic')(data => { return { ...data, bookingType: 'group' } })}>
                     <CardContent>
-                        <Checkbox checked={data?.bookingType == "group"} sx={{ float: 'right', mt: -1, mr: -1 }} disabled={readOnly}/>
+                        <Checkbox checked={data?.bookingType == "group"} sx={{ float: 'right', mt: -1, mr: -1 }} disabled={readOnly} />
                         <Typography variant="h5">Group Booking</Typography>
                         <Typography variant="body1">If you are booking for a Woodcraft Folk District, Group, or other large booking, please select this option.</Typography>
                     </CardContent>
@@ -131,7 +136,7 @@ function bookingGroupContactFields({ data, update, readOnly }: { data: PartialDe
             <Grid xs={6} item>
                 <Card variant="outlined" sx={{ display: 'flex', flexDirection: 'column', height: '100%', ...individualStyle }} onClick={() => update('basic')(data => { return { ...data, bookingType: 'individual' } })}>
                     <CardContent>
-                        <Checkbox checked={data?.bookingType == "individual"} sx={{ float: 'right', mt: -1, mr: -1 }} disabled={readOnly}/>
+                        <Checkbox checked={data?.bookingType == "individual"} sx={{ float: 'right', mt: -1, mr: -1 }} disabled={readOnly} />
                         <Typography variant="h5">Individual Booking</Typography>
                         <Typography variant="body1">If you are booking just yourself or your family members, please select this option.</Typography>
                     </CardContent>
@@ -151,14 +156,14 @@ function bookingGroupContactFields({ data, update, readOnly }: { data: PartialDe
                 {organsationItems}
             </Select>
         </FormControl>
-        <TextField autoComplete="group" name="group" id="group" inputProps={{'data-form-type': 'other'}} fullWidth sx={{ mt: 2 }} required={districtRequired} label="District" value={data?.district || ''} onChange={updateField('district')} disabled={readOnly}/>
+        <TextField autoComplete="group" name="group" id="group" inputProps={{ 'data-form-type': 'other' }} fullWidth sx={{ mt: 2 }} required={districtRequired} label="District" value={data?.district || ''} onChange={updateField('district')} disabled={readOnly} />
         <Typography variant="h6" mt={2}>{`Your details`}</Typography>
-        <TextField autoComplete="name" name="name" id="name" inputProps={{'data-form-type': 'name'}} fullWidth sx={{ mt: 2 }} required label="Your Name" value={data?.contactName || ''} onChange={updateField('contactName')} disabled={readOnly}/>
-        <TextField autoComplete="email" name="email" id="email" inputProps={{'data-form-type': 'email'}} fullWidth sx={{ mt: 2 }} required type="email" label="Your email" value={data?.contactEmail || ''} onChange={updateField('contactEmail')} disabled={readOnly}/>
+        <TextField autoComplete="name" name="name" id="name" inputProps={{ 'data-form-type': 'name' }} fullWidth sx={{ mt: 2 }} required label="Your Name" value={data?.contactName || ''} onChange={updateField('contactName')} disabled={readOnly} />
+        <TextField autoComplete="email" name="email" id="email" inputProps={{ 'data-form-type': 'email' }} fullWidth sx={{ mt: 2 }} required type="email" label="Your email" value={data?.contactEmail || ''} onChange={updateField('contactEmail')} disabled={readOnly} />
         {data?.contactEmail?.includes("privaterelay.appleid.com") ? <Alert severity="warning" sx={{ mt: 2, pt: 2 }}>
             <AlertTitle>This appears to be an Apple private relay address, we recommend you provide your actual email address, otherwise we may be unable to contact you. This will not be shared outside the camp team.</AlertTitle>
         </Alert> : null}
-        <TextField autoComplete="tel" name="telephone" id="telephone" inputProps={{'data-form-type': 'phone'}} fullWidth sx={{ mt: 2 }} required type="tel" label="Phone Number" value={data?.contactPhone || ''} onChange={updateField('contactPhone')} disabled={readOnly}/>
+        <TextField autoComplete="tel" name="telephone" id="telephone" inputProps={{ 'data-form-type': 'phone' }} fullWidth sx={{ mt: 2 }} required type="tel" label="Phone Number" value={data?.contactPhone || ''} onChange={updateField('contactPhone')} disabled={readOnly} />
     </>
 }
 
