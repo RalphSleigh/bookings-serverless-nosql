@@ -3,6 +3,7 @@ import React from "react"
 import { getAgeGroup } from "./woodcraft.js"
 import { JsonBookingWithExtraType, JsonParticipantWithExtraType } from "./computedDataTypes.js"
 import { JsonBookingType, JsonEventType, JsonParticipantType, BookingType } from "../lambda-common/onetable.js"
+import { diff } from "json-diff-ts"
 
 export function parseDate(date: Date | string | undefined): Date | null {
     if(!date) return null
@@ -100,4 +101,69 @@ export function getMemoUpdateFunctions(update) {
 
 export const capitalizeWord = (word: string = "") => {
     return word.charAt(0).toUpperCase() + word.slice(1);
+}
+
+export const generateDiscordDiff: (oldBooking: BookingType, newBooking: BookingType) => string[] = (oldBooking, newBooking) => {
+
+    const replacements = {
+        "basic": "Basic",
+        "participants": "Campers",
+        "bookingType": "Type",
+        "emergency": "Emergency Contact",
+        "camping": "Camping",
+        "travel": "Travel",
+        "howDidYouHear": "How did you hear",
+        "campsWith": "Camping preference",
+        "canBringEquipment": "Camping Equipment",
+        "attendance": "Attendance",
+        "kp": "Dietary Requirements",
+        "medical": "Medical & Accessibility",
+        "consent": "Consents",
+        "extraContacts": "Extra Contacts",
+        "district": "District",
+        "contactName": "Contact Name",
+        "contactEmail": "Contact Email",
+        "contactPhone": "Contact Phone",
+        "email": "Email",
+        "dob": "Date of Birth",
+    }
+
+    const updateString = (updateItem, stack) => {
+        if (["extraFeeData"].includes(updateItem.key)) return
+        if (updateItem.changes) {
+            updateItem.changes.forEach(c => {
+                updateString(c, [...stack, updateItem])
+            })
+            return
+        }
+        if (["version", "created", "updated"].includes(updateItem.key)) return
+
+        const capitalise = (string) => {
+            return string[0].toUpperCase() + string.slice(1).toLowerCase()
+        }
+
+        let chain = [...stack, updateItem]
+        if(chain.length == 4 && chain[0].key == "participants" && chain[2].key !== "basic") {
+            updateItem = chain.pop()
+        }
+        const updateType = typeof (updateItem.value) === "boolean" ? "Update" : capitalise(updateItem.type)
+        const string = `${updateType}: ${chain.map(u => replacements[u.key] ? replacements[u.key] : u.key).join(" -> ")}`
+        updateStrings.push(string)
+    }
+
+    const updateStrings: string[] = []
+
+    const existingLatestBookingDiscord = { ...oldBooking, participants: oldBooking.participants.map(p => ({ ...p, name: p.basic.name })) }
+    //@ts-ignore
+    const newLatestBookingDiscord = { ...newBooking, participants: newBooking.participants.map(p => ({ ...p, name: p.basic.name })) }
+
+    const updates = diff(existingLatestBookingDiscord, newLatestBookingDiscord, { embeddedObjKeys: { participants: 'name' } })
+    updates.forEach(u => {
+        updateString(u, [])
+    });
+
+    const unquieUpdateStrings = [...new Set(updateStrings)]
+
+    return updates.length > 0 ? unquieUpdateStrings : []
+
 }

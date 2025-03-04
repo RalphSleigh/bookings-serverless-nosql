@@ -11,7 +11,7 @@ import { getFee } from "../../../shared/fee/fee.js";
 import { MemoBookingPermissionSection } from "./permission.js";
 import { BookingValidationResults, Validation } from "./validation.js";
 import { Lock, LockOpen, Delete, Send } from '@mui/icons-material';
-import { getMemoUpdateFunctions } from "../../../shared/util.js";
+import { generateDiscordDiff, getMemoUpdateFunctions } from "../../../shared/util.js";
 import { LoadingButton } from '@mui/lab'
 import { PartialDeep } from "type-fest";
 import { getAttendance } from "../../../shared/attendance/attendance.js";
@@ -47,6 +47,9 @@ export function BookingForm({ data, originalData, event, user, update, submit, m
 
     const validationResults = validation.validate(data, permission.permission)
 
+    //@ts-ignore
+    const diff = generateDiscordDiff(originalData, data)
+
     return <Grid container spacing={2} p={2} justifyContent="center">
         <Grid xl={6} lg={7} md={8} sm={9} xs={12} item>
             <Box p={2}>
@@ -80,7 +83,13 @@ export function BookingForm({ data, originalData, event, user, update, submit, m
                             <IconButton color="warning" onClick={() => setDeleteLock(!deleteLock)}>{deleteLock ? <Lock /> : <LockOpen />}</IconButton></> : null}
                         {mode === "edit" && !own ? <FormControlLabel sx={{ mt: 2 }} control={<Switch checked={notify} onChange={() => setNotify(!notify)} />} label="Notify Booking Owner" /> : null}
                     </Stack>
+                    {mode === "edit" && diff.length > 0 && validationResults.length === 0 ? <>
+                    <Alert severity="info" sx={{ mt: 2, pt: 2 }}>
+                        <AlertTitle>Changes you have made:</AlertTitle>
+                        {diff.map((d, i) => <Typography variant="body2" key={i}>{d}</Typography>)}
+                    </Alert></> : null}
                 </form>
+                
             </Box>
         </Grid>
         <QuickList participants={data.participants || []} event={event} />

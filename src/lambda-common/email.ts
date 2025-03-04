@@ -1,7 +1,7 @@
 import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
 import am_in_lambda from "./am_in_lambda.js"
 import { log } from "./logging.js"
-import { BookingType, EventType, RoleType, UserType, table } from "./onetable.js"
+import { BookingType, EventType, FoundUserResponseType, RoleType, UserResponseType, UserType, table } from "./onetable.js"
 import { getEmailTemplate } from "./emails/emails.js";
 import MailComposer from 'nodemailer/lib/mail-composer/index.js'
 import { auth, gmail } from '@googleapis/gmail'
@@ -16,32 +16,32 @@ const UserModel = table.getModel<UserType>('User')
 
 export type BasicEmailData = {
     template: "managerDataAccess" | "applicationReceived" | "applicationApproved"
-    recipient: UserType
+    recipient: UserType | UserResponseType | FoundUserResponseType
     event: EventType
 }
 
 export type ApplicationEmailData = {
     template: "managerApplicationReceived",
-    recipient: UserType
+    recipient: UserType | UserResponseType | FoundUserResponseType
     event: EventType
-    bookingOwner: UserType
+    bookingOwner: UserType | UserResponseType | FoundUserResponseType
 }
 
 export type BookingEmailData = {
     template: "confirmation" | "edited" | "managerConfirmation" | "managerBookingUpdated" | "managerBookingCancelled",
-    recipient: UserType
+    recipient: UserType | UserResponseType | FoundUserResponseType
     event: EventType
     booking: BookingType
-    bookingOwner: UserType
+    bookingOwner: UserType | UserResponseType | FoundUserResponseType
 }
 
 export type BookingManagerEmailData = {
     template: "managerManagerBookingEdited",
-    recipient: UserType
+    recipient: UserType | UserResponseType | FoundUserResponseType
     event: EventType
     booking: BookingType
-    bookingOwner: UserType
-    bookingEditor: UserType
+    bookingOwner: UserType | UserResponseType | FoundUserResponseType
+    bookingEditor: UserType | UserResponseType | FoundUserResponseType
 }
 
 export type EmailData = BasicEmailData | BookingEmailData | ApplicationEmailData | BookingManagerEmailData
@@ -51,14 +51,14 @@ export async function queueEmail(data: EmailData, config: ConfigType) {
     console.log(data)
 
     if (!config.EMAIL_ENABLED) {
-        log(`Not sending email ${data.template} to ${data.recipient.email} as email is disabled`)
+        log(`Not sending email ${data.template} to ${data.recipient!.email} as email is disabled`)
         return true
     }
     else if (am_in_lambda()) {
-        log(`Queuing email ${data.template} to ${data.recipient.email} via lambda`)
+        log(`Queuing email ${data.template} to ${data.recipient!.email} via lambda`)
         await triggerEmailSQS(data)
     } else {
-        log(`Queuing email ${data.template} to ${data.recipient.email}`)
+        log(`Queuing email ${data.template} to ${data.recipient!.email}`)
         sendEmail(data, config)
     }
 }
@@ -107,12 +107,12 @@ export async function sendEmail(data: EmailData, config: any) {
     try {
         const { recipient, event } = data
 
-        if (!recipient.email) {
+        if (!recipient!.email) {
             console.log("no email address")
             return
         }
 
-        console.log(`Sending email ${data.template} to ${recipient.email}`)
+        console.log(`Sending email ${data.template} to ${recipient!.email}`)
 
         const template = getEmailTemplate(data.template)
 
@@ -127,7 +127,7 @@ export async function sendEmail(data: EmailData, config: any) {
             from: `Woodcraft Folk Bookings <${config.EMAIL_FROM}>`,
             sender: config.EMAIL_FROM,
             replyTo: event.replyTo,
-            to: recipient.email,
+            to: recipient!.email,
             subject: subject,
             html: htmlEmailText,
             text: textEmailText

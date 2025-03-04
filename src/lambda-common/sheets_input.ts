@@ -1,6 +1,6 @@
 import { sheets, auth, sheets_v4 } from "@googleapis/sheets"
 import { drive, drive_v3 } from '@googleapis/drive'
-import { BookingType, JsonBookingType, JsonParticipantType, OnetableEventType, UserType } from "./onetable.js";
+import { BookingType, FoundUserResponseType, JsonBookingType, JsonParticipantType, OnetableEventType, UserType } from "./onetable.js";
 import { fi, th } from "date-fns/locale";
 import { KpStructure } from "../shared/kp/kp_class.js";
 import { parse } from "date-fns";
@@ -47,7 +47,7 @@ async function getSheetsClient(config) {
 
 export type HasSheetType = drive_v3.Schema$File | false
 
-export async function getHasSheet(config, event: OnetableEventType, user: UserType) {
+export async function getHasSheet(config, event: OnetableEventType, user: FoundUserResponseType) {
     const drive_instance = await getDriveClient(config)
 
     try {
@@ -335,7 +335,7 @@ const cachedPromise = (key, fn) => {
     return promiseCache[key]
 }
 
-export async function getParticipantsFromSheet(config, event: OnetableEventType, user: UserType): Promise<Partial<JsonParticipantType>[]> {
+export async function getParticipantsFromSheet(config, event: OnetableEventType, user: FoundUserResponseType): Promise<Partial<JsonParticipantType>[]> {
     const drive_instance = await cachedPromise("client", () => getDriveClient(config))
 
     let sheet: drive_v3.Schema$File
@@ -350,7 +350,7 @@ export async function getParticipantsFromSheet(config, event: OnetableEventType,
         const userFolder = await cachedPromise(`${event.id}${user.id}`, () => drive_instance.files.list({ q: `name contains '${user.id}' and mimeType = 'application/vnd.google-apps.folder' and '${eventFolder.data.files[0].id}' in parents and trashed = false` }))
         if (!userFolder.data?.files?.[0]) throw new Error("Event folder not found")
 
-        const userFile = await cachedPromise( `${event.id}${user.id}files`, () => drive_instance.files.list({ q: `'${userFolder.data.files[0].id}' in parents and trashed = false`, fields: 'files(id, name, webViewLink)' }))
+        const userFile = await drive_instance.files.list({ q: `'${userFolder.data.files[0].id}' in parents and trashed = false`, fields: 'files(id, name, webViewLink)' })
         if (!userFile.data?.files?.[0]) throw new Error("Sheet not found")
 
         sheet = userFile.data.files[0]
