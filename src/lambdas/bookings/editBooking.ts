@@ -1,15 +1,12 @@
-import { Model } from 'dynamodb-onetable';
+import type { Model } from 'dynamodb-onetable';
 import { lambda_wrapper_json } from '../../lambda-common/lambda_wrappers.js';
-import { BookingType, EventBookingTimelineType, EventType, OnetableBookingType, OnetableEventType, table } from '../../lambda-common/onetable.js';
+import { BookingType, EventBookingTimelineType, EventType, OnetableBookingType, OnetableEventType, UserType, table } from '../../lambda-common/onetable.js';
 import { CanEditBooking, CanEditEvent, CanEditOwnBooking, PermissionError } from '../../shared/permissions.js';
 import { addVersionToBooking, updateParticipantsDates } from '../../lambda-common/util.js';
 import { queueDriveSync } from '../../lambda-common/drive_sync.js';
 import { queueEmail, queueManagerEmails } from '../../lambda-common/email.js';
 import { postToDiscord } from '../../lambda-common/discord.js';
-import { diffString } from 'json-diff';
-import { log } from '../../lambda-common/logging.js';
-import { diff } from 'json-diff-ts';
-import { getFee } from '../../shared/fee/fee.js';
+import { generateDiscordDiff } from '../../shared/util.js';
 
 const BookingModel: Model<OnetableBookingType> = table.getModel<OnetableBookingType>('Booking')
 const EventModel = table.getModel<OnetableEventType>('Event')
@@ -31,7 +28,7 @@ export const lambdaHandler = lambda_wrapper_json(
                 delete newData.fees
                 delete newData.village
 
-                const newLatest = await addVersionToBooking(event, existingLatestBooking, newData)
+                const newLatest = await addVersionToBooking(event as EventType, existingLatestBooking, newData)
 
                 console.log(`Edited booking ${newData.eventId}-${newData.userId}`);
                 if (isOwnBooking || notify) {
@@ -76,7 +73,7 @@ export const lambdaHandler = lambda_wrapper_json(
                     console.log("END EMAIL BEGIN DISCORD")
                     try {
                         //@ts-ignore
-                        const discordDiffString = generateDiscordDiff(existingLatestBooking, newLatest)
+                        const discordDiffString = generateDiscordDiff(existingLatestBooking, newLatest).join("\n")
                         console.log(discordDiffString)
 
                         if (discordDiffString !== "") {
@@ -110,39 +107,3 @@ export const lambdaHandler = lambda_wrapper_json(
         }
     })
 
-const generateDiscordDiff: (oldBooking: BookingType, newBooking: BookingType) => string = (oldBooking, newBooking) => {
-    const updateString = (updateItem, stack) => {
-        if (["extraFeeData"].includes(updateItem.key)) return
-        if (updateItem.changes) {
-            updateItem.changes.forEach(c => {
-                updateString(c, [...stack, updateItem])
-            })
-            return
-        }
-        if (["version", "created", "updated"].includes(updateItem.key)) return
-
-
-        const capitalise = (string) => {
-            return string[0].toUpperCase() + string.slice(1).toLowerCase()
-        }
-
-        const updateType = typeof (updateItem.value) === "boolean" ? "Update" : capitalise(updateItem.type)
-        const chain = [...stack, updateItem].map(u => u.key).join(" -> ")
-        const string = `${updateType}: ${chain}`
-        updateStrings.push(string)
-    }
-
-    const updateStrings: string[] = []
-
-    const existingLatestBookingDiscord = { ...oldBooking, participants: oldBooking.participants.map(p => ({ ...p, name: p.basic.name })) }
-    //@ts-ignore
-    const newLatestBookingDiscord = { ...newBooking, participants: newBooking.participants.map(p => ({ ...p, name: p.basic.name })) }
-
-    const updates = diff(existingLatestBookingDiscord, newLatestBookingDiscord, { embeddedObjKeys: { participants: 'name' } })
-    updates.forEach(u => {
-        updateString(u, [])
-    });
-
-    return updates.length > 0 ? updateStrings.join("\n") : ""
-
-}
