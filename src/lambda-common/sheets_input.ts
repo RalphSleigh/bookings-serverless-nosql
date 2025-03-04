@@ -350,7 +350,7 @@ export async function getParticipantsFromSheet(config, event: OnetableEventType,
         const userFolder = await cachedPromise(`${event.id}${user.id}`, () => drive_instance.files.list({ q: `name contains '${user.id}' and mimeType = 'application/vnd.google-apps.folder' and '${eventFolder.data.files[0].id}' in parents and trashed = false` }))
         if (!userFolder.data?.files?.[0]) throw new Error("Event folder not found")
 
-        const userFile = await drive_instance.files.list({ q: `'${userFolder.data.files[0].id}' in parents and trashed = false`, fields: 'files(id, name, webViewLink)' })
+        const userFile = await cachedPromise (`${event.id}${user.id}sheetfile`, () => drive_instance.files.list({ q: `'${userFolder.data.files[0].id}' in parents and trashed = false`, fields: 'files(id, name, webViewLink)' }))
         if (!userFile.data?.files?.[0]) throw new Error("Sheet not found")
 
         sheet = userFile.data.files[0]
@@ -359,13 +359,13 @@ export async function getParticipantsFromSheet(config, event: OnetableEventType,
         throw new Error("Sheet not found")
     }
 
-    const sheets_instance = await getSheetsClient(config)
+    const sheets_instance = await cachedPromise(`sheetsclient`, () => getSheetsClient(config))
 
-    const response = await cachedPromise( `${event.id}${user.id}sheet`, () => sheets_instance.spreadsheets.values.get({
+    const response = await sheets_instance.spreadsheets.values.get({
         spreadsheetId: sheet.id!,
         range: 'Sheet1',
         valueRenderOption: 'UNFORMATTED_VALUE',
-    }))
+    })
 
     if (!response.data.values) throw new Error("No data found")
 
