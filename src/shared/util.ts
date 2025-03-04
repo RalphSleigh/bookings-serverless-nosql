@@ -126,6 +126,7 @@ export const generateDiscordDiff: (oldBooking: BookingType, newBooking: BookingT
         "contactPhone": "Contact Phone",
         "email": "Email",
         "dob": "Date of Birth",
+        "accessibilityNeeds": "Accessibility Needs"
     }
 
     const updateString = (updateItem, stack) => {
