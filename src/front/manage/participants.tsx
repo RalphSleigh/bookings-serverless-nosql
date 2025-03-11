@@ -34,6 +34,14 @@ export function Component() {
     const [columnVisibilityModel, setColumnVisibilityModel] =
         useStickyState<GridColumnVisibilityModel>(fields.getDefaultColumnVisibility(user), `paricipant-columns-${event.id}`);
 
+    const [columnSortModel, setColumncolumnSortModelModel] =
+        useStickyState<any>([
+            {
+              field: 'Updated',
+              sort: 'asc',
+            },
+          ], `participants-columns-sort-${event.id}`);
+
     const rows = useMemo(() => participants.map((p, i) => {
         return { participant: p, id: i }
     }), [participants])
@@ -57,6 +65,9 @@ export function Component() {
                 columnVisibilityModel={columnVisibilityModel}
                 onColumnVisibilityModelChange={(newModel) =>
                     setColumnVisibilityModel(newModel)}
+                    sortModel={columnSortModel}
+                onSortModelChange={(newModel) =>
+                        setColumncolumnSortModelModel(newModel)}
                 getRowClassName={(params) => `participant-row-deleted-${params.row.participant.booking.deleted}`}
                 slots={{ toolbar: CustomToolbar(() => saveCSV(event, user, participants)) }} />
         </Grid></>

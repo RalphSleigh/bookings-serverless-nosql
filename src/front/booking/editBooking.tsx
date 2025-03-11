@@ -12,11 +12,11 @@ export function EditBookingPage({ event, booking, user }) {
     const [bookingData, setBookingData] = useState<PartialDeep<JsonBookingType>>(booking)
     const setSnackbar = useContext(SnackBarContext)
 
-    const submit = useCallback(() => {
+    const submit = useCallback((notify) => {
         setBookingData(data => {
             data.extraContacts = data.extraContacts?.filter(c => c.name && c.email)
             console.log(data)
-            editBooking.mutate(data as JsonBookingType)
+            editBooking.mutate({booking: data as JsonBookingType, notify: notify})
             return data
         })
     }, [])
@@ -40,6 +40,7 @@ export function EditBookingPage({ event, booking, user }) {
 
     return <BookingForm
         data={bookingData}
+        originalData={booking}
         user={user}
         event={event}
         update={setBookingData}

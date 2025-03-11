@@ -47,7 +47,7 @@ const schema = {
             id: { type: String, generate: 'uid', required: true },
             userId: { type: String, required: true },
             eventId: { type: String, required: true },
-            role: { type: String, required: true, enum: ['Owner', 'Manage', 'View', 'Money', 'KP', 'Comms', 'Accessibility', 'Book', 'View - Village'] },
+            role: { type: String, required: true, enum: ['Owner', 'Manage', 'View', 'Money', 'KP', 'Comms', 'Accessibility', 'Book', 'Amend', 'View - Village'] },
             village: { type: String },
             created: { type: Date },
             updated: { type: Date },
@@ -252,6 +252,11 @@ const schema = {
                 }
             },
             village: { type: String },
+            extraFeeData: { type: Object,
+                schema: {
+                    participantsAtDeadline: { type: Array },
+                }
+            },
             created: { type: Date, required: true },
             updated: { type: Date, required: true },
         },

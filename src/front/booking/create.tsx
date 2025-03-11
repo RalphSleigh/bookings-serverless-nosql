@@ -7,6 +7,7 @@ import { CanBookIntoEvent } from "../../shared/permissions.js";
 import { BookingType, JsonApplicationType, JsonBookingType, JsonEventType, JsonUserResponseType, UserResponseType } from "../../lambda-common/onetable.js";
 import { SnackBarContext, SnackbarDataType } from "../app/toasts.js";
 import { PartialDeep } from "type-fest";
+import _ from "lodash";
 
 export function CreateBookingPage({ event, user, application }: { event: JsonEventType, user: JsonUserResponseType, application: JsonApplicationType | undefined }) {
     const createBooking = useCreateBooking(event)
@@ -14,7 +15,7 @@ export function CreateBookingPage({ event, user, application }: { event: JsonEve
     let existingBooking: PartialDeep<JsonBookingType, {recurseIntoArrays: true}> | undefined = undefined
 
     if(event.kpMode === "basic" && event.attendanceStructure === "whole") {
-        existingBooking = bookings.sort((a, b) => a.participants.length - b.participants.length).pop()
+        existingBooking = _.cloneDeep(bookings).sort((a, b) => a.participants.length - b.participants.length).pop()
         if(existingBooking) {
             existingBooking.eventId = event.id
             delete existingBooking.created
@@ -44,6 +45,7 @@ export function CreateBookingPage({ event, user, application }: { event: JsonEve
 
     return <BookingForm
         data={bookingData}
+        originalData={bookingData}
         user={user}
         event={event}
         update={setBookingData}

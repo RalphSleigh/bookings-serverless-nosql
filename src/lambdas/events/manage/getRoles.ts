@@ -10,7 +10,7 @@ const RoleModel = table.getModel<RoleType>('Role')
 export const lambdaHandler = lambda_wrapper_json(
     async (lambda_event, config, current_user) => {
         const event = await EventModel.get({ id: lambda_event.pathParameters?.id })
-        if (current_user && event) {
+        if (event) {
             CanCreateAnyRole.throw({ user: current_user, event: event })
             const roles = await RoleModel.find({ sk: { begins: event.id } })
             return { roles }

@@ -117,6 +117,12 @@ variable "lambda_definitions" {
       path   = "event/{id}/manage/applications"
       method = "get"
     },
+    event_applications_sheets_numbers = {
+      name   = "event_applications_sheets_numbers"
+      code   = "events/manage/getApplicationsSheetsNumbers"
+      path   = "event/{id}/manage/applicationsSheetNumbers"
+      method = "get"
+    },
     event_roles_create = {
       name   = "event_roles_create"
       code   = "events/manage/createRole"
@@ -146,6 +152,12 @@ variable "lambda_definitions" {
       code   = "events/manage/eventOperation"
       path   = "event/{id}/manage/operation"
       method = "post"
+    },
+    event_widget = {
+      name   = "event_widget"
+      code   = "events/eventWidget"
+      path   = "event/{id}/widget"
+      method = "get"
     },
     /*handlerSetup('/api/event/:id/manage/timeline', 'events/manage/getTimeline')
     handlerSetup('/api/event/:id/manage/booking/:userId/operation', 'events/manage/bookingOperation', "POST")

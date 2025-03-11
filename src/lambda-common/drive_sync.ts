@@ -2,7 +2,7 @@ import { sheets, auth } from "@googleapis/sheets"
 import { drive } from '@googleapis/drive'
 import { BookingType, EventType, FoundUserResponseType, JsonBookingType, JsonParticipantType, OnetableEventType, ParticipantType, RoleType, UserType, UserWithRoles, table } from "./onetable.js"
 import { filterDataByRoles } from "./roles.js"
-import { ParticipantFields, CSVCurrent } from "../shared/participantFields.js"
+import { ParticipantFields, CSVCurrent, ComputedAttendace, ComputedAttendaceFirstThree, ComputedAttendaceLastSeven } from "../shared/participantFields.js"
 import { User } from "discord.js"
 import { ConfigType } from "./config.js"
 import { log } from "./logging.js"
@@ -68,7 +68,9 @@ export async function syncEventToDrive(eventId, config) {
                     console.log(JSON.stringify(fullUser))
                     console.log(`Synced drive for ${user.userName} event ${event.name}`)
                 } catch (e: any) {
-                    if (e.code === 401) {
+                    if (e.code === '401' || e.code === '400') {
+                        console.log(`ERROR syncing drive for ${user.userName} event ${event?.name} - removing tokens`)
+                        console.log(e)
                         await UserModel.update({ remoteId: user.remoteId }, { remove: ['tokens'] })
                     } else {
                         console.log(`ERROR syncing drive for ${user.userName} event ${event?.name}`)
@@ -138,6 +140,8 @@ async function syncToDrive(event: OnetableEventType, user: UserWithRoles, partic
 
     const fields = new ParticipantFields(event)
     fields.fields.push(new CSVCurrent(event))
+    fields.fields.push(new ComputedAttendaceFirstThree(event))
+    fields.fields.push(new ComputedAttendaceLastSeven(event))
 
     const headers = fields.getCSVHeaders(user)
     const participants = participantsData.map(p => fields.getCSVValues(p, user))

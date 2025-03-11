@@ -2,12 +2,11 @@ import React, { useContext } from "react";
 import { useEvents, useUsersBookings } from "../queries.js";
 import { Navigate, useParams } from "react-router-dom";
 import { EnsureHasPermission } from "../permissions.js";
-import { CanBookIntoEvent, CanEditOwnBooking } from "../../shared/permissions.js";
+import { CanViewOwnBooking } from "../../shared/permissions.js";
 import { UserContext } from "../user/userContext.js";
-import { ThanksPage } from "./thanks.js";
-import { addComputedFieldsToBookingsQueryResult } from "../../shared/util.js";
+import { ViewOwnBookingPage } from "./viewOwnBooking.js";
 
-export function ThanksLoader({ }) {
+export function ViewOwnBookingLoader({ }) {
     const user = useContext(UserContext)
     const { eventId } = useParams()
     const { events  } = useEvents().data
@@ -19,10 +18,8 @@ export function ThanksLoader({ }) {
     const booking = bookings.find(b => b.eventId === event.id)
     if (!booking) return <Navigate to='/' />
 
-    const enhancedBooking = addComputedFieldsToBookingsQueryResult([booking], event)[0]
-
-    return <EnsureHasPermission permission={CanBookIntoEvent} event={event} user={user} booking={enhancedBooking}>
-        <ThanksPage event={event} booking={enhancedBooking} user={user} />
+    return <EnsureHasPermission permission={CanViewOwnBooking} event={event} user={user} booking={booking}>
+        <ViewOwnBookingPage event={event} booking={booking} user={user} />
     </EnsureHasPermission>
 }
 

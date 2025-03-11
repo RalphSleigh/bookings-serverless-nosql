@@ -1,6 +1,6 @@
 import { Model } from 'dynamodb-onetable';
 import { lambda_wrapper_json } from '../../lambda-common/lambda_wrappers.js';
-import { BookingType, OnetableEventType, table } from '../../lambda-common/onetable.js';
+import { BookingType, OnetableEventType, UserType, table } from '../../lambda-common/onetable.js';
 import { CanBookIntoEvent } from '../../shared/permissions.js';
 import { getHasSheet, getParticipantsFromSheet } from '../../lambda-common/sheets_input.js';
 import { user } from '../../lambda-common/index.js';
@@ -25,7 +25,7 @@ export const lambdaHandler = lambda_wrapper_json(
     if(event == null) throw new Error("Event not found")
     CanBookIntoEvent.throw({user: current_user, event:event})
 
-    const participants = await getParticipantsFromSheet(config, event, current_user)
+    const participants = await getParticipantsFromSheet(config, event, current_user as UserType)
 
     return {participants: participants}
     }

@@ -1,6 +1,6 @@
 import { sheets, auth, sheets_v4 } from "@googleapis/sheets"
 import { drive, drive_v3 } from '@googleapis/drive'
-import { BookingType, JsonBookingType, JsonParticipantType, OnetableEventType, UserType } from "./onetable.js";
+import { BookingType, FoundUserResponseType, JsonBookingType, JsonParticipantType, OnetableEventType, UserType } from "./onetable.js";
 import { fi, th } from "date-fns/locale";
 import { KpStructure } from "../shared/kp/kp_class.js";
 import { parse } from "date-fns";
@@ -47,7 +47,7 @@ async function getSheetsClient(config) {
 
 export type HasSheetType = drive_v3.Schema$File | false
 
-export async function getHasSheet(config, event: OnetableEventType, user: UserType) {
+export async function getHasSheet(config, event: OnetableEventType, user: FoundUserResponseType) {
     const drive_instance = await getDriveClient(config)
 
     try {
@@ -326,22 +326,31 @@ export async function createSheetForBooking(config: ConfigType, event: OnetableE
     }
 }
 
-export async function getParticipantsFromSheet(config, event: OnetableEventType, user: UserType): Promise<Partial<JsonParticipantType>[]> {
-    const drive_instance = await getDriveClient(config)
+const promiseCache = {}
+
+const cachedPromise = (key, fn) => {
+    if (!promiseCache[key]) {
+        promiseCache[key] = fn()
+    }
+    return promiseCache[key]
+}
+
+export async function getParticipantsFromSheet(config, event: OnetableEventType, user: FoundUserResponseType): Promise<Partial<JsonParticipantType>[]> {
+    const drive_instance = await cachedPromise("client", () => getDriveClient(config))
 
     let sheet: drive_v3.Schema$File
 
     try {
-        const rootFolder = await drive_instance.files.list({ q: `name = 'shared_sheets' and mimeType = 'application/vnd.google-apps.folder' and trashed = false` })
+        const rootFolder = await cachedPromise("root", () => drive_instance.files.list({ q: `name = 'shared_sheets' and mimeType = 'application/vnd.google-apps.folder' and trashed = false` }))
         if (!rootFolder.data?.files?.[0]) throw new Error("Root folder not found")
 
-        const eventFolder = await drive_instance.files.list({ q: `name contains '${event.id}' and mimeType = 'application/vnd.google-apps.folder' and '${rootFolder.data.files[0].id}' in parents and trashed = false` })
+        const eventFolder = await cachedPromise(event.id, () => drive_instance.files.list({ q: `name contains '${event.id}' and mimeType = 'application/vnd.google-apps.folder' and '${rootFolder.data.files[0].id}' in parents and trashed = false` }))
         if (!eventFolder.data?.files?.[0]) throw new Error("Event folder not found")
 
-        const userFolder = await drive_instance.files.list({ q: `name contains '${user.id}' and mimeType = 'application/vnd.google-apps.folder' and '${eventFolder.data.files[0].id}' in parents and trashed = false` })
+        const userFolder = await cachedPromise(`${event.id}${user.id}`, () => drive_instance.files.list({ q: `name contains '${user.id}' and mimeType = 'application/vnd.google-apps.folder' and '${eventFolder.data.files[0].id}' in parents and trashed = false` }))
         if (!userFolder.data?.files?.[0]) throw new Error("Event folder not found")
 
-        const userFile = await drive_instance.files.list({ q: `'${userFolder.data.files[0].id}' in parents and trashed = false`, fields: 'files(id, name, webViewLink)' })
+        const userFile = await cachedPromise (`${event.id}${user.id}sheetfile`, () => drive_instance.files.list({ q: `'${userFolder.data.files[0].id}' in parents and trashed = false`, fields: 'files(id, name, webViewLink)' }))
         if (!userFile.data?.files?.[0]) throw new Error("Sheet not found")
 
         sheet = userFile.data.files[0]
@@ -350,7 +359,7 @@ export async function getParticipantsFromSheet(config, event: OnetableEventType,
         throw new Error("Sheet not found")
     }
 
-    const sheets_instance = await getSheetsClient(config)
+    const sheets_instance = await cachedPromise(`sheetsclient`, () => getSheetsClient(config))
 
     const response = await sheets_instance.spreadsheets.values.get({
         spreadsheetId: sheet.id!,
@@ -415,6 +424,12 @@ function getParticipantFromRow(row: NonNullable<sheets_v4.Schema$ValueRange["val
 
     if (row[16]) result.consent!.photo = row[16] === "Yes"
     if (row[17]) result.consent!.sre = row[17] === "Yes"
+
+    const removeEmpty = obj => Object.fromEntries(Object.keys(obj).filter(k => obj[k] !== '').map(k => [k, obj[k]]));
+
+    result.kp = removeEmpty(result.kp)
+    result.medical = removeEmpty(result.medical)
+
 
     return result
 }

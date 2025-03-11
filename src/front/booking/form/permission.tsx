@@ -4,7 +4,7 @@ import React from "react"
 import { FeeStructure } from "../../../shared/fee/feeStructure.js"
 import { getMemoUpdateFunctions } from "../../../shared/util.js"
 
-function bookingPermissionSection({ event, data, update }) {
+function bookingPermissionSection({ event, data, update, readOnly }) {
 
 
     const { updateSwitch } = getMemoUpdateFunctions(update)
@@ -14,13 +14,13 @@ function bookingPermissionSection({ event, data, update }) {
             <Typography variant="h6" mt={2} mb={2}>Permission</Typography>
             <FormGroup row>
                 <FormControlLabel
+                    checked={data.permission}
                     sx={{ color: "text.secondary" }}
                     control={<Checkbox
                         style={{ alignSelf: 'start' }}
                         sx={{ mt: -1 }}
                         aria-labelledby={`permission-label`}
                         name={`permission-check`}
-                        value={data}
                         onChange={updateSwitch("permission")} />}
                     labelPlacement="start"
                     label={<>
@@ -34,7 +34,8 @@ function bookingPermissionSection({ event, data, update }) {
                         information with medical or child protection professionals. For more information please visit
                         <a href="https://woodcraft.org.uk/privacy"> www.woodcraft.org.uk/privacy</a> or contact <a
                             href="mailto:data@woodcraft.org.uk">data@woodcraft.org.uk</a>
-                    </>} />
+                    </>} 
+                    disabled={readOnly}/>
             </FormGroup>
         </>)
     }
@@ -43,13 +44,13 @@ function bookingPermissionSection({ event, data, update }) {
             <Typography variant="h6" mt={2} mb={2}>Permission</Typography>
             <FormGroup row>
                 <FormControlLabel
+                    checked={data.permission}
                     sx={{ color: "text.secondary" }}
                     control={<Checkbox
                         style={{ alignSelf: 'start' }}
                         sx={{ mt: -1 }}
                         aria-labelledby={`permission-label`}
                         name={`permission-check`}
-                        value={data}
                         onChange={updateSwitch("permission")} />}
                     labelPlacement="start"
                     label={<>
@@ -63,7 +64,8 @@ function bookingPermissionSection({ event, data, update }) {
                         information with medical or child protection professionals. For more information please visit
                         <a href="https://woodcraft.org.uk/privacy"> www.woodcraft.org.uk/privacy</a> or contact <a
                             href="mailto:data@woodcraft.org.uk">data@woodcraft.org.uk</a>
-                    </>} />
+                    </>} 
+                    disabled={readOnly}/>
             </FormGroup>
         </>)
     }

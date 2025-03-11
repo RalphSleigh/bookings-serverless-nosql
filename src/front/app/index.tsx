@@ -31,6 +31,7 @@ import { ThanksLoader } from '../booking/thanksLoader.js';
 import { ReactErrorBoundary, RouterErrorBoundary } from './errors.js';
 import { SnackBarProvider } from './toasts.js';
 import { EditBookingLoader } from '../booking/editBookingLoader.js';
+import { ViewOwnBookingLoader } from '../booking/viewOwnBookingLoader.js';
 import { Footer } from './footer.js';
 import { ApplyLoader } from '../booking/applyLoader.js';
 import { ApplyThanksLoader } from '../booking/applyThanksLoader.js';
@@ -91,6 +92,9 @@ const router = createBrowserRouter([{
             }, {
                 path: "event/:eventId/edit-my-booking",
                 element: <EditOwnBookingLoader />,
+            }, {
+                path: "event/:eventId/view-my-booking",
+                element: <ViewOwnBookingLoader />,
             }, {
                 path: "event/:eventId/edit-booking/:userId",
                 element: <EditBookingLoader />,

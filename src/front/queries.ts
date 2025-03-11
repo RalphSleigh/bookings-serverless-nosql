@@ -1,4 +1,4 @@
-import { QueryObserverSuccessResult, UseQueryOptions, useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
+import { QueryObserverResult, QueryObserverSuccessResult, UseQueryOptions, useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import axios from 'axios'
 import { BookingType, EventBookingTimelineType, EventType, JsonApplicationType, JsonBookingType, JsonEventBookingTimelineType, JsonEventType, JsonRoleType, JsonUserResponseType, JsonUserType } from '../lambda-common/onetable.js'
 import { SnackBarContext } from './app/toasts.js';
@@ -21,6 +21,7 @@ export const userQuery = {
     queryFn: async () => (await axios.get("/api/user")).data,
     staleTime: 60 * 1000,
     cacheTime: 60 * 1000,
+    refetchInterval: 60 * 1000,
     refetchOnWindowFocus: true
 }
 
@@ -158,9 +159,9 @@ export function useEditBooking(user, event) {
     const queryClient = useQueryClient()
     const setSnackbar = useContext(SnackBarContext)
     const navigate = useNavigate()
-    return useMutation<{}, any, JsonBookingType, any>(
+    return useMutation<{}, any, {booking: JsonBookingType, notify: Boolean}, any>(
         {
-            mutationFn: async data => (await axios.post('/api/booking/edit', { booking: data })).data,
+            mutationFn: async data => (await axios.post('/api/booking/edit', { booking: data.booking, notify: data.notify })).data,
             onSuccess: (data, variables, context) => {
                 queryClient.invalidateQueries({
                     queryKey: ['user', 'bookings']
@@ -169,7 +170,7 @@ export function useEditBooking(user, event) {
                     queryKey: ['manage']
                 })
                 setSnackbar({ message: "Booking Updated", severity: 'success' })
-                const target = user.id === variables.userId ? `/event/${event.id}/thanks` : `/event/${event.id}/manage`
+                const target = user.id === variables.booking.userId ? `/event/${event.id}/thanks` : `/event/${event.id}/manage`
                 navigate(target)
             },
             onError: snackbarError(setSnackbar)
@@ -271,6 +272,25 @@ export const eventApplicationsQuery = eventId => {
 export function useEventApplications(eventId) {
     return useSuspenseQuery(eventApplicationsQuery(eventId)) as QueryObserverSuccessResult<{ "applications": [JsonApplicationType] }>
 }
+
+
+
+
+export type eventApplicationsSheetsNumbersQueryType = UseQueryOptions<Record<string, number>, any>
+
+export const eventApplicationsSheetsNumberQuery = eventId => {
+    return {
+        queryKey: ['manage', eventId, 'applications', 'numbers'],
+        queryFn: async () => (await axios.get(`/api/event/${eventId}/manage/applicationsSheetNumbers`)).data
+    }
+}
+
+export function useEventApplicationsSheetsNumberQuery(eventId) {
+    return useQuery(eventApplicationsSheetsNumberQuery(eventId)) as QueryObserverResult<Record<string, number>>
+}
+
+
+
 
 export type eventRolesQueryType = UseQueryOptions<{ "roles": [JsonRoleType] }, any>
 

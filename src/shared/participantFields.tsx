@@ -7,6 +7,7 @@ import { parseDate } from "./util.js";
 import { differenceInYears, format, formatDistanceToNow, formatISO9075 } from "date-fns";
 import { getAgeGroup } from "./woodcraft.js";
 import { useMediaQuery, useTheme } from "@mui/material";
+import { readFile } from "node:fs";
 
 abstract class Field {
     event: JsonEventType | OnetableEventType;
@@ -554,6 +555,24 @@ class Town extends Field {
     defaultValue = ""
     value (participant: JsonParticipantWithExtraType) {
         return participant.booking.town ? participant.booking.town : ""
+    }
+}
+
+export class ComputedAttendaceFirstThree extends Field {
+    fieldName = "First Three Days"
+    visbileMobile = false
+    visibleDesktop = false
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.attendance?.option ===  0 || participant.attendance?.option === 1
+    }
+}
+
+export class ComputedAttendaceLastSeven extends Field {
+    fieldName = "Last Seven Days"
+    visbileMobile = false
+    visibleDesktop = false
+    value (participant: JsonParticipantWithExtraType) {
+        return participant.attendance?.option ===  0 || participant.attendance?.option === 2
     }
 }
 

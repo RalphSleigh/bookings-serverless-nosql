@@ -20,7 +20,7 @@
   "dependencies": {
     "@aws-sdk/client-cloudwatch": "^3.306.0",
     "@aws-sdk/client-cloudwatch-logs": "^3.306.0",
-    "@aws-sdk/client-dynamodb": "^3.303.0",
+    "@aws-sdk/client-dynamodb": "^3.758.0",
     "@aws-sdk/client-lambda": "^3.490.0",
     "@aws-sdk/client-sns": "^3.529.1",
     "@aws-sdk/client-sqs": "^3.496.0",
@@ -62,7 +62,7 @@
     "debounce": "^1.1.0",
     "discord-verify": "^1.2.0",
     "discord.js": "^14.7.1",
-    "dynamodb-onetable": "^2.7.1",
+    "dynamodb-onetable": "^2.7.7",
     "eol": "^0.9.1",
     "esbuild": "^0.15.11",
     "exponential-backoff": "^2.2.1",

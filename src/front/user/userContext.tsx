@@ -3,12 +3,13 @@ import { createContext } from 'react';
 import { useUser } from '../queries.js'
 
 import type { JsonUserResponseType, UserType } from '../../lambda-common/onetable.js'
-
+//@ts-ignore
 export const UserContext = createContext<JsonUserResponseType>(null);
 
 
 export function UserContextProvider(props) {
-    const { user } = useUser().data
+    const userQuery = useUser()
+    const { user } = userQuery.data
 
     return <UserContext.Provider value={user}>
         {props.children}

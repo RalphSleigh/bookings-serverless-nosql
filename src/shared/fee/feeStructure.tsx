@@ -25,4 +25,5 @@ export abstract class FeeStructure {
     public abstract getValueLabels: () => string[]
     public abstract getPaymentReference(booking: (PartialDeep<JsonBookingType> | BookingType) & { userId: string }): string | undefined
     public abstract StripeElement: React.FC<{event: JsonEventType, booking: JsonBookingType}>
+    public processBookingUpdate(event: JsonEventType | EventType, existingBooking: BookingType | Partial<BookingType> | PartialDeep<JsonBookingType>, newBooking: BookingType | Partial<BookingType> | PartialDeep<JsonBookingType>) {}
 }

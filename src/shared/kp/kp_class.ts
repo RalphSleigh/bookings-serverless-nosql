@@ -5,7 +5,7 @@ export type kpValidationResults = string[]
 
 export abstract class KpStructure {
     abstract kpName: String
-    abstract ParticipantFormElement: React.FunctionComponent<{ index: number, data: Partial<Required<JsonParticipantType>["kp"]>, update: any }>
+    abstract ParticipantFormElement: React.FunctionComponent<{ index: number, data: Partial<Required<JsonParticipantType>["kp"]>, update: any, readOnly: boolean }>
     abstract PaticipantCardElement: React.FunctionComponent<{ data: JsonParticipantType["kp"] }>
 
     public abstract validate(data: PartialDeep<JsonParticipantType>): kpValidationResults

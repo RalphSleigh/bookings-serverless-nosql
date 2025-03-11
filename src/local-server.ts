@@ -15,7 +15,7 @@ app.use(express.text())
 app.use(bodyParser.json());
 app.use(bodyParser.text({ type: 'application/x-www-form-urlencoded' }));
 
-const handlerSetup = (url: string, lambda_path: string, method: string = "GET", ppath=undefined) => {
+const handlerSetup = (url: string, lambda_path: string, method: string = "GET", ppath: string | undefined = undefined) => {
 
   const handler_func = method == "POST" ? app.post: app.get
 
@@ -83,11 +83,13 @@ handlerSetup('/api/event/:id/manage/getParticipantNumbersChartData', 'events/man
 handlerSetup('/api/event/:id/manage/timeline', 'events/manage/getEventTimeline')
 handlerSetup('/api/event/:id/manage/roles', 'events/manage/getRoles')
 handlerSetup('/api/event/:id/manage/applications', 'events/manage/getApplications')
+handlerSetup('/api/event/:id/manage/applicationsSheetNumbers', 'events/manage/getApplicationsSheetsNumbers')
 handlerSetup('/api/event/:id/manage/roles/create', 'events/manage/createRole', "POST")
 handlerSetup('/api/event/:id/manage/roles/delete', 'events/manage/deleteRole', "POST")
 handlerSetup('/api/event/:id/manage/booking/:userId/operation', 'events/manage/bookingOperation', "POST")
 handlerSetup('/api/event/:id/manage/application/:userId/operation', 'events/manage/applicationOperation', "POST")
 handlerSetup('/api/event/:id/manage/operation', 'events/manage/eventOperation', "POST")
+handlerSetup('/api/event/:id/widget', 'events/eventWidget', "GET", '/api/event/:id/widget?target')
 handlerSetup('/api/booking/user', 'bookings/getUsersBookings')
 handlerSetup('/api/booking/create', 'bookings/createBooking', "POST")
 //handlerSetup('/api/booking/:id', 'bookings/get/handler')
