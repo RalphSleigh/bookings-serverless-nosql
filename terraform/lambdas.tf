@@ -28,7 +28,7 @@ resource "aws_lambda_function" "lambda" {
   s3_key    = resource.aws_s3_object.lambda_code[each.key].key
 
   architectures = ["arm64"]
-  memory_size   = 256
+  memory_size   = 512
   timeout       = 60
 
   #layers = [resource.aws_lambda_layer_version.common_layer.arn, resource.aws_lambda_layer_version.node_modules_layer.arn, "arn:aws:lambda:eu-west-2:282860088358:layer:AWS-AppConfig-Extension-Arm64:11"]
