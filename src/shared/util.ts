@@ -154,9 +154,13 @@ export const generateDiscordDiff: (oldBooking: BookingType, newBooking: BookingT
 
     const updateStrings: string[] = []
 
-    const existingLatestBookingDiscord = { ...oldBooking, participants: (oldBooking.participants || []).map(p => ({ ...p, name: p.basic.name, basic: {...p.basic, dob: p.basic.dob instanceof Date ? p.basic.dob.toISOString() : p.basic.dob}})) }
+    const existingLatestBookingDiscord = { ...oldBooking, participants: (oldBooking.participants || [])
+        .filter(p => p.basic?.name && p.basic?.dob) 
+        .map(p => ({ ...p, name: p.basic?.name, basic: {...p.basic, dob: p.basic?.dob instanceof Date ? p.basic?.dob.toISOString() : p.basic?.dob}})) }
     //@ts-ignore
-    const newLatestBookingDiscord = { ...newBooking, participants: (newBooking.participants || []).map(p => ({ ...p, name: p.basic.name, basic: {...p.basic, dob: p.basic.dob instanceof Date ? p.basic.dob.toISOString() : p.basic.dob} })) }
+    const newLatestBookingDiscord = { ...newBooking, participants: (newBooking.participants || [])
+        .filter(p => p.basic?.name && p.basic?.dob) 
+        .map(p => ({ ...p, name: p.basic?.name, basic: {...p.basic, dob: p.basic?.dob instanceof Date ? p.basic?.dob.toISOString() : p.basic?.dob} })) }
 
     const updates = diff(existingLatestBookingDiscord, newLatestBookingDiscord, { embeddedObjKeys: { participants: 'name' } })
     updates.forEach(u => {
