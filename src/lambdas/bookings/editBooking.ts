@@ -92,6 +92,12 @@ export const lambdaHandler = lambda_wrapper_json(
                                     discordString = ""
                                 }
                             }
+                            
+                            if(discordString.length > 0) {
+                                console.log("Posting to discord")
+                                console.log(discordString)
+                                await postToDiscord(config, "```" + discordString + "```")
+                            }
 
                         } else {
                             console.log("No diff to post to discord")
