@@ -73,17 +73,28 @@ export const lambdaHandler = lambda_wrapper_json(
                     console.log("END EMAIL BEGIN DISCORD")
                     try {
                         //@ts-ignore
-                        const discordDiffString = generateDiscordDiff(existingLatestBooking, newLatest).join("\n")
-                        console.log(discordDiffString)
+                        const discordDiffs = generateDiscordDiff(existingLatestBooking, newLatest)
 
-                        if (discordDiffString !== "") {
+                        if (discordDiffs.length > 0) {
                             if (isOwnBooking) {
                                 await postToDiscord(config, `${newLatest.basic.contactName} (${newLatest.basic.district}) edited their booking for event ${event.name}, they have booked ${newLatest.participants.length} people (previously ${existingLatestBooking.participants.length})`)
                             } else {
                                 await postToDiscord(config, `${current_user.userName} edited booking ${newLatest.basic.contactName} (${newLatest.basic.district}) for event ${event.name}, they have booked ${newLatest.participants.length} people (previously ${existingLatestBooking.participants.length})`)
                             }
 
-                            await postToDiscord(config, "```" + discordDiffString + "```")
+                            let discordString = ""
+                            while(discordDiffs.length > 0) {
+                                discordString += discordDiffs.shift() + "\n"
+                                if(discordString.length > 1900) {
+                                    console.log("Posting to discord")
+                                    console.log(discordString)
+                                    await postToDiscord(config, "```" + discordString + "```")
+                                    discordString = ""
+                                }
+                            }
+
+                        } else {
+                            console.log("No diff to post to discord")
                         }
                         console.log("END DISCORD")
                     } catch (e) {
