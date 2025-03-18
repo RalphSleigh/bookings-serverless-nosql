@@ -48,7 +48,7 @@ export function BookingForm({ data, originalData, event, user, update, submit, m
     const validationResults = validation.validate(data, permission.permission)
 
     //@ts-ignore
-    const diff = generateDiscordDiff(originalData, data)
+    const diff = validationResults.length == 0 ? generateDiscordDiff(originalData, data) : []
 
     return <Grid container spacing={2} p={2} justifyContent="center">
         <Grid xl={6} lg={7} md={8} sm={9} xs={12} item>

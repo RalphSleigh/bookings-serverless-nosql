@@ -54,7 +54,7 @@ export function RouterErrorBoundary() {
         }
     }
 
-    return <div>Oops, something went wrong, maybe <a href="/">refreshing</a> the page will help.</div>
+    return <div>Oops, something went wrong, maybe <a href="/">refreshing</a> the page will help.<br /><br />It would be helpful to email <a href="mailto:ralph.sleigh@woodcraft.org.uk">ralph.sleigh@woodcraft.org.uk</a> describing what you were doing when this happened</div>
 }
 
 export class ReactErrorBoundary extends React.Component<{ children }, { hasError: boolean }> {
@@ -81,7 +81,7 @@ export class ReactErrorBoundary extends React.Component<{ children }, { hasError
     render() {
         if (this.state.hasError) {
             // You can render any custom fallback UI
-            return <div>Oops, something went wrong, maybe <a href="/">refreshing</a> the page will help</div>
+            return <div>Oops, something went wrong, maybe <a href="/">refreshing</a> the page will help.<br /><br />It would be helpful to email <a href="mailto:ralph.sleigh@woodcraft.org.uk">ralph.sleigh@woodcraft.org.uk</a> describing what you were doing when this happened</div>
         }
 
         return this.props.children;
