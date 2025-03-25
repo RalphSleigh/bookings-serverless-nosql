@@ -37,4 +37,4 @@ export class Free extends FeeStructure {
     public getPaymentReference(booking: (PartialDeep<JsonBookingType> | BookingType) & { userId: string }){
         return ""
     }
-}
+    
