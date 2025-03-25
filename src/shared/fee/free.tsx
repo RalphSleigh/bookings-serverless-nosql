@@ -16,14 +16,14 @@ export class Free extends FeeStructure {
         </>
     }
 
-    public StripeElement = ({ event, booking }: { event: JsonEventType, booking: JsonBookingType}) => {
+    public StripeElement = ({ event, booking }: { event: JsonEventType, booking: JsonBookingType }) => {
         return null
     }
 
     public getFeeLines = (event: JsonEventType | EventType, booking: PartialDeep<JsonBookingType> | BookingType): FeeLine[] => {
         return []
     }
-    
+
     public DescriptionElement = ({ event, booking }: { event: JsonEventType, booking: PartialDeep<JsonBookingType> }) => {
         return <Typography variant="body1">Its Free</Typography>
     }
@@ -33,8 +33,8 @@ export class Free extends FeeStructure {
     }
 
     public getValueLabels = () => ([])
-    
-    public getPaymentReference(booking: (PartialDeep<JsonBookingType> | BookingType) & { userId: string }){
+
+    public getPaymentReference(booking: (PartialDeep<JsonBookingType> | BookingType) & { userId: string }) {
         return ""
     }
-    
+}
