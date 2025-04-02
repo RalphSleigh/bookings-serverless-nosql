@@ -30,7 +30,7 @@ export class EalingC100 extends FeeStructure {
         const { updateSubField } = getMemoUpdateFunctions(update)
         const { updateArrayItem } = getMemoUpdateFunctions(updateSubField('options'))
 
-        const optionsElements = (attendanceData?.options || []).map((option, i) => {
+        const OptionsElement = ({ option, i}: {option: string, i: number}) => {
             const { updateField, updateNumber } = getMemoUpdateFunctions(updateArrayItem(i))
             return <>
                 <Typography sx={{ mt: 2 }} variant="h5">Ealing fee options = {option}</Typography>
@@ -44,7 +44,7 @@ export class EalingC100 extends FeeStructure {
                             id="outlined-required"
                             label="Unaccompanied"
                             type="number"
-                            value={data.ealingUnaccompanied}
+                            value={data?.options?.[i]?.ealingUnaccompanied}
                             onChange={updateNumber('ealingUnaccompanied')} />
                     </Grid>
                     <Grid item xs={6}>
@@ -56,7 +56,7 @@ export class EalingC100 extends FeeStructure {
                             id="outlined-required"
                             label="Unaccompanied Discount"
                             type="number"
-                            value={data.ealingDiscountUnaccompanied}
+                            value={data?.options?.[i]?.ealingDiscountUnaccompanied}
                             onChange={updateNumber('ealingDiscountUnaccompanied')} />
                     </Grid>
                     <Grid item xs={6}>
@@ -68,7 +68,7 @@ export class EalingC100 extends FeeStructure {
                             id="outlined-required"
                             label="Accompanied"
                             type="number"
-                            value={data.ealingAccompanied}
+                            value={data?.options?.[i]?.ealingAccompanied}
                             onChange={updateNumber('ealingAccompanied')} />
                     </Grid>
                     <Grid item xs={6}>
@@ -80,12 +80,14 @@ export class EalingC100 extends FeeStructure {
                             id="outlined-required"
                             label="Accompanied Discount"
                             type="number"
-                            value={data.ealingDiscountAccompanied}
+                            value={data?.options?.[i]?.ealingDiscountAccompanied}
                             onChange={updateNumber('ealingDiscountAccompanied')} />
                     </Grid>
                 </Grid>
             </>
-        })
+        }
+
+        const optionsElements = (attendanceData?.options || []).map((option, i) => <OptionsElement key={i} option={option} i={i} />)
 
         return <>{optionsElements}</>
     }
