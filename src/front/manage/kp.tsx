@@ -125,7 +125,7 @@ const LargeKP = ({ event, bookings }: { event: JsonEventType, bookings: Required
     for (let booking of bookings) {
         for (let participant of booking.participants) {
             const ageIndex = groups.findIndex(g => g.name == participant.ageGroup.name)
-            const dietIndex = KpStructure.dietOptions.findIndex(d => d == participant.kp!.diet)
+            const dietIndex = KpStructure.dietOptions.findIndex(d => d == participant.kp!.diet.toLowerCase())
             counts[ageIndex] = counts[ageIndex] || new Array(KpStructure.dietOptions.length).fill(0)
             counts[ageIndex][dietIndex]++
             if (isNonEmptyString(participant.kp.details) ||
