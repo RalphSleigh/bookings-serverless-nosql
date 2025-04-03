@@ -396,7 +396,7 @@ function getParticipantFromRow(row: NonNullable<sheets_v4.Schema$ValueRange["val
         attendance: {
         },
         kp: {
-            diet: row[4],
+            diet: row[4].toLowerCase(),
             details: row[5],
             preferences: row[6],
             nuts: row[7] === "Yes",
