@@ -30,7 +30,7 @@ export class Basic implements KpStructure {
     public validate(participant: Partial<JsonParticipantType>): kpValidationResults {
         const results: kpValidationResults = []
         if(participant.basic?.name) {
-            if(!participant.kp?.diet) results.push(`Please select a diet for ${participant.basic?.name}`)
+            if(!KpStructure.dietOptions.includes(participant.kp?.diet || "")) results.push(`Please select a diet for ${participant.basic?.name}`)
         }
         return results
     }
