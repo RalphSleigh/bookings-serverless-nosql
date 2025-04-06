@@ -157,6 +157,9 @@ const BookingsModal = ({ event, selectedBooking, booking, handleClose }: { event
                             <b>How heard:</b><br /> {booking.basic.howDidYouHear}
                         </Typography>
                         <Typography variant="body1" sx={noWrap}>
+                            <b>Travel:</b><br /> {booking.camping?.travel}
+                        </Typography>
+                        <Typography variant="body1" sx={noWrap}>
                             <b>Payment Reference:</b><br /> {fees.large.getPaymentReference(booking)}
                         </Typography>
                     </> : null}

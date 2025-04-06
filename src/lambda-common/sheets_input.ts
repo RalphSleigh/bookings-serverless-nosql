@@ -47,7 +47,7 @@ async function getSheetsClient(config) {
 
 export type HasSheetType = drive_v3.Schema$File | false
 
-export async function getHasSheet(config, event: OnetableEventType, user: FoundUserResponseType) {
+export async function getHasSheet(config, event: OnetableEventType, user: UserType) {
     const drive_instance = await getDriveClient(config)
 
     try {
@@ -427,7 +427,9 @@ function getParticipantFromRow(row: NonNullable<sheets_v4.Schema$ValueRange["val
 
     const removeEmpty = obj => Object.fromEntries(Object.keys(obj).filter(k => obj[k] !== '').map(k => [k, obj[k]]));
 
+    //@ts-expect-error
     result.kp = removeEmpty(result.kp)
+    //@ts-expect-error
     result.medical = removeEmpty(result.medical)
 
 
