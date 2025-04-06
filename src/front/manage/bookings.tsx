@@ -156,7 +156,7 @@ const BookingsModal = ({ event, selectedBooking, booking, handleClose }: { event
                         <Typography variant="body1" sx={noWrap}>
                             <b>How heard:</b><br /> {booking.basic.howDidYouHear}
                         </Typography>
-                        <Typography variant="body1" sx={noWrap}>
+                        <Typography variant="body1">
                             <b>Travel:</b><br /> {booking.camping?.travel}
                         </Typography>
                         <Typography variant="body1" sx={noWrap}>
