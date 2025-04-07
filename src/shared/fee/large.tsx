@@ -237,6 +237,7 @@ export class Large extends FeeStructure {
                             <TableCell></TableCell>
                             {valueHeaders}
                             {payments && payments.length > 0 ? <TableCell><b>Payments</b></TableCell> : null}
+                            <TableCell><b>Balance</b></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -247,6 +248,7 @@ export class Large extends FeeStructure {
                             <TableCell><b>Total</b></TableCell>
                             {totals.map((v, i) => <TableCell key={i}><b>{currency(v)}</b></TableCell>)}
                             {payments && payments.length > 0 ? <TableCell><b>{currency(paymentTotal)}</b></TableCell> : null}
+                            <TableCell><b>{currency(totals[0] - paymentTotal)}</b></TableCell>
                         </TableRow>
                     </TableBody>
                 </Table>
