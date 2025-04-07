@@ -429,7 +429,7 @@ export class Large extends FeeStructure {
             </tr>
             {paymentLines.length > 0 ? <> 
             <tr>
-                <td>Payments Received:</td><td></td>
+                <td colSpan={2} align="center"><b>Payments Received:</b></td>
             </tr>
             {paymentLines}
             <tr>
@@ -437,7 +437,7 @@ export class Large extends FeeStructure {
                     <b>Total:{" "}</b>
                 </td>
                 <td>
-                    <b>{currency(totalOwed)}</b>
+                    <b>{currency(totalPaid)}</b>
                 </td>
             </tr>
             </> : null }
