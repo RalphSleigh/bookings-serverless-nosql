@@ -175,6 +175,7 @@ export class Large extends FeeStructure {
                 <TableCell>{f.description}</TableCell>
                 {this.getValueLabels().map((l, i) => <TableCell component="th" key={i}></TableCell>)}
                 <TableCell component="th" key={i}>{currency(f.value)}</TableCell>
+                <TableCell></TableCell>
             </TableRow>)
         })
 
@@ -191,6 +192,7 @@ export class Large extends FeeStructure {
                 <TableCell component="th" scope="row"><Tooltip followCursor={true} title={row.tooltip}><span>{row.description}</span></Tooltip></TableCell>
                 {row.values.map((v, i) => <TableCell key={i}>{currency(v)}</TableCell>)}
                 {payments && payments.length > 0 ? <TableCell></TableCell> : null}
+                <TableCell></TableCell>
             </TableRow>)
         })
 
@@ -204,6 +206,7 @@ export class Large extends FeeStructure {
                 <TableCell>{f.description}</TableCell>
                 {this.getValueLabels().map((l, i) => <TableCell component="th" key={i}>{currency(f.value)}</TableCell>)}
                 {payments && payments.length > 0 ? <TableCell></TableCell> : null}
+                <TableCell></TableCell>
             </TableRow>)
         })
 
