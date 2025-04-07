@@ -18,7 +18,7 @@ variable "dyanmodb_read_min_capacity" {
 
 variable "dynamodb_read_max_capacity" {
   description = "The maximum read capacity for the DynamoDB table"
-  default     = 20
+  default     = 50
   type = number
 }
 
