@@ -48,7 +48,7 @@ resource "aws_lambda_function" "discord_lambda" {
     aws_iam_role_policy_attachment.lambda_policy_attachment,
   ]
 
-  runtime = "nodejs18.x"
+  runtime = "nodejs20.x"
 }
 
 resource "aws_lambda_event_source_mapping" "event_source_mapping_discord" {
