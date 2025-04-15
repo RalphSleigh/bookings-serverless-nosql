@@ -1,8 +1,6 @@
 resource "aws_dynamodb_table" "bookings_table" {
   name           = "Bookings"
-  billing_mode   = "PROVISIONED"
-  read_capacity  = var.dynamodb_read_default_capacity
-  write_capacity = var.dynamodb_write_default_capacity
+  billing_mode   = "PAY_PER_REQUEST"
   hash_key       = "pk"
   range_key      = "sk"
 
@@ -26,15 +24,8 @@ resource "aws_dynamodb_table" "bookings_table" {
     projection_type = "ALL"
     range_key       = "userIdVersion"
   }
-
-  lifecycle {
-    ignore_changes = [
-      read_capacity,
-      write_capacity,
-    ]
-  }
 }
-
+/* 
 resource "aws_appautoscaling_target" "bookings_table_read_target" {
   min_capacity       = var.dyanmodb_read_min_capacity
   max_capacity       = var.dynamodb_read_max_capacity
@@ -81,7 +72,7 @@ resource "aws_appautoscaling_policy" "bookings_table_write_policy" {
 
     target_value = 70
   }
-}
+} */
 
 resource "aws_dynamodb_table" "config_table" {
   name           = "Config"
