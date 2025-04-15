@@ -99,7 +99,7 @@ resource "aws_dynamodb_table" "config_table" {
     ]
   }
 }
-
+/* 
 resource "aws_appautoscaling_target" "config_table_read_target" {
   max_capacity       = 5
   min_capacity       = 5
@@ -147,3 +147,4 @@ resource "aws_appautoscaling_policy" "config_table_write_policy" {
     target_value = 70
   }
 }
+ */
