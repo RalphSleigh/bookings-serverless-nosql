@@ -1,6 +1,6 @@
 variable "dynamodb_read_default_capacity" {
   description = "The default read capacity for the DynamoDB table"
-  default     = 15
+  default     = 25
   type = number
 }
 
@@ -12,7 +12,7 @@ variable "dynamodb_write_default_capacity" {
 
 variable "dyanmodb_read_min_capacity" {
   description = "The minimum read capacity for the DynamoDB table"
-  default     = 15
+  default     = 25
   type = number
 }
 
