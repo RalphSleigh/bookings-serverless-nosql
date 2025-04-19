@@ -40,6 +40,7 @@ export function Component() {
             <TableCell><a href={`mailto:${a.email}`}>{a.email}</a></TableCell>
             <TableCell>{a.district}</TableCell>
             <TableCell>{a.predictedParticipants}</TableCell>
+            <TableCell>{a.created}</TableCell>
             <TableCell>
                 <Button variant="contained" disabled={applicationOperation.isPending} onClick={() => approve(a.userId)}>Approve</Button>
             </TableCell>
@@ -81,6 +82,7 @@ export function Component() {
                         <TableCell><strong>Email</strong></TableCell>
                         <TableCell><strong>Group/District</strong></TableCell>
                         <TableCell><strong>Predicted</strong></TableCell>
+                        <TableCell><strong>Created</strong></TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
