@@ -58,7 +58,7 @@ export function Component() {
             <Stack direction="row" spacing={1}>
                 <WoodcraftAvatar user={u} />
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Typography>{u.userName}</Typography>
+                    <Typography>{u.userName} ({u.email})</Typography>
                 </Box>
             </Stack>
         </MenuItem>
@@ -164,7 +164,7 @@ const renderUserCell = props => {
     return <Stack direction="row" spacing={1}>
         <WoodcraftAvatar user={u} />
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Typography>{u.userName}</Typography>
+            <Typography>{u.userName} ({u.email})</Typography>
         </Box>
     </Stack>
 }
@@ -181,6 +181,9 @@ const userSortComparator = (a, b) => {
 
 const WoodcraftAvatar: React.FC<{ user: JsonUserType }> = props => {
     const { user } = props
+
+    const badgeLetter = user.source.charAt(0).toUpperCase()
+
     return (user.isWoodcraft ?
         <Badge
             overlap="circular"
@@ -192,5 +195,13 @@ const WoodcraftAvatar: React.FC<{ user: JsonUserType }> = props => {
             <Avatar imgProps={{ referrerPolicy: "no-referrer" }} sx={{ width: 26, height: 26, boxShadow: 5 }} alt={user.userName || ""} src={user.picture || "/nope.jpg"} />
         </Badge>
         :
-        <Avatar imgProps={{ referrerPolicy: "no-referrer" }} sx={{ width: 26, height: 26, boxShadow: 5 }} alt={user.userName || ""} src={user.picture || "/nope.jpg"} />)
+        <Badge
+            overlap="circular"
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            badgeContent={
+                <Avatar sx={{ width: 16, height: 16, border: "2px solid #fff" }}>{badgeLetter}</Avatar>
+            }
+        >
+            <Avatar imgProps={{ referrerPolicy: "no-referrer" }} sx={{ width: 26, height: 26, boxShadow: 5 }} alt={user.userName || ""} src={user.picture || "/nope.jpg"} />
+        </Badge>)
 }
