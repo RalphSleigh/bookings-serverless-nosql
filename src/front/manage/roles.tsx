@@ -215,13 +215,13 @@ const WoodcraftAvatar: React.FC<{ user: JsonUserType }> = (props) => {
   if (user.isWoodcraft) {
     logoSrc = "/logo-avatar.png";
   } else if (user.source === "google") {
-    logoSrc = "/google-logo.png";
+    logoSrc = "/logo-google.png";
   } else if (user.source === "apple") {
-    logoSrc = "/apple-logo.png";
+    logoSrc = "/logo-apple.png";
   } else if (user.source === "yahoo") {
-    logoSrc = "/yahoo-logo.png";
+    logoSrc = "/logo-yahoo.png";
   } else if (user.source === "microsoft") {
-    logoSrc = "/microsoft-logo.png";
+    logoSrc = "/logo-microsoft.png";
   }
 
   return <Badge
