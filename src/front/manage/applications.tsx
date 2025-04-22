@@ -47,6 +47,8 @@ import { Close } from "@mui/icons-material";
 import { JsonUserType, RoleType } from "../../lambda-common/onetable.js";
 import { applicationTypeIcon } from "./utils.js";
 import { application } from "express";
+import format from "date-fns/format";
+import { parseISO } from "date-fns";
 
 export function Component() {
   const { event, bookings } = useOutletContext<managePageContext>();
@@ -81,7 +83,7 @@ export function Component() {
           </TableCell>
           <TableCell>{a.district}</TableCell>
           <TableCell>{a.predictedParticipants}</TableCell>
-          <TableCell>{a.created}</TableCell>
+          <TableCell>{format(parseISO(a.created!), 'do MMMM yyyy')}</TableCell>
           <TableCell>
             <Button variant="contained" disabled={applicationOperation.isPending} onClick={() => approve(a.userId)}>
               Approve
