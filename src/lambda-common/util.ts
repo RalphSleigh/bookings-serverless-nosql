@@ -1,94 +1,123 @@
-import _ from 'lodash';
-import { BookingType, EventBookingTimelineType, EventType, JsonBookingType, JsonParticipantType, OnetableBookingType, OnetableEventType, ParticipantType, RoleType, UserType, UserWithRoles, table } from './onetable.js';
-import { Model } from 'dynamodb-onetable';
-import { getFee } from '../shared/fee/fee.js';
+import _ from "lodash";
+import {
+  BookingType,
+  EventBookingTimelineType,
+  EventType,
+  JsonBookingType,
+  JsonParticipantType,
+  OnetableBookingType,
+  OnetableEventType,
+  ParticipantType,
+  RoleType,
+  UserType,
+  UserWithRoles,
+  table,
+} from "./onetable.js";
+import { Model } from "dynamodb-onetable";
+import { getFee } from "../shared/fee/fee.js";
 //import { db } from './orm'
 
-const RoleModel = table.getModel<RoleType>('Role')
-const UserModel = table.getModel<UserType>('User')
-const BookingModel: Model<OnetableBookingType> = table.getModel<OnetableBookingType>('Booking')
-const EventBookingTimelineModel = table.getModel<EventBookingTimelineType>('EventBookingTimeline')
+const RoleModel = table.getModel<RoleType>("Role");
+const UserModel = table.getModel<UserType>("User");
+const BookingModel: Model<OnetableBookingType> = table.getModel<OnetableBookingType>("Booking");
+const EventBookingTimelineModel = table.getModel<EventBookingTimelineType>("EventBookingTimeline");
 
 export function updateParticipantsDates(existing: Array<ParticipantType>, incoming: Array<JsonParticipantType> | Array<ParticipantType>) {
-    let now = new Date()
+  let now = new Date();
 
-    let used = new Set()
+  let used = new Set();
+  let matched = new Set();
 
-    incoming.forEach(p => {
-        let existingParticipant: undefined | JsonParticipantType | ParticipantType = undefined
+  incoming.forEach((p, i) => {
+    let existingParticipant: undefined | JsonParticipantType | ParticipantType = undefined;
 
-        const existingParticipantsByAndDoB = existing.filter(ep => ep.basic.name.trim() === p.basic.name.trim() && ep.basic.dob === p.basic.dob)
-        if (existingParticipantsByAndDoB.length === 1 && !used.has(existingParticipantsByAndDoB[0].created.toISOString())) {
-            existingParticipant = existingParticipantsByAndDoB[0]
-            used.add(existingParticipant.created.toISOString())
-        }
+    const existingParticipantsByAndDoB = existing.filter((ep) => ep.basic.name.trim() === p.basic.name.trim() && ep.basic.dob === p.basic.dob);
+    if (existingParticipantsByAndDoB.length === 1 && !used.has(existingParticipantsByAndDoB[0].created.toISOString())) {
+      console.log("found existing participant by name and dob", existingParticipantsByAndDoB[0].basic.name, p.basic.name);
+      existingParticipant = existingParticipantsByAndDoB[0];
+      used.add(existingParticipant.created.toISOString());
+    }
 
-        const existingToCompare = {..._.cloneDeep(existingParticipant), created: null, updated: null}
-        const newToCompare = {..._.cloneDeep(p), created: null, updated: null}
-        const updated = existingParticipant && !_.isEqual(existingToCompare, newToCompare)
-        p.created = existingParticipant ? existingParticipant.created.toISOString() : now.toISOString()
-        p.updated = !existingParticipant || updated ? now.toISOString() : existingParticipant.updated.toISOString()
-        now = new Date(now.getTime() + 1)
-    })
+    if (existingParticipant && !matched.has(i)) {
+      const existingToCompare = { ..._.cloneDeep(existingParticipant), created: null, updated: null };
+      const newToCompare = { ..._.cloneDeep(p), created: null, updated: null };
+      const updated = existingParticipant && !_.isEqual(existingToCompare, newToCompare);
+      p.created = existingParticipant ? existingParticipant.created.toISOString() : now.toISOString();
+      p.updated = !existingParticipant || updated ? now.toISOString() : existingParticipant.updated.toISOString();
+      now = new Date(now.getTime() + 1);
+      matched.add(i);
+    }
+  });
 
-    incoming.forEach(p => {
-        let existingParticipant: undefined | JsonParticipantType | ParticipantType = undefined
-        const existingParticipantsByName = existing.filter(ep => ep.basic.name.trim() === p.basic.name.trim())
-        if (existingParticipantsByName.length === 1 && !used.has(existingParticipantsByName[0].created.toISOString())) {
-            existingParticipant = existingParticipantsByName[0]
-            used.add(existingParticipant.created.toISOString())
-        } 
-        
-        const existingToCompare = {..._.cloneDeep(existingParticipant), created: null, updated: null}
-        const newToCompare = {..._.cloneDeep(p), created: null, updated: null}
-        const updated = existingParticipant && !_.isEqual(existingToCompare, newToCompare)
-        p.created = existingParticipant ? existingParticipant.created.toISOString() : now.toISOString()
-        p.updated = !existingParticipant || updated ? now.toISOString() : existingParticipant.updated.toISOString()
-        now = new Date(now.getTime() + 1)
-    })
+  incoming.forEach((p, i) => {
+    let existingParticipant: undefined | JsonParticipantType | ParticipantType = undefined;
+    const existingParticipantsByName = existing.filter((ep) => ep.basic.name.trim() === p.basic.name.trim());
+    if (existingParticipantsByName.length === 1 && !used.has(existingParticipantsByName[0].created.toISOString())) {
+      console.log("found existing participant by name", existingParticipantsByName[0].basic.name, p.basic.name);
+      existingParticipant = existingParticipantsByName[0];
+      used.add(existingParticipant.created.toISOString());
+    }
 
-    incoming.forEach(p => {
-        let existingParticipant: undefined | JsonParticipantType | ParticipantType = undefined
-        const existingParticipantsByDob = existing.filter(ep => ep.basic.dob === p.basic.dob)
-        if (existingParticipantsByDob.length === 1 && !used.has(existingParticipantsByDob[0].created.toISOString())) {
-            existingParticipant = existingParticipantsByDob[0]
-            used.add(existingParticipant.created.toISOString())
-        } 
+    if (existingParticipant && !matched.has(i)) {
+      const existingToCompare = { ..._.cloneDeep(existingParticipant), created: null, updated: null };
+      const newToCompare = { ..._.cloneDeep(p), created: null, updated: null };
+      const updated = existingParticipant && !_.isEqual(existingToCompare, newToCompare);
+      p.created = existingParticipant ? existingParticipant.created.toISOString() : now.toISOString();
+      p.updated = !existingParticipant || updated ? now.toISOString() : existingParticipant.updated.toISOString();
+      now = new Date(now.getTime() + 1);
+      matched.add(i);
+    }
+  });
 
-        const existingToCompare = {..._.cloneDeep(existingParticipant), created: null, updated: null}
-        const newToCompare = {..._.cloneDeep(p), created: null, updated: null}
-        const updated = existingParticipant && !_.isEqual(existingToCompare, newToCompare)
-        p.created = existingParticipant ? existingParticipant.created.toISOString() : now.toISOString()
-        p.updated = !existingParticipant || updated ? now.toISOString() : existingParticipant.updated.toISOString()
-        now = new Date(now.getTime() + 1)
-    })
+  incoming.forEach((p, i) => {
+    let existingParticipant: undefined | JsonParticipantType | ParticipantType = undefined;
+    const existingParticipantsByDob = existing.filter((ep) => ep.basic.dob === p.basic.dob);
+    if (existingParticipantsByDob.length === 1 && !used.has(existingParticipantsByDob[0].created.toISOString())) {
+      existingParticipant = existingParticipantsByDob[0];
+      used.add(existingParticipant.created.toISOString());
+      console.log("found existing participant by dob", existingParticipantsByDob[0].basic.name, p.basic.name);
+    }
+
+    if (!matched.has(i)) {
+      const existingToCompare = { ..._.cloneDeep(existingParticipant), created: null, updated: null };
+      const newToCompare = { ..._.cloneDeep(p), created: null, updated: null };
+      const updated = existingParticipant && !_.isEqual(existingToCompare, newToCompare);
+      p.created = existingParticipant ? existingParticipant.created.toISOString() : now.toISOString();
+      p.updated = !existingParticipant || updated ? now.toISOString() : existingParticipant.updated.toISOString();
+      now = new Date(now.getTime() + 1);
+      matched.add(i);
+    }
+  });
 }
 
 export async function getUsersWithRolesForEvent(event: OnetableEventType, rolesNames: Array<RoleType["role"]>): Promise<UserWithRoles[]> {
-    const roles = await RoleModel.find({ sk: { begins: event.id } })
-    const users = await UserModel.scan()
-    const usersWithRoles = users.filter(u => roles.find(r => r.userId === u.id && rolesNames.includes(r.role)))
-    return usersWithRoles.map(u => {
-        const userRoles = roles.filter(r => r.userId === u.id)
-        return { roles: userRoles, ...u }
-    })
+  const roles = await RoleModel.find({ sk: { begins: event.id } });
+  const users = await UserModel.scan();
+  const usersWithRoles = users.filter((u) => roles.find((r) => r.userId === u.id && rolesNames.includes(r.role)));
+  return usersWithRoles.map((u) => {
+    const userRoles = roles.filter((r) => r.userId === u.id);
+    return { roles: userRoles, ...u };
+  });
 }
 
 export async function addVersionToBooking(event: EventType, existing: BookingType, newData: Partial<BookingType>) {
-    if(newData.participants) updateParticipantsDates(existing.participants, newData.participants!)
+  if (newData.participants) updateParticipantsDates(existing.participants, newData.participants!);
 
-    const fees = getFee(event)
-    fees.processBookingUpdate(event, existing, newData)
+  const fees = getFee(event);
+  fees.processBookingUpdate(event, existing, newData);
 
-    const newLatest = await BookingModel.update({ ...existing, ...newData, deleted: false }, { partial: false })
-    const newVersion = await BookingModel.create({ ...newLatest, version: newLatest.updated.toISOString() })
+  const newLatest = await BookingModel.update({ ...existing, ...newData, deleted: false }, { partial: false });
+  const newVersion = await BookingModel.create({ ...newLatest, version: newLatest.updated.toISOString() });
 
-    EventBookingTimelineModel.update({ eventId: newVersion.eventId }, {
-            set: { events: 'list_append(if_not_exists(events, @{emptyList}), @{newEvent})' },
-            substitutions: { newEvent: [{ userId: newVersion.userId, time: newLatest.updated.toISOString() }], emptyList: [] }
-        })
+  EventBookingTimelineModel.update(
+    { eventId: newVersion.eventId },
+    {
+      set: { events: "list_append(if_not_exists(events, @{emptyList}), @{newEvent})" },
+      substitutions: { newEvent: [{ userId: newVersion.userId, time: newLatest.updated.toISOString() }], emptyList: [] },
+    }
+  );
 
-    return newVersion
+  return newVersion;
 }
 
 /* export function updateAssociation(db, instance, key, Association, values) {
