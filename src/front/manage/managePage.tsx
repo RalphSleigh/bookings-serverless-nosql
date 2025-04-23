@@ -136,6 +136,7 @@ export function Component() {
                 bookingSearch={debouncedBookingSearch} 
                 villageSearch={villageSearch}
                 townSearch={townSearch}
+                location={location}
                 />
             </SuspenseWrapper>
         </Grid ></>
@@ -156,21 +157,23 @@ export type managePageContext = manageLoaderContext & {
     displayDeleted: boolean
 }
 
-function LatestDataLoader({ event, timeline, displayDeleted, participantSearch, bookingSearch, villageSearch, townSearch }) {
+function LatestDataLoader({ event, timeline, displayDeleted, participantSearch, bookingSearch, villageSearch, townSearch, location }) {
+    const mode = location.pathname.endsWith("money") || location.pathname.endsWith("bookings") ? "find" : "filter"
     const { bookings } = useEventBookings(event.id).data
     const enhancedBookings = addComputedFieldsToBookingsQueryResult(bookings, event)
     const bookingSearchedBookings = bookingsBookingSearch(event, enhancedBookings, bookingSearch, villageSearch, townSearch)
-    const searchedBookings = bookingsParticipantSearch(bookingSearchedBookings, participantSearch)
+    const searchedBookings = bookingsParticipantSearch(bookingSearchedBookings, participantSearch, mode)
     return <Outlet context={{ event, bookings: searchedBookings, timeline, displayDeleted }} />
 }
 
 const MemoLatestDataLoader = React.memo(LatestDataLoader)
 
-function TimeLineDataLoader({ event, timeline, displayDeleted, participantSearch, bookingSearch, villageSearch, townSearch }) {
+function TimeLineDataLoader({ event, timeline, displayDeleted, participantSearch, bookingSearch, villageSearch, townSearch, location }) {
+    const mode = location.pathname.endsWith("money") || location.pathname.endsWith("bookings") ? "find" : "filter"
     const { bookings } = useHistoricalEventBookings(event.id, Date.parse(timeline.position.time).toString()).data
     const enhancedBookings = addComputedFieldsToBookingsQueryResult(bookings, event)
     const bookingSearchedBookings = bookingsBookingSearch(event, enhancedBookings, bookingSearch, villageSearch, townSearch)
-    const searchedBookings = bookingsParticipantSearch(bookingSearchedBookings, participantSearch)
+    const searchedBookings = bookingsParticipantSearch(bookingSearchedBookings, participantSearch, mode)
     return <Outlet context={{ event, bookings: searchedBookings, timeline, displayDeleted }} />
 }
 
