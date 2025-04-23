@@ -13,9 +13,20 @@ export function updateParticipantsDates(existing: Array<ParticipantType>, incomi
     let now = new Date()
 
     incoming.forEach(p => {
-        const existingParticipants = existing.filter(ep => ep.basic.name.trim() === p.basic.name.trim() && ep.basic.dob === p.basic.dob)
-        if(existingParticipants.length > 1) throw new Error(`Multiple participants with name ${p.basic.name} and dob ${p.basic.dob}`)
-        const existingParticipant = existingParticipants[0]
+        let existingParticipant: undefined | JsonParticipantType | ParticipantType = undefined
+        const existingParticipantsByAndDoB = existing.filter(ep => ep.basic.name.trim() === p.basic.name.trim() && ep.basic.dob === p.basic.dob)
+        const existingParticipantsByName = existing.filter(ep => ep.basic.name.trim() === p.basic.name.trim())
+        const existingParticipantsByDob = existing.filter(ep => ep.basic.dob === p.basic.dob)
+        if (existingParticipantsByAndDoB.length === 1) {
+            existingParticipant = existingParticipantsByAndDoB[0]
+        } else if (existingParticipantsByName.length === 1) {
+            existingParticipant = existingParticipantsByName[0]
+        } else if (existingParticipantsByDob.length === 1) {
+            existingParticipant = existingParticipantsByDob[0]
+        } 
+
+        // if(existingParticipants.length > 1) throw new Error(`Multiple participants with name ${p.basic.name} or dob ${p.basic.dob}`)
+        //const existingParticipant = existingParticipants[0]
         const existingToCompare = {..._.cloneDeep(existingParticipant), created: null, updated: null}
         const newToCompare = {..._.cloneDeep(p), created: null, updated: null}
         const updated = existingParticipant && !_.isEqual(existingToCompare, newToCompare)
