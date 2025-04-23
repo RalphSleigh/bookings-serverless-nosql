@@ -51,7 +51,7 @@ export function updateParticipantsDates(existing: Array<ParticipantType>, incomi
 
   incoming.forEach((p, i) => {
     let existingParticipant: undefined | JsonParticipantType | ParticipantType = undefined;
-    const existingParticipantsByName = existing.filter((ep) => ep.basic.name.trim() === p.basic.name.trim());
+    const existingParticipantsByName = existing.filter((ep) => ep.basic.name.trim() === p.basic.name.trim() && !used.has(ep.created.toISOString()));
     if (existingParticipantsByName.length === 1 && !used.has(existingParticipantsByName[0].created.toISOString())) {
       console.log("found existing participant by name", existingParticipantsByName[0].basic.name, p.basic.name);
       existingParticipant = existingParticipantsByName[0];
@@ -71,7 +71,7 @@ export function updateParticipantsDates(existing: Array<ParticipantType>, incomi
 
   incoming.forEach((p, i) => {
     let existingParticipant: undefined | JsonParticipantType | ParticipantType = undefined;
-    const existingParticipantsByDob = existing.filter((ep) => ep.basic.dob === p.basic.dob);
+    const existingParticipantsByDob = existing.filter((ep) => ep.basic.dob === p.basic.dob && !used.has(ep.created.toISOString()));
     if (existingParticipantsByDob.length === 1 && !used.has(existingParticipantsByDob[0].created.toISOString())) {
       existingParticipant = existingParticipantsByDob[0];
       used.add(existingParticipant.created.toISOString());
