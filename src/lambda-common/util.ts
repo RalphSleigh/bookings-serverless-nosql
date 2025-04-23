@@ -12,21 +12,49 @@ const EventBookingTimelineModel = table.getModel<EventBookingTimelineType>('Even
 export function updateParticipantsDates(existing: Array<ParticipantType>, incoming: Array<JsonParticipantType> | Array<ParticipantType>) {
     let now = new Date()
 
+    let used = new Set()
+
     incoming.forEach(p => {
         let existingParticipant: undefined | JsonParticipantType | ParticipantType = undefined
+
         const existingParticipantsByAndDoB = existing.filter(ep => ep.basic.name.trim() === p.basic.name.trim() && ep.basic.dob === p.basic.dob)
-        const existingParticipantsByName = existing.filter(ep => ep.basic.name.trim() === p.basic.name.trim())
-        const existingParticipantsByDob = existing.filter(ep => ep.basic.dob === p.basic.dob)
-        if (existingParticipantsByAndDoB.length === 1) {
+        if (existingParticipantsByAndDoB.length === 1 && !used.has(existingParticipantsByAndDoB[0].created.toISOString())) {
             existingParticipant = existingParticipantsByAndDoB[0]
-        } else if (existingParticipantsByName.length === 1) {
+            used.add(existingParticipant.created.toISOString())
+        }
+
+        const existingToCompare = {..._.cloneDeep(existingParticipant), created: null, updated: null}
+        const newToCompare = {..._.cloneDeep(p), created: null, updated: null}
+        const updated = existingParticipant && !_.isEqual(existingToCompare, newToCompare)
+        p.created = existingParticipant ? existingParticipant.created.toISOString() : now.toISOString()
+        p.updated = !existingParticipant || updated ? now.toISOString() : existingParticipant.updated.toISOString()
+        now = new Date(now.getTime() + 1)
+    })
+
+    incoming.forEach(p => {
+        let existingParticipant: undefined | JsonParticipantType | ParticipantType = undefined
+        const existingParticipantsByName = existing.filter(ep => ep.basic.name.trim() === p.basic.name.trim())
+        if (existingParticipantsByName.length === 1 && !used.has(existingParticipantsByName[0].created.toISOString())) {
             existingParticipant = existingParticipantsByName[0]
-        } else if (existingParticipantsByDob.length === 1) {
+            used.add(existingParticipant.created.toISOString())
+        } 
+        
+        const existingToCompare = {..._.cloneDeep(existingParticipant), created: null, updated: null}
+        const newToCompare = {..._.cloneDeep(p), created: null, updated: null}
+        const updated = existingParticipant && !_.isEqual(existingToCompare, newToCompare)
+        p.created = existingParticipant ? existingParticipant.created.toISOString() : now.toISOString()
+        p.updated = !existingParticipant || updated ? now.toISOString() : existingParticipant.updated.toISOString()
+        now = new Date(now.getTime() + 1)
+    })
+
+    incoming.forEach(p => {
+        let existingParticipant: undefined | JsonParticipantType | ParticipantType = undefined
+        const existingParticipantsByDob = existing.filter(ep => ep.basic.dob === p.basic.dob)
+        if (existingParticipantsByDob.length === 1 && !used.has(existingParticipantsByDob[0].created.toISOString())) {
             existingParticipant = existingParticipantsByDob[0]
+            used.add(existingParticipant.created.toISOString())
         } 
 
-        // if(existingParticipants.length > 1) throw new Error(`Multiple participants with name ${p.basic.name} or dob ${p.basic.dob}`)
-        //const existingParticipant = existingParticipants[0]
         const existingToCompare = {..._.cloneDeep(existingParticipant), created: null, updated: null}
         const newToCompare = {..._.cloneDeep(p), created: null, updated: null}
         const updated = existingParticipant && !_.isEqual(existingToCompare, newToCompare)
