@@ -24,7 +24,7 @@ export const lambdaHandler = lambda_wrapper_json(
         const countPerUser = filteredBookings.reduce((acc, b) => {
             if (b.deleted) return acc
             const userId = b.userId
-            if (!acc[userId]) acc[userId] = 1
+            if (!acc[userId]) acc[userId] = 0
             acc[userId] += 1
             return acc
         },{} as Record<string, number>)

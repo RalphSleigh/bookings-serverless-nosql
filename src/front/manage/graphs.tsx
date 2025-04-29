@@ -16,7 +16,7 @@ export function Component() {
   });
 
   const tableRows = Object.entries(graphDataQuery.countPerUser)
-    .sort((a, b) => a[1] - b[1])
+    .sort((a, b) => b[1] - a[1])
     .map(([userId, count], i) => {
       const booking = bookings.find((b) => b.userId === userId && b.version === "latest");
       if (!booking) return null;
