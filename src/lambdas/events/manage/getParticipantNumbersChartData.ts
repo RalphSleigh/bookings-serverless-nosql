@@ -21,6 +21,13 @@ export const lambdaHandler = lambda_wrapper_json(
         const bookings = await BookingModel.find({ sk: { begins: `event:${lambda_event.pathParameters?.id}` } }) as [BookingType]
         //ts-ignore
         const filteredBookings = filterDataByRoles(event, bookings, current_user!)
+        const countPerUser = filteredBookings.reduce((acc, b) => {
+            if (b.deleted) return acc
+            const userId = b.userId
+            if (!acc[userId]) acc[userId] = 1
+            acc[userId] += 1
+            return acc
+        },{} as Record<string, number>)
         const timelineBookings = filteredBookings
         .filter(b => b.version !== "latest")
         .sort((a, b) => Date.parse(b.version) - Date.parse(a.version))
@@ -39,6 +46,6 @@ export const lambdaHandler = lambda_wrapper_json(
             })
             participantTotals.push({ day, total: latestBookingsBeforeTimestamp.filter(b=> !b.deleted).reduce((acc, b) => acc + b.participants.length, 0) })
         }
-        return { participantTotals };
+        return { participantTotals, countPerUser };
     }
 )
