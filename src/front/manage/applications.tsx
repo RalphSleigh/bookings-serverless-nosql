@@ -81,9 +81,11 @@ export function Component() {
       if (!user) return null;
       return (
         <TableRow key={i}>
-          <TableCell>
+          <TableCell sx={{width: 34}}>
             <Tooltip title={`${user.userName} ${user.email}`}>
+              <Box>
               <WoodcraftAvatar user={user} />
+              </Box>
             </Tooltip>
           </TableCell>
           <TableCell>{applicationTypeIcon(a.bookingType)}</TableCell>
@@ -119,9 +121,11 @@ export function Component() {
       if (!user) return null;
       return (
         <TableRow key={i}>
-          <TableCell>
-            <Tooltip title={`${user.userName} ${user.email}`}>
+          <TableCell sx={{width: 34}}>
+          <Tooltip title={`${user.userName} ${user.email}`}>
+              <Box>
               <WoodcraftAvatar user={user} />
+              </Box>
             </Tooltip>
           </TableCell>
           <TableCell>{applicationTypeIcon(a.bookingType)}</TableCell>
