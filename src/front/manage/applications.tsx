@@ -49,11 +49,13 @@ import { applicationTypeIcon } from "./utils.js";
 import { application } from "express";
 import format from "date-fns/format";
 import { parseISO } from "date-fns";
+import { WoodcraftAvatar } from "./manageUtils.js";
 
 export function Component() {
   const { event, bookings } = useOutletContext<managePageContext>();
-
-  const [roleData, applicationsData] = useSuspenseQueries<[eventRolesQueryType, eventApplicationsQueryType]>({ queries: [eventRolesQuery(event.id), eventApplicationsQuery(event.id)] });
+  const [userData, roleData, applicationsData] = useSuspenseQueries<[allUsersQueryType, eventRolesQueryType, eventApplicationsQueryType]>({
+    queries: [allUsersQuery(event.id), eventRolesQuery(event.id), eventApplicationsQuery(event.id)],
+  });
   const applicationSheetsNumbers = useEventApplicationsSheetsNumberQuery(event.id);
   const applicationOperation = useApplicationOperation(event.id);
 
@@ -72,18 +74,24 @@ export function Component() {
   };
 
   const applicationRows = waitingApplications
-    .sort((a, b) => (a.created || "").localeCompare(b.created || ""))
+    .sort((a, b) => (b.created || "").localeCompare(a.created || ""))
     .map((a, i) => {
+      const user = userData.data?.users.find((u) => u.id === a.userId);
+      if (!user) return null;
       return (
         <TableRow key={i}>
           <TableCell>{applicationTypeIcon(a.bookingType)}</TableCell>
+          <TableCell>
+            {" "}
+            <WoodcraftAvatar user={user} />
+          </TableCell>
           <TableCell>{a.name}</TableCell>
           <TableCell>
             <a href={`mailto:${a.email}`}>{a.email}</a>
           </TableCell>
           <TableCell>{a.district}</TableCell>
           <TableCell>{a.predictedParticipants}</TableCell>
-          <TableCell>{format(parseISO(a.created!), 'do MMMM yyyy')}</TableCell>
+          <TableCell>{format(parseISO(a.created!), "do MMMM yyyy")}</TableCell>
           <TableCell>
             <Button variant="contained" disabled={applicationOperation.isPending} onClick={() => approve(a.userId)}>
               Approve
@@ -105,10 +113,15 @@ export function Component() {
     .map((a, i) => {
       const booking = filteredBookings.find((b) => b.userId === a.userId);
       total += Math.max(a.predictedParticipants, booking?.participants.length || 0);
-
+      const user = userData.data?.users.find((u) => u.id === a.userId);
+      if (!user) return null;
       return (
         <TableRow key={i}>
           <TableCell>{applicationTypeIcon(a.bookingType)}</TableCell>
+          <TableCell>
+            {" "}
+            <WoodcraftAvatar user={user} />
+          </TableCell>
           <TableCell>{a.name}</TableCell>
           <TableCell>
             <a href={`mailto:${a.email}`}>{a.email}</a>
@@ -129,6 +142,9 @@ export function Component() {
           <TableHead>
             <TableRow>
               <TableCell></TableCell>
+              <TableCell>
+                <strong>User</strong>
+              </TableCell>
               <TableCell>
                 <strong>Name</strong>
               </TableCell>
@@ -160,6 +176,9 @@ export function Component() {
           <TableHead>
             <TableRow>
               <TableCell></TableCell>
+              <TableCell>
+                <strong>User</strong>
+              </TableCell>
               <TableCell>
                 <strong>Name</strong>
               </TableCell>
