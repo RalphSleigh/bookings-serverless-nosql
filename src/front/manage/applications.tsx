@@ -40,6 +40,7 @@ import {
   TableHead,
   TableRow,
   TextField,
+  Tooltip,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -80,11 +81,12 @@ export function Component() {
       if (!user) return null;
       return (
         <TableRow key={i}>
-          <TableCell>{applicationTypeIcon(a.bookingType)}</TableCell>
           <TableCell>
-            {" "}
-            <WoodcraftAvatar user={user} />
+            <Tooltip title={`${user.userName} ${user.email}`}>
+              <WoodcraftAvatar user={user} />
+            </Tooltip>
           </TableCell>
+          <TableCell>{applicationTypeIcon(a.bookingType)}</TableCell>
           <TableCell>{a.name}</TableCell>
           <TableCell>
             <a href={`mailto:${a.email}`}>{a.email}</a>
@@ -117,11 +119,12 @@ export function Component() {
       if (!user) return null;
       return (
         <TableRow key={i}>
-          <TableCell>{applicationTypeIcon(a.bookingType)}</TableCell>
           <TableCell>
-            {" "}
-            <WoodcraftAvatar user={user} />
+            <Tooltip title={`${user.userName} ${user.email}`}>
+              <WoodcraftAvatar user={user} />
+            </Tooltip>
           </TableCell>
+          <TableCell>{applicationTypeIcon(a.bookingType)}</TableCell>
           <TableCell>{a.name}</TableCell>
           <TableCell>
             <a href={`mailto:${a.email}`}>{a.email}</a>
@@ -142,9 +145,7 @@ export function Component() {
           <TableHead>
             <TableRow>
               <TableCell></TableCell>
-              <TableCell>
-                <strong>User</strong>
-              </TableCell>
+              <TableCell></TableCell>
               <TableCell>
                 <strong>Name</strong>
               </TableCell>
@@ -176,9 +177,7 @@ export function Component() {
           <TableHead>
             <TableRow>
               <TableCell></TableCell>
-              <TableCell>
-                <strong>User</strong>
-              </TableCell>
+              <TableCell></TableCell>
               <TableCell>
                 <strong>Name</strong>
               </TableCell>
