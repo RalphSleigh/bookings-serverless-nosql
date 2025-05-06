@@ -56,7 +56,7 @@ export function BookingForm({ data, originalData, event, user, update, submit, m
                 <form>
                     <Typography variant="h4">{`Booking for ${event.name}`}</Typography>
                     {readOnly ? <Alert variant="outlined" severity="warning" sx={{ mt: 2, pt: 2 }}>
-                        <AlertTitle>This view read-only</AlertTitle>
+                        <AlertTitle>This view is read-only</AlertTitle>
                         As the deadline has passed you can no longer update your booking. If you need to make changes please contact the camp team at <a href="mailto:info@camp100.org.uk">info@camp100.org.uk</a> and they can make the changes or allow you to edit it yourself.
                     </Alert> : null}
                     <BasicFields data={data.basic} update={updateSubField} readOnly={readOnly} />
