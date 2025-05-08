@@ -23,13 +23,13 @@ import {
   Typography,
 } from "@mui/material";
 import { JsonBookingWithExtraType, JsonParticipantWithExtraType } from "../../shared/computedDataTypes.js";
-import { Close, ContentCopy, Email } from "@mui/icons-material";
+import { Close, ContentCopy, Email, StackedBarChart } from "@mui/icons-material";
 import { getMemoUpdateFunctions } from "../../shared/util.js";
 import { eventRolesQuery, useBookingOperation, useEventOperation } from "../queries.js";
 import { applicationTypeIcon } from "./utils.js";
 import { groupParticipants } from "../../shared/woodcraft.js";
 import { JsonEventType } from "../../lambda-common/onetable.js";
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 const AddVillageWidget: React.FC<{ event: JsonEventType }> = ({ event }) => {
   const [newVillage, setNewVillage] = useState({ name: "", town: "" });
@@ -132,7 +132,7 @@ export function Component() {
           </Grid>
           <Grid item xs={4}>
             <ResponsiveContainer width="100%" aspect={1}>
-              <AreaChart
+              <BarChart
                 width={100}
                 height={100}
                 data={data}
@@ -147,9 +147,9 @@ export function Component() {
                 <XAxis dataKey="name" tick={{dy: 7 }} />
                 <YAxis tickCount={2}/>
                 <Tooltip />
-                <Area type="monotone" dataKey="u16" stackId="1" stroke="#8884d8" fill="#8884d8" />
-                <Area type="monotone" dataKey="o16" stackId="1" stroke="#82ca9d" fill="#82ca9d" />
-              </AreaChart>
+                <Bar type="monotone" dataKey="u16" stackId="1" stroke="#8884d8" fill="#8884d8" />
+                <Bar type="monotone" dataKey="o16" stackId="1" stroke="#82ca9d" fill="#82ca9d" />
+              </BarChart>
             </ResponsiveContainer>
           </Grid>
           <Grid item xs={8}>
@@ -166,7 +166,7 @@ export function Component() {
               </Table>
             </TableContainer>
             <Typography variant="body1" sx={{ mt: 1 }} color={(t) => (participants.length < 80 ? t.palette.success.main : participants.length < 90 ? t.palette.warning.main : t.palette.error.main)}>
-              Total: {participants.length} {totalsString}
+              <b>Total: {participants.length}</b> - {totalsString}
             </Typography>
           </Grid>
         </Grid>
