@@ -23,13 +23,56 @@ import {
   Typography,
 } from "@mui/material";
 import { JsonBookingWithExtraType, JsonParticipantWithExtraType } from "../../shared/computedDataTypes.js";
-import { Close, ContentCopy, Email, StackedBarChart } from "@mui/icons-material";
+import { Close, ContentCopy, Edit, Email, StackedBarChart } from "@mui/icons-material";
 import { getMemoUpdateFunctions } from "../../shared/util.js";
 import { eventRolesQuery, useBookingOperation, useEventOperation } from "../queries.js";
 import { applicationTypeIcon } from "./utils.js";
 import { groupParticipants } from "../../shared/woodcraft.js";
-import { JsonEventType } from "../../lambda-common/onetable.js";
+import { JsonBookingType, JsonEventType, JsonParticipantType } from "../../lambda-common/onetable.js";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+
+const TownsSummary: React.FC<{ event: JsonEventType; bookings: JsonBookingType[] }> = ({ event, bookings }) => {
+  const towns = new Set<string>();
+  event.villages?.forEach((v) => {
+    towns.add(v.town);
+  });
+  const rows = Array.from(towns).map((town, i) => {
+    const villagesInTown = event.villages?.filter((v) => v.town === town).map((v) => v.name);
+    const bookingsInTown = bookings.filter((b) => villagesInTown?.includes(b.village || "") && !b.deleted);
+    const participants = bookingsInTown.reduce<JsonParticipantType[]>((a, c) => {
+      return [...a, ...c.participants];
+    }, []);
+
+    return (
+      <TableRow key={i}>
+        <TableCell>{town}</TableCell>
+        <TableCell>{villagesInTown?.length}</TableCell>
+        <TableCell>{participants.length}</TableCell>
+      </TableRow>
+    );
+  });
+
+  return (
+    <TableContainer component={Paper}>
+      <Table size="small">
+        <TableHead>
+          <TableRow>
+            <TableCell>
+              <b>Town</b>
+            </TableCell>
+            <TableCell>
+              <b>Villages</b>
+            </TableCell>
+            <TableCell>
+              <b>Participants</b>
+            </TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>{rows}</TableBody>
+      </Table>
+    </TableContainer>
+  );
+};
 
 const AddVillageWidget: React.FC<{ event: JsonEventType }> = ({ event }) => {
   const [newVillage, setNewVillage] = useState({ name: "", town: "" });
@@ -76,103 +119,118 @@ export function Component() {
     bookingOperation.mutate({ eventId: event.id, userId: userId, operation: { type: "unassignVillage", village: e.target.value } });
   };
 
-  const rows = event.villages?.map((v, i) => {
-    const bookingsInVillage = rawBookings.filter((b) => b.village === v.name && !b.deleted);
-    const participants = bookingsInVillage.reduce<JsonParticipantWithExtraType[]>((a, c) => {
-      return [...a, ...c.participants];
-    }, []);
-    const totalsString = groupParticipants(participants, event)
-      .filter((g) => g.participants.length > 0)
-      .map((g) => `${g.group.name}: ${g.participants.length}`)
-      .join(", ");
+  const rows = event.villages
+    ?.sort((a, b) => `${a.town} ${a.name}`.localeCompare(`${b.town} ${b.name}`))
+    .map((v, i) => {
+      const bookingsInVillage = rawBookings.filter((b) => b.village === v.name && !b.deleted);
+      const participants = bookingsInVillage.reduce<JsonParticipantWithExtraType[]>((a, c) => {
+        return [...a, ...c.participants];
+      }, []);
+      const totalsString = groupParticipants(participants, event)
+        .filter((g) => g.participants.length > 0)
+        .map((g) => `${g.group.name}: ${g.participants.length}`)
+        .join(", ");
 
-    const over16firstThree = participants.filter((p) => p.age >= 16 && (p.attendance.option === 0 || p.attendance.option === 1)).length;
-    const under16firstThree = participants.filter((p) => p.age < 16 && (p.attendance.option === 0 || p.attendance.option === 1)).length;
+      const over16firstThree = participants.filter((p) => p.age >= 16 && (p.attendance.option === 0 || p.attendance.option === 1)).length;
+      const under16firstThree = participants.filter((p) => p.age < 16 && (p.attendance.option === 0 || p.attendance.option === 1)).length;
 
-    const over16lastSeven = participants.filter((p) => p.age >= 16 && (p.attendance.option === 0 || p.attendance.option === 2)).length;
-    const under16lastSeven = participants.filter((p) => p.age < 16 && (p.attendance.option === 0 || p.attendance.option === 2)).length;
+      const over16lastSeven = participants.filter((p) => p.age >= 16 && (p.attendance.option === 0 || p.attendance.option === 2)).length;
+      const under16lastSeven = participants.filter((p) => p.age < 16 && (p.attendance.option === 0 || p.attendance.option === 2)).length;
 
-    const data = [
-      {
-        name: "First 3",
-        u16: under16firstThree,
-        o16: over16firstThree,
-      },
-      {
-        name: "Last 7",
-        u16: under16lastSeven,
-        o16: over16lastSeven,
-      },
-    ];
+      const data = [
+        {
+          name: "First 3",
+          u16: under16firstThree,
+          o16: over16firstThree,
+        },
+        {
+          name: "Last 7",
+          u16: under16lastSeven,
+          o16: over16lastSeven,
+        },
+      ];
 
-    const tableRows = bookingsInVillage.map((b, i) => {
+      const renameVillage = (e) => {
+        const newName = prompt("Enter new village name", v.name);
+        const newTownName = prompt("Enter new town name", v.name);
+        if (newName) {
+          eventOperation.mutate({ operation: { type: "renameVillage", oldName: v.name, newName: newName, newTownName: newTownName } });
+        }
+      };
+
+      const tableRows = bookingsInVillage.map((b, i) => {
+        return (
+          <TableRow key={i}>
+            <TableCell>{b.basic.bookingType === "group" ? b.basic.district : b.basic.contactName}</TableCell>
+            <TableCell>{b.participants.length}</TableCell>
+            <TableCell>
+              <IconButton disabled={bookingOperation.isPending} onClick={unassignVillage(b.userId)} color="warning">
+                <Close />
+              </IconButton>
+            </TableCell>
+          </TableRow>
+        );
+      });
+
       return (
-        <TableRow key={i}>
-          <TableCell>{b.basic.bookingType === "group" ? b.basic.district : b.basic.contactName}</TableCell>
-          <TableCell>{b.participants.length}</TableCell>
-          <TableCell>
-            <IconButton disabled={bookingOperation.isPending} onClick={unassignVillage(b.userId)} color="warning">
-              <Close />
-            </IconButton>
-          </TableCell>
-        </TableRow>
+        <Paper sx={{ p: 2, mb: 2 }} key={i}>
+          <Grid container spacing={2} p={0} key={i}>
+            <Grid item xs={12}>
+              <IconButton sx={{ float: "right" }} disabled={eventOperation.isPending} color="warning" onClick={removeVillage(v.name)} className="hidden-button">
+                <Close />
+              </IconButton>
+              <Stack alignItems="center" gap={1} direction="row">
+                <Typography variant="h5" sx={{ mb: 2, mt: 2 }}>
+                  {v.name} - {v.town}
+                </Typography>
+                <IconButton disabled={eventOperation.isPending} color="warning" onClick={renameVillage} className="hidden-button">
+                  <Edit />
+                </IconButton>
+              </Stack>
+            </Grid>
+            <Grid item xs={4}>
+              <ResponsiveContainer width="100%" aspect={1}>
+                <BarChart
+                  width={100}
+                  height={100}
+                  data={data}
+                  margin={{
+                    top: 0,
+                    right: 0,
+                    left: -20,
+                    bottom: 0,
+                  }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" tick={{ dy: 7 }} />
+                  <YAxis tickCount={2} />
+                  <Tooltip />
+                  <Bar type="monotone" dataKey="u16" stackId="1" stroke="#8884d8" fill="#8884d8" />
+                  <Bar type="monotone" dataKey="o16" stackId="1" stroke="#82ca9d" fill="#82ca9d" />
+                </BarChart>
+              </ResponsiveContainer>
+            </Grid>
+            <Grid item xs={8}>
+              <TableContainer component={Paper}>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Group</TableCell>
+                      <TableCell>Participants</TableCell>
+                      <TableCell>Unassign</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>{tableRows}</TableBody>
+                </Table>
+              </TableContainer>
+              <Typography variant="body1" sx={{ mt: 1 }} color={(t) => (participants.length < 80 ? t.palette.success.main : participants.length < 90 ? t.palette.warning.main : t.palette.error.main)}>
+                <b>Total: {participants.length}</b> - {totalsString}
+              </Typography>
+            </Grid>
+          </Grid>
+        </Paper>
       );
     });
-
-    return (
-      <Paper sx={{ p: 2, mb: 2 }} key={i}>
-        <Grid container spacing={2} p={2} key={i}>
-          <Grid item xs={12}>
-            <IconButton sx={{ float: "right" }} disabled={eventOperation.isPending} color="warning" onClick={removeVillage(v.name)} className="hidden-button">
-              <Close />
-            </IconButton>
-            <Typography variant="h5" sx={{ mb: 2 }}>
-              {v.name} - {v.town}
-            </Typography>
-          </Grid>
-          <Grid item xs={4}>
-            <ResponsiveContainer width="100%" aspect={1}>
-              <BarChart
-                width={100}
-                height={100}
-                data={data}
-                margin={{
-                  top: 0,
-                  right: 0,
-                  left: -20,
-                  bottom: 0,
-                }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" tick={{dy: 7 }} />
-                <YAxis tickCount={2}/>
-                <Tooltip />
-                <Bar type="monotone" dataKey="u16" stackId="1" stroke="#8884d8" fill="#8884d8" />
-                <Bar type="monotone" dataKey="o16" stackId="1" stroke="#82ca9d" fill="#82ca9d" />
-              </BarChart>
-            </ResponsiveContainer>
-          </Grid>
-          <Grid item xs={8}>
-            <TableContainer component={Paper}>
-              <Table size="small">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Group</TableCell>
-                    <TableCell>Participants</TableCell>
-                    <TableCell>Unassign</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>{tableRows}</TableBody>
-              </Table>
-            </TableContainer>
-            <Typography variant="body1" sx={{ mt: 1 }} color={(t) => (participants.length < 80 ? t.palette.success.main : participants.length < 90 ? t.palette.warning.main : t.palette.error.main)}>
-              <b>Total: {participants.length}</b> - {totalsString}
-            </Typography>
-          </Grid>
-        </Grid>
-      </Paper>
-    );
-  });
 
   const menuItems = event.villages?.map((v, i) => {
     return (
@@ -220,6 +278,9 @@ export function Component() {
   return (
     <Grid container spacing={2} p={2}>
       <AddVillageWidget event={event} />
+      <Grid item xs={12}>
+        <TownsSummary event={event} bookings={rawBookings} />
+      </Grid>
       <Grid item xs={4}>
         {bookingVillages}
       </Grid>
