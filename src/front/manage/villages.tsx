@@ -205,7 +205,7 @@ export function Component() {
                     strokeDasharray="3 3"
                     vertical={false}
                     horizontalCoordinatesGenerator={({ yAxis, width, height, offset }) => {
-                      const heightPerTen = (offset.height! / (yAxis.domain[1] - yAxis.domain[0])) * 10;
+                      const heightPerTen = (offset.height! / yAxis.niceTicks[1]) * 10;
                       const lines = [];
                       let i = offset.height!;
                       while (i > 0) {
