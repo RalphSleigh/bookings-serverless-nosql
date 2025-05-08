@@ -152,8 +152,8 @@ export function Component() {
 
       const renameVillage = (e) => {
         const newName = prompt("Enter new village name", v.name);
-        const newTownName = prompt("Enter new town name", v.name);
-        if (newName) {
+        const newTownName = prompt("Enter new town name", v.town);
+        if (newName && newTownName) {
           eventOperation.mutate({ operation: { type: "renameVillage", oldName: v.name, newName: newName, newTownName: newTownName } });
         }
       };
