@@ -134,6 +134,7 @@ export function Component() {
             <a href={`mailto:${a.email}`}>{a.email}</a>
           </TableCell>
           <TableCell>{a.district}</TableCell>
+          <TableCell>{format(parseISO(a.created!), "do MMMM yyyy")}</TableCell>
           <TableCell>{a.predictedParticipants}</TableCell>
           <TableCell>{booking ? booking.participants.length : ""}</TableCell>
           <TableCell>{applicationSheetsNumbers.isSuccess ? (applicationSheetsNumbers.data[a.userId] === 0 ? "" : applicationSheetsNumbers.data[a.userId]) : "Loading"}</TableCell>
@@ -190,6 +191,9 @@ export function Component() {
               </TableCell>
               <TableCell>
                 <strong>Group/District</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Created</strong>
               </TableCell>
               <TableCell>
                 <strong>Predicted</strong>
