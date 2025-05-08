@@ -413,6 +413,9 @@ export function useEventOperation(eventId) {
                 queryClient.invalidateQueries({
                     queryKey: ['events']
                 })
+                queryClient.invalidateQueries({
+                    queryKey: ['manage']
+                })
                 setSnackbar({ message: data.message, severity: 'success' })
             },
             onError: snackbarError(setSnackbar)

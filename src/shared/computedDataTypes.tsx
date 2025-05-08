@@ -66,4 +66,11 @@ type RemoveVillageType = {
     name: string
 }
 
-export type EventOperationType = AddVillageType | RemoveVillageType
+type RenameVillageType = {
+    type: "renameVillage",
+    oldName: string
+    newName: string
+    newTownName: string
+}
+
+export type EventOperationType = AddVillageType | RemoveVillageType | RenameVillageType

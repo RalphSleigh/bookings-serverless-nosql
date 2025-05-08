@@ -40,6 +40,7 @@ import {
   TableHead,
   TableRow,
   TextField,
+  Tooltip,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -49,11 +50,13 @@ import { applicationTypeIcon } from "./utils.js";
 import { application } from "express";
 import format from "date-fns/format";
 import { parseISO } from "date-fns";
+import { WoodcraftAvatar } from "./manageUtils.js";
 
 export function Component() {
   const { event, bookings } = useOutletContext<managePageContext>();
-
-  const [roleData, applicationsData] = useSuspenseQueries<[eventRolesQueryType, eventApplicationsQueryType]>({ queries: [eventRolesQuery(event.id), eventApplicationsQuery(event.id)] });
+  const [userData, roleData, applicationsData] = useSuspenseQueries<[allUsersQueryType, eventRolesQueryType, eventApplicationsQueryType]>({
+    queries: [allUsersQuery(event.id), eventRolesQuery(event.id), eventApplicationsQuery(event.id)],
+  });
   const applicationSheetsNumbers = useEventApplicationsSheetsNumberQuery(event.id);
   const applicationOperation = useApplicationOperation(event.id);
 
@@ -72,10 +75,19 @@ export function Component() {
   };
 
   const applicationRows = waitingApplications
-    .sort((a, b) => (a.created || "").localeCompare(b.created || ""))
+    .sort((a, b) => (b.created || "").localeCompare(a.created || ""))
     .map((a, i) => {
+      const user = userData.data?.users.find((u) => u.id === a.userId);
+      if (!user) return null;
       return (
         <TableRow key={i}>
+          <TableCell sx={{width: 34}}>
+            <Tooltip title={`${user.userName} ${user.email}`}>
+              <Box>
+              <WoodcraftAvatar user={user} />
+              </Box>
+            </Tooltip>
+          </TableCell>
           <TableCell>{applicationTypeIcon(a.bookingType)}</TableCell>
           <TableCell>{a.name}</TableCell>
           <TableCell>
@@ -83,7 +95,7 @@ export function Component() {
           </TableCell>
           <TableCell>{a.district}</TableCell>
           <TableCell>{a.predictedParticipants}</TableCell>
-          <TableCell>{format(parseISO(a.created!), 'do MMMM yyyy')}</TableCell>
+          <TableCell>{format(parseISO(a.created!), "do MMMM yyyy")}</TableCell>
           <TableCell>
             <Button variant="contained" disabled={applicationOperation.isPending} onClick={() => approve(a.userId)}>
               Approve
@@ -105,15 +117,24 @@ export function Component() {
     .map((a, i) => {
       const booking = filteredBookings.find((b) => b.userId === a.userId);
       total += Math.max(a.predictedParticipants, booking?.participants.length || 0);
-
+      const user = userData.data?.users.find((u) => u.id === a.userId);
+      if (!user) return null;
       return (
         <TableRow key={i}>
+          <TableCell sx={{width: 34}}>
+          <Tooltip title={`${user.userName} ${user.email}`}>
+              <Box>
+              <WoodcraftAvatar user={user} />
+              </Box>
+            </Tooltip>
+          </TableCell>
           <TableCell>{applicationTypeIcon(a.bookingType)}</TableCell>
           <TableCell>{a.name}</TableCell>
           <TableCell>
             <a href={`mailto:${a.email}`}>{a.email}</a>
           </TableCell>
           <TableCell>{a.district}</TableCell>
+          <TableCell>{format(parseISO(a.created!), "do MMMM yyyy")}</TableCell>
           <TableCell>{a.predictedParticipants}</TableCell>
           <TableCell>{booking ? booking.participants.length : ""}</TableCell>
           <TableCell>{applicationSheetsNumbers.isSuccess ? (applicationSheetsNumbers.data[a.userId] === 0 ? "" : applicationSheetsNumbers.data[a.userId]) : "Loading"}</TableCell>
@@ -128,6 +149,7 @@ export function Component() {
         <Table size="small">
           <TableHead>
             <TableRow>
+              <TableCell></TableCell>
               <TableCell></TableCell>
               <TableCell>
                 <strong>Name</strong>
@@ -160,6 +182,7 @@ export function Component() {
           <TableHead>
             <TableRow>
               <TableCell></TableCell>
+              <TableCell></TableCell>
               <TableCell>
                 <strong>Name</strong>
               </TableCell>
@@ -168,6 +191,9 @@ export function Component() {
               </TableCell>
               <TableCell>
                 <strong>Group/District</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Created</strong>
               </TableCell>
               <TableCell>
                 <strong>Predicted</strong>
