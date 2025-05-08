@@ -62,7 +62,7 @@ export const lambdaHandler = lambda_wrapper_json(
                         return { message: "Village assigned" }
                     case "unassignVillage":
                         CanManageVillages.throw({ user: current_user, event: event })
-                        await addVersionToBooking(event as EventType, booking as BookingType, { village: undefined })
+                        await addVersionToBooking(event as EventType, booking as BookingType, { village: "" })
                         return { message: "Village unassigned" }
                     default:
                         throw new Error("Invalid operation")
