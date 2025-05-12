@@ -343,7 +343,7 @@ export function Component() {
       return (
         <Paper sx={{ p: 2, mb: 2 }} key={i}>
           <Stack alignItems="center" gap={1} direction="row">
-            <Typography variant="h6">{a.district}</Typography>
+            <Typography variant="h6">{a.name} - {a.district}</Typography>
             {applicationTypeIcon(a.bookingType)}
           </Stack>
           <Typography sx={{ mt: 1 }} variant="body2">
