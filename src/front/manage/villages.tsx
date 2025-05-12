@@ -129,7 +129,7 @@ export function Component() {
   };
 
   const rows = event.villages
-    ?.sort((a, b) => `${a.town} ${a.name}`.localeCompare(`${b.town} ${b.name}`))
+    ?.sort((a, b) => `${a.name} ${a.town}`.localeCompare(`${b.name} ${b.town}`))
     .map((v, i) => {
       const bookingsInVillage = rawBookings.filter((b) => b.village === v.name && !b.deleted);
       const participants = bookingsInVillage.reduce<JsonParticipantWithExtraType[]>((a, c) => {
