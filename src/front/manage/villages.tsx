@@ -82,7 +82,7 @@ const AddVillageWidget: React.FC<{ event: JsonEventType }> = ({ event }) => {
   const eventOperation = useEventOperation(event.id);
 
   const submit = (e) => {
-    eventOperation.mutate({ operation: { type: "addVillage", name: newVillage.name, town: newVillage.town } });
+    eventOperation.mutate({ operation: { type: "addVillage", name: newVillage.name.trim(), town: newVillage.town.trim() } });
     e.preventDefault();
   };
 
@@ -172,10 +172,12 @@ export function Component() {
           alert("Village name already exists");
           return
         }
-        
+
+        if(!newName) return;
+
         const newTownName = prompt("Enter new town name", v.town);
         if (newName && newTownName) {
-          eventOperation.mutate({ operation: { type: "renameVillage", oldName: v.name, newName: newName, newTownName: newTownName } });
+          eventOperation.mutate({ operation: { type: "renameVillage", oldName: v.name, newName: newName.trim(), newTownName: newTownName.trim() } });
         }
       };
 
