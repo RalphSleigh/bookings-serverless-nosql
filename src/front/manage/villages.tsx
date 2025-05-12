@@ -29,7 +29,7 @@ import { eventApplicationsQuery, eventApplicationsQueryType, eventRolesQuery, ev
 import { applicationTypeIcon } from "./utils.js";
 import { groupParticipants } from "../../shared/woodcraft.js";
 import { JsonBookingType, JsonEventType, JsonParticipantType } from "../../lambda-common/onetable.js";
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, LabelList, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { useSuspenseQueries } from "@tanstack/react-query";
 
 const TownsSummary: React.FC<{ event: JsonEventType; bookings: JsonBookingType[] }> = ({ event, bookings }) => {
@@ -263,7 +263,12 @@ export function Component() {
                   <Tooltip />
                   <Bar type="monotone" dataKey="applied" stackId="1" stroke="#ffcaca" fill="#ffcaca" />
                   <Bar type="monotone" dataKey="u16" stackId="1" stroke="#8884d8" fill="#8884d8" />
-                  <Bar type="monotone" dataKey="o16" stackId="1" stroke="#82ca9d" fill="#82ca9d" />
+                  <Bar type="monotone" dataKey="o16" stackId="1" stroke="#82ca9d" fill="#82ca9d">
+                    <LabelList
+                      position="top"
+                      valueAccessor={entry => entry.o16 + entry.u16 + entry.applied} 
+                    />
+                    </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </Grid>
