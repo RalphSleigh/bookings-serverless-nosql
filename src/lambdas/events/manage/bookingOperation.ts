@@ -20,6 +20,7 @@ export const lambdaHandler = lambda_wrapper_json(
             const booking = await BookingModel.get({ eventId: lambda_event.pathParameters?.id, userId: lambda_event.pathParameters?.userId, version: "latest" })
             if (booking) {
                 const operation: BookingOperationType = lambda_event.body.operation
+                console.log("Operation", JSON.stringify(operation))
                 switch (operation.type) {
                     case "addPayment":
                         CanWriteMoney.throw({ user: current_user, event: event })

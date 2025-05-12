@@ -16,6 +16,7 @@ export const lambdaHandler = lambda_wrapper_json(
         const event = await EventModel.get({ id: lambda_event.pathParameters?.id })
         if (event && current_user) {
                 const operation: EventOperationType = lambda_event.body.operation
+                console.log("Operation", JSON.stringify(operation))
                 switch (operation.type) {
                     case "addVillage":
                         CanManageVillages.throw({ user: current_user, event: event })
