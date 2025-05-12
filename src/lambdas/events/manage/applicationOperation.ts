@@ -21,6 +21,7 @@ export const lambdaHandler = lambda_wrapper_json(
             const appliction = await ApplicationModel.get({ eventId: event.id, userId: operation.userId })
             if (!appliction) throw new Error("Can't find application")
             CanManageApplications.throw({ user: current_user, event: event })
+            console.log("Operation", JSON.stringify(operation))
             switch (operation.type) {
                 case "approveApplication":
                     const maybeRole = await RoleModel.find({ userId: operation.userId, eventId: event.id, role: "Book" })
