@@ -168,6 +168,11 @@ export function Component() {
 
       const renameVillage = (e) => {
         const newName = prompt("Enter new village name", v.name);
+        if(event.villages?.find(v => v.name === newName)) {
+          alert("Village name already exists");
+          return
+        }
+        
         const newTownName = prompt("Enter new town name", v.town);
         if (newName && newTownName) {
           eventOperation.mutate({ operation: { type: "renameVillage", oldName: v.name, newName: newName, newTownName: newTownName } });
