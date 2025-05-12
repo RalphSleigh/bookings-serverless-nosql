@@ -334,6 +334,9 @@ export function Component() {
           <Typography sx={{ mt: 1 }} variant="body2">
             {b.camping?.accessibilityNeeds}
           </Typography>
+          {b.village && b.village !== "" ? <Typography sx={{ mt: 1 }} variant="body2">
+            "{b.village}"
+          </Typography>: null}
           <FormControl fullWidth sx={{ mt: 2 }}>
             <InputLabel id={`select-village-${i}`}>Village</InputLabel>
             <Select value="" label="Villages" onChange={assignVillage(b.userId)} labelId={`select-village-${i}`} disabled={bookingOperation.isPending}>
