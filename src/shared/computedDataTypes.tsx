@@ -53,7 +53,13 @@ type DeclineApplicationType = {
     userId: string
 }
 
-export type ApplicationOperationType = ApproveApplicationType | DeclineApplicationType
+type AssignVillageToApplication = {
+    type: "assignVillageToApplication"
+    userId: string
+    village: string
+}
+
+export type ApplicationOperationType = ApproveApplicationType | DeclineApplicationType | AssignVillageToApplication
 
 type AddVillageType = {
     type: "addVillage",

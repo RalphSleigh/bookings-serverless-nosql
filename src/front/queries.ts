@@ -391,10 +391,7 @@ export function useApplicationOperation(eventId) {
             mutationFn: async data => (await axios.post(`/api/event/${eventId}/manage/application/${data.userId}/operation`, { operation: data.operation })).data,
             onSuccess: (data) => {
                 queryClient.invalidateQueries({
-                    queryKey: ['manage', eventId, 'applications']
-                })
-                queryClient.invalidateQueries({
-                    queryKey: ['manage', eventId, 'roles']
+                    queryKey: ['manage', eventId]
                 })
                 setSnackbar({ message: data.message, severity: 'success' })
             },

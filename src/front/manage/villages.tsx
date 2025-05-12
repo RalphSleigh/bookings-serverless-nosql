@@ -25,11 +25,12 @@ import {
 import { JsonBookingWithExtraType, JsonParticipantWithExtraType } from "../../shared/computedDataTypes.js";
 import { Close, ContentCopy, Edit, Email, StackedBarChart } from "@mui/icons-material";
 import { getMemoUpdateFunctions } from "../../shared/util.js";
-import { eventRolesQuery, useBookingOperation, useEventOperation } from "../queries.js";
+import { eventApplicationsQuery, eventApplicationsQueryType, eventRolesQuery, eventRolesQueryType, useApplicationOperation, useBookingOperation, useEventOperation } from "../queries.js";
 import { applicationTypeIcon } from "./utils.js";
 import { groupParticipants } from "../../shared/woodcraft.js";
 import { JsonBookingType, JsonEventType, JsonParticipantType } from "../../lambda-common/onetable.js";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { useSuspenseQueries } from "@tanstack/react-query";
 
 const TownsSummary: React.FC<{ event: JsonEventType; bookings: JsonBookingType[] }> = ({ event, bookings }) => {
   const towns = new Set<string>();
@@ -107,6 +108,14 @@ const AddVillageWidget: React.FC<{ event: JsonEventType }> = ({ event }) => {
 export function Component() {
   const { event, bookings: rawBookings, displayDeleted } = useOutletContext<managePageContext>();
 
+  const [roleData, applicationsData] = useSuspenseQueries<[eventRolesQueryType, eventApplicationsQueryType]>({
+    queries: [eventRolesQuery(event.id), eventApplicationsQuery(event.id)],
+  });
+
+  const applicationOperation = useApplicationOperation(event.id);
+
+  const waitingApplications = applicationsData.data.applications.filter((a) => rawBookings.find((b) => b.userId === a.userId) === undefined);
+
   const eventOperation = useEventOperation(event.id);
   const bookingOperation = useBookingOperation();
 
@@ -126,10 +135,15 @@ export function Component() {
       const participants = bookingsInVillage.reduce<JsonParticipantWithExtraType[]>((a, c) => {
         return [...a, ...c.participants];
       }, []);
+
+      const applicationsInVillage = waitingApplications.filter((a) => a.village === v.name);
+
       const totalsString = groupParticipants(participants, event)
         .filter((g) => g.participants.length > 0)
         .map((g) => `${g.group.name}: ${g.participants.length}`)
         .join(", ");
+
+      const appliedTotal = applicationsInVillage.reduce((a, c) => a + c.predictedParticipants, 0);
 
       const over16firstThree = participants.filter((p) => p.age >= 16 && (p.attendance.option === 0 || p.attendance.option === 1)).length;
       const under16firstThree = participants.filter((p) => p.age < 16 && (p.attendance.option === 0 || p.attendance.option === 1)).length;
@@ -142,11 +156,13 @@ export function Component() {
           name: "First 3",
           u16: under16firstThree,
           o16: over16firstThree,
+          applied: appliedTotal,
         },
         {
           name: "Last 7",
           u16: under16lastSeven,
           o16: over16lastSeven,
+          applied: appliedTotal,
         },
       ];
 
@@ -165,6 +181,26 @@ export function Component() {
             <TableCell>{b.participants.length}</TableCell>
             <TableCell>
               <IconButton disabled={bookingOperation.isPending} onClick={unassignVillage(b.userId)} color="warning">
+                <Close />
+              </IconButton>
+            </TableCell>
+          </TableRow>
+        );
+      });
+
+      const tableRowsApplications = applicationsInVillage.map((a, i) => {
+        const unassignVillageToApplication = (userId) => (e) => {
+          applicationOperation.mutate({ userId, operation: { type: "assignVillageToApplication", userId: userId, village: "" } });
+        };
+
+        return (
+          <TableRow key={i+"application"}>
+            <TableCell>
+              {a.name} - {a.district}
+            </TableCell>
+            <TableCell>{a.predictedParticipants} (predicted)</TableCell>
+            <TableCell>
+              <IconButton disabled={applicationOperation.isPending} onClick={unassignVillageToApplication(a.userId)} color="warning">
                 <Close />
               </IconButton>
             </TableCell>
@@ -206,18 +242,19 @@ export function Component() {
                     vertical={false}
                     horizontalCoordinatesGenerator={({ yAxis, width, height, offset }) => {
                       const heightPerTen = (offset.height! / yAxis.niceTicks[1]) * 10;
-                      const lines = [];
+                      const lines: number[] = [];
                       let i = offset.height!;
                       while (i > 0) {
                         lines.push(i);
                         i -= heightPerTen;
                       }
-                      return lines
+                      return lines;
                     }}
                   />
                   <XAxis dataKey="name" tick={{ dy: 7 }} />
                   <YAxis tickCount={2} />
                   <Tooltip />
+                  <Bar type="monotone" dataKey="applied" stackId="1" stroke="#ffcaca" fill="#ffcaca" />
                   <Bar type="monotone" dataKey="u16" stackId="1" stroke="#8884d8" fill="#8884d8" />
                   <Bar type="monotone" dataKey="o16" stackId="1" stroke="#82ca9d" fill="#82ca9d" />
                 </BarChart>
@@ -233,11 +270,18 @@ export function Component() {
                       <TableCell>Unassign</TableCell>
                     </TableRow>
                   </TableHead>
-                  <TableBody>{tableRows}</TableBody>
+                  <TableBody>
+                    {tableRows}
+                    {tableRowsApplications}
+                  </TableBody>
                 </Table>
               </TableContainer>
-              <Typography variant="body1" sx={{ mt: 1 }} color={(t) => (participants.length < 80 ? t.palette.success.main : participants.length < 90 ? t.palette.warning.main : t.palette.error.main)}>
-                <b>Total: {participants.length}</b> - {totalsString}
+              <Typography
+                variant="body1"
+                sx={{ mt: 1 }}
+                color={(t) => (participants.length + appliedTotal < 80 ? t.palette.success.main : participants.length + appliedTotal < 90 ? t.palette.warning.main : t.palette.error.main)}
+              >
+                <b>Total: {participants.length + appliedTotal}</b> - {totalsString}, applied: {appliedTotal}
               </Typography>
             </Grid>
           </Grid>
@@ -257,8 +301,13 @@ export function Component() {
     bookingOperation.mutate({ eventId: event.id, userId: userId, operation: { type: "assignVillage", village: e.target.value } });
   };
 
+  const assignVillageToApplication = (userId) => (e) => {
+    applicationOperation.mutate({ userId, operation: { type: "assignVillageToApplication", userId: userId, village: e.target.value } });
+  };
+
   const bookingVillages = rawBookings
     .filter((b) => !event.villages?.find((v) => v.name === b.village) && !b.deleted)
+    .sort((a, b) => b.participants.length - a.participants.length)
     .map((b, i) => {
       return (
         <Paper sx={{ p: 2, mb: 2 }} key={i}>
@@ -288,6 +337,28 @@ export function Component() {
       );
     });
 
+  const applicationVillages = waitingApplications
+    .filter((a) => !a.village)
+    .map((a, i) => {
+      return (
+        <Paper sx={{ p: 2, mb: 2 }} key={i}>
+          <Stack alignItems="center" gap={1} direction="row">
+            <Typography variant="h6">{a.district}</Typography>
+            {applicationTypeIcon(a.bookingType)}
+          </Stack>
+          <Typography sx={{ mt: 1 }} variant="body2">
+            <b>Predicted Campers:</b> {a.predictedParticipants}
+          </Typography>
+          <FormControl fullWidth sx={{ mt: 2 }}>
+            <InputLabel id={`select-village-${i}`}>Village</InputLabel>
+            <Select value="" label="Villages" onChange={assignVillageToApplication(a.userId)} labelId={`select-village-${i}`} disabled={bookingOperation.isPending}>
+              {menuItems}
+            </Select>
+          </FormControl>
+        </Paper>
+      );
+    });
+
   return (
     <Grid container spacing={2} p={2}>
       <AddVillageWidget event={event} />
@@ -296,6 +367,7 @@ export function Component() {
       </Grid>
       <Grid item xs={4}>
         {bookingVillages}
+        {applicationVillages}
       </Grid>
       <Grid item xs={8}>
         {rows}

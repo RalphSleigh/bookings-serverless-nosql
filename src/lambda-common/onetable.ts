@@ -288,6 +288,7 @@ const schema = {
             email: { type: String, required: true },
             district: { type: String },
             predictedParticipants: { type: Number, required: true },
+            village: { type: String },
             created: { type: Date },
             updated: { type: Date },
         }
