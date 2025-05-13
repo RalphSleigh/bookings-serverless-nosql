@@ -103,6 +103,7 @@ const TownsSummary: React.FC<{ event: JsonEventType; bookings: JsonBookingWithEx
     towns.add(v.town);
   });
   const rows = Array.from(towns).map((town, i) => {
+    const applicationsInTown = waitingApplications.filter((a) => event.villages?.find(v => v.name === a.village && v.town === town));
     const villagesInTown = event.villages?.filter((v) => v.town === town).map((v) => v.name);
     const bookingsInTown = bookings.filter((b) => villagesInTown?.includes(b.village || "") && !b.deleted);
     const participants = bookingsInTown.reduce<JsonParticipantWithExtraType[]>((a, c) => {
@@ -114,6 +115,7 @@ const TownsSummary: React.FC<{ event: JsonEventType; bookings: JsonBookingWithEx
         <TableCell>{town}</TableCell>
         <TableCell>{villagesInTown?.length}</TableCell>
         <TableCell>{participants.length}</TableCell>
+        <TableCell>{applicationsInTown.reduce((a,c) => a += c.predictedParticipants, 0)}</TableCell>
       </TableRow>
     );
   });
@@ -150,6 +152,9 @@ const TownsSummary: React.FC<{ event: JsonEventType; bookings: JsonBookingWithEx
               </TableCell>
               <TableCell>
                 <b>Participants</b>
+              </TableCell>
+              <TableCell>
+                <b>Predicted</b>
               </TableCell>
             </TableRow>
           </TableHead>
