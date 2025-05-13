@@ -83,7 +83,7 @@ const TownGraph: React.FC<{ event: JsonEventType; participants: JsonParticipantW
         <XAxis dataKey="name" tick={{ dy: 7 }} />
         <YAxis tickCount={2} />
         <Tooltip />
-        <Bar type="monotone" dataKey="application" stackId="1" stroke="#999999" fill="rgb(99, 99, 99)" />
+        <Bar type="monotone" dataKey="applications" stackId="1" stroke="#999999" fill="rgb(99, 99, 99)" />
         <Bar type="monotone" dataKey="Woodchips" stackId="1" stroke="#999999" fill="rgb(255, 243, 192)" />
         <Bar type="monotone" dataKey="Elfins" stackId="1" stroke="#999999" fill="rgb(250, 156, 156)" />
         <Bar type="monotone" dataKey="Pioneers" stackId="1" stroke="#999999" fill="rgb(182, 255, 175)"/>
