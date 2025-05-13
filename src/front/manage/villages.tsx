@@ -28,26 +28,28 @@ import { getMemoUpdateFunctions } from "../../shared/util.js";
 import { eventApplicationsQuery, eventApplicationsQueryType, eventRolesQuery, eventRolesQueryType, useApplicationOperation, useBookingOperation, useEventOperation } from "../queries.js";
 import { applicationTypeIcon } from "./utils.js";
 import { AgeGroup, ageGroups, groupParticipants } from "../../shared/woodcraft.js";
-import { JsonBookingType, JsonEventType, JsonParticipantType } from "../../lambda-common/onetable.js";
+import { ApplicationType, JsonApplicationType, JsonBookingType, JsonEventType, JsonParticipantType } from "../../lambda-common/onetable.js";
 import { Bar, BarChart, CartesianGrid, LabelList, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { useSuspenseQueries } from "@tanstack/react-query";
 import { EnableInsightRulesCommand } from "@aws-sdk/client-cloudwatch";
 
-const TownGraph: React.FC<{ event: JsonEventType; participants: JsonParticipantWithExtraType[] }> = ({ event, participants }) => {
-  const data = [
+const TownGraph: React.FC<{ event: JsonEventType; participants: JsonParticipantWithExtraType[], applications: number}> = ({ event, participants, applications }) => {
+  
+  
+    const data = [
     {
       name: "First 3",
       ...ageGroups().reduce((a, g) => {
         const inAge = participants.filter((p) => g.filter(p.age) && (p.attendance.option === 0 || p.attendance.option === 1));
         return { ...a, [g.name]: inAge.length };
-      }, {}),
+      }, {applications}),
     },
     {
       name: "Last 7",
       ...ageGroups().reduce((a, g) => {
         const inAge = participants.filter((p) => g.filter(p.age) && (p.attendance.option === 0 || p.attendance.option === 2));
         return { ...a, [g.name]: inAge.length };
-      }, {}),
+      }, {applications}),
     },
   ];
 
@@ -81,6 +83,7 @@ const TownGraph: React.FC<{ event: JsonEventType; participants: JsonParticipantW
         <XAxis dataKey="name" tick={{ dy: 7 }} />
         <YAxis tickCount={2} />
         <Tooltip />
+        <Bar type="monotone" dataKey="application" stackId="1" stroke="#999999" fill="rgb(99, 99, 99)" />
         <Bar type="monotone" dataKey="Woodchips" stackId="1" stroke="#999999" fill="rgb(255, 243, 192)" />
         <Bar type="monotone" dataKey="Elfins" stackId="1" stroke="#999999" fill="rgb(250, 156, 156)" />
         <Bar type="monotone" dataKey="Pioneers" stackId="1" stroke="#999999" fill="rgb(182, 255, 175)"/>
@@ -94,12 +97,13 @@ const TownGraph: React.FC<{ event: JsonEventType; participants: JsonParticipantW
   );
 };
 
-const TownsSummary: React.FC<{ event: JsonEventType; bookings: JsonBookingWithExtraType[] }> = ({ event, bookings }) => {
+const TownsSummary: React.FC<{ event: JsonEventType; bookings: JsonBookingWithExtraType[], waitingApplications: JsonApplicationType[] }> = ({ event, bookings, waitingApplications }) => {
   const towns = new Set<string>();
   event.villages?.forEach((v) => {
     towns.add(v.town);
   });
   const rows = Array.from(towns).map((town, i) => {
+    const applicationsInTown = waitingApplications.filter((a) => event.villages?.find(v => v.name === a.village && v.town === town));
     const villagesInTown = event.villages?.filter((v) => v.town === town).map((v) => v.name);
     const bookingsInTown = bookings.filter((b) => villagesInTown?.includes(b.village || "") && !b.deleted);
     const participants = bookingsInTown.reduce<JsonParticipantWithExtraType[]>((a, c) => {
@@ -111,11 +115,15 @@ const TownsSummary: React.FC<{ event: JsonEventType; bookings: JsonBookingWithEx
         <TableCell>{town}</TableCell>
         <TableCell>{villagesInTown?.length}</TableCell>
         <TableCell>{participants.length}</TableCell>
+        <TableCell>{applicationsInTown.reduce((a,c) => a += c.predictedParticipants, 0)}</TableCell>
       </TableRow>
     );
   });
 
   const graphs = Array.from(towns).map((town, i) => {
+
+    const applicationsInTown = waitingApplications.filter((a) => event.villages?.find(v => v.name === a.village && v.town === town));
+
     const villagesInTown = event.villages?.filter((v) => v.town === town).map((v) => v.name);
     const bookingsInTown = bookings.filter((b) => villagesInTown?.includes(b.village || "") && !b.deleted);
     const participants = bookingsInTown.reduce<JsonParticipantWithExtraType[]>((a, c) => {
@@ -125,7 +133,7 @@ const TownsSummary: React.FC<{ event: JsonEventType; bookings: JsonBookingWithEx
     return (
       <Grid item key={i} xs={12} sm={3}>
         <Typography variant="h5">{town}</Typography>
-        <TownGraph event={event} participants={participants} />
+        <TownGraph event={event} participants={participants} applications={applicationsInTown.reduce((a,c) => a += c.predictedParticipants, 0)}/>
       </Grid>
     );
   });
@@ -144,6 +152,9 @@ const TownsSummary: React.FC<{ event: JsonEventType; bookings: JsonBookingWithEx
               </TableCell>
               <TableCell>
                 <b>Participants</b>
+              </TableCell>
+              <TableCell>
+                <b>Predicted</b>
               </TableCell>
             </TableRow>
           </TableHead>
@@ -461,7 +472,7 @@ export function Component() {
     <Grid container spacing={2} p={2}>
       <AddVillageWidget event={event} />
       <Grid item xs={12}>
-        <TownsSummary event={event} bookings={rawBookings} />
+        <TownsSummary event={event} bookings={rawBookings} waitingApplications={waitingApplications} />
       </Grid>
       <Grid item xs={4}>
         {bookingVillages}
