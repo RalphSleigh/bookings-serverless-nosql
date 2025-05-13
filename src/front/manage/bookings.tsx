@@ -101,13 +101,6 @@ const BookingsModal = ({ event, selectedBooking, booking, handleClose }: { event
     const noWrap = { whiteSpace: 'nowrap' as 'nowrap', mt: 1 }
     const participants = booking.participants.map((p, i) => <li key={i}>{p.basic.name}</li>)
 
-    const chunks: JSX.Element[][] = []
-    const chunkSize = 20;
-    for (let i = 0; i < participants.length; i += chunkSize) {
-        chunks.push(participants.slice(i, i + chunkSize))
-
-    }
-
     const customAnswers = event.customQuestions.map((q, i) => <Typography key={i} variant="body1" sx={noWrap}>
         <b>{q.questionLabel}</b><br /> {booking.customQuestions?.[i]?.toString()}
     </Typography>)
@@ -120,7 +113,7 @@ const BookingsModal = ({ event, selectedBooking, booking, handleClose }: { event
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
         sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-        <Paper elevation={6} sx={{ p: 2, outline: 'none', maxWidth: "95vw" }}>
+        <Paper elevation={6} sx={{ p: 2, outline: 'none', maxWidth: "95vw", maxHeight: "95vh", overflowY: "scroll" }}>
             <Grid container spacing={2}>
                 <Grid item xs={12} sm>
                     <Stack alignItems="center" gap={1} direction="row"><Typography id="modal-modal-title" variant="h6">
@@ -165,12 +158,12 @@ const BookingsModal = ({ event, selectedBooking, booking, handleClose }: { event
                     </> : null}
                     {customAnswers}
                 </Grid>
-                {chunks.map((c, i) => <Grid item xs={12} sm key={i}>
-                    {i == 0 ? <Typography variant="body1" sx={noWrap}><b>Attendees: ({booking.participants.length})</b></Typography> : null}
+                <Grid item xs={12} sm sx={{overflowY: "scroll"}}>
+                <Typography variant="body1" sx={noWrap}><b>Attendees: ({booking.participants.length})</b></Typography>
                     <ul>
-                        {c}
+                        {participants}
                     </ul>
-                </Grid>)}
+                </Grid>
                 {pastDeadline && event.bigCampMode ? <IfHasPermission permission={CanCreateAnyRole} event={event}>
                     <UnlockWidget event={event} booking={booking} />
                 </IfHasPermission> : null}
