@@ -27,12 +27,74 @@ import { Close, ContentCopy, Edit, Email, StackedBarChart } from "@mui/icons-mat
 import { getMemoUpdateFunctions } from "../../shared/util.js";
 import { eventApplicationsQuery, eventApplicationsQueryType, eventRolesQuery, eventRolesQueryType, useApplicationOperation, useBookingOperation, useEventOperation } from "../queries.js";
 import { applicationTypeIcon } from "./utils.js";
-import { groupParticipants } from "../../shared/woodcraft.js";
+import { AgeGroup, ageGroups, groupParticipants } from "../../shared/woodcraft.js";
 import { JsonBookingType, JsonEventType, JsonParticipantType } from "../../lambda-common/onetable.js";
 import { Bar, BarChart, CartesianGrid, LabelList, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { useSuspenseQueries } from "@tanstack/react-query";
+import { EnableInsightRulesCommand } from "@aws-sdk/client-cloudwatch";
 
-const TownsSummary: React.FC<{ event: JsonEventType; bookings: JsonBookingType[] }> = ({ event, bookings }) => {
+const TownGraph: React.FC<{ event: JsonEventType; participants: JsonParticipantWithExtraType[] }> = ({ event, participants }) => {
+  const data = [
+    {
+      name: "First 3",
+      ...ageGroups().reduce((a, g) => {
+        const inAge = participants.filter((p) => g.filter(p.age) && (p.attendance.option === 0 || p.attendance.option === 1));
+        return { ...a, [g.name]: inAge.length };
+      }, {}),
+    },
+    {
+      name: "Last 7",
+      ...ageGroups().reduce((a, g) => {
+        const inAge = participants.filter((p) => g.filter(p.age) && (p.attendance.option === 0 || p.attendance.option === 2));
+        return { ...a, [g.name]: inAge.length };
+      }, {}),
+    },
+  ];
+
+  return (
+    <ResponsiveContainer width="100%" aspect={1}>
+      <BarChart
+        width={100}
+        height={100}
+        data={data}
+        margin={{
+          top: 0,
+          right: 0,
+          left: -20,
+          bottom: 0,
+        }}
+      >
+        <CartesianGrid
+          strokeDasharray="3 3"
+          vertical={false}
+          horizontalCoordinatesGenerator={({ yAxis, width, height, offset }) => {
+            const heightPerTen = (offset.height! / yAxis.niceTicks[1]) * 50;
+            const lines: number[] = [];
+            let i = offset.height!;
+            while (i > 0) {
+              lines.push(i);
+              i -= heightPerTen;
+            }
+            return lines;
+          }}
+        />
+        <XAxis dataKey="name" tick={{ dy: 7 }} />
+        <YAxis tickCount={2} />
+        <Tooltip />
+        <Bar type="monotone" dataKey="Woodchips" stackId="1" stroke="#999999" fill="rgb(255, 243, 192)" />
+        <Bar type="monotone" dataKey="Elfins" stackId="1" stroke="#999999" fill="rgb(250, 156, 156)" />
+        <Bar type="monotone" dataKey="Pioneers" stackId="1" stroke="#999999" fill="rgb(182, 255, 175)"/>
+        <Bar type="monotone" dataKey="Venturers" stackId="1" stroke="#999999" fill="rgb(167, 215, 255)" />
+        <Bar type="monotone" dataKey="DFs" stackId="1" stroke="#999999" fill="rgb(138, 146, 255)" />
+        <Bar type="monotone" dataKey="Adults" stackId="1" stroke="#999999" fill="rgb(218, 169, 255)">
+          <LabelList position="center" valueAccessor={(entry) => entry.Woodchips + entry.Elfins + entry.Pioneers + entry.Venturers + entry.DFs + entry.Adults} />
+        </Bar>
+      </BarChart>
+    </ResponsiveContainer>
+  );
+};
+
+const TownsSummary: React.FC<{ event: JsonEventType; bookings: JsonBookingWithExtraType[] }> = ({ event, bookings }) => {
   const towns = new Set<string>();
   event.villages?.forEach((v) => {
     towns.add(v.town);
@@ -40,7 +102,7 @@ const TownsSummary: React.FC<{ event: JsonEventType; bookings: JsonBookingType[]
   const rows = Array.from(towns).map((town, i) => {
     const villagesInTown = event.villages?.filter((v) => v.town === town).map((v) => v.name);
     const bookingsInTown = bookings.filter((b) => villagesInTown?.includes(b.village || "") && !b.deleted);
-    const participants = bookingsInTown.reduce<JsonParticipantType[]>((a, c) => {
+    const participants = bookingsInTown.reduce<JsonParticipantWithExtraType[]>((a, c) => {
       return [...a, ...c.participants];
     }, []);
 
@@ -53,25 +115,45 @@ const TownsSummary: React.FC<{ event: JsonEventType; bookings: JsonBookingType[]
     );
   });
 
+  const graphs = Array.from(towns).map((town, i) => {
+    const villagesInTown = event.villages?.filter((v) => v.town === town).map((v) => v.name);
+    const bookingsInTown = bookings.filter((b) => villagesInTown?.includes(b.village || "") && !b.deleted);
+    const participants = bookingsInTown.reduce<JsonParticipantWithExtraType[]>((a, c) => {
+      return [...a, ...c.participants];
+    }, []);
+
+    return (
+      <Grid item key={i} xs={12} sm={3}>
+        <Typography variant="h5">{town}</Typography>
+        <TownGraph event={event} participants={participants} />
+      </Grid>
+    );
+  });
+
   return (
-    <TableContainer component={Paper}>
-      <Table size="small">
-        <TableHead>
-          <TableRow>
-            <TableCell>
-              <b>Town</b>
-            </TableCell>
-            <TableCell>
-              <b>Villages</b>
-            </TableCell>
-            <TableCell>
-              <b>Participants</b>
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>{rows}</TableBody>
-      </Table>
-    </TableContainer>
+    <>
+      <TableContainer component={Paper}>
+        <Table size="small">
+          <TableHead>
+            <TableRow>
+              <TableCell>
+                <b>Town</b>
+              </TableCell>
+              <TableCell>
+                <b>Villages</b>
+              </TableCell>
+              <TableCell>
+                <b>Participants</b>
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>{rows}</TableBody>
+        </Table>
+      </TableContainer>
+      <Grid container spacing={2} p={2}>
+        {graphs}
+      </Grid>
+    </>
   );
 };
 
@@ -168,12 +250,12 @@ export function Component() {
 
       const renameVillage = (e) => {
         const newName = prompt("Enter new village name", v.name);
-        if(event.villages?.find(v => v.name === newName)) {
+        if (event.villages?.find((v) => v.name === newName)) {
           alert("Village name already exists");
-          return
+          return;
         }
 
-        if(!newName) return;
+        if (!newName) return;
 
         const newTownName = prompt("Enter new town name", v.town);
         if (newName && newTownName) {
@@ -201,7 +283,7 @@ export function Component() {
         };
 
         return (
-          <TableRow key={i+"application"}>
+          <TableRow key={i + "application"}>
             <TableCell>
               {a.name} - {a.district}
             </TableCell>
@@ -264,11 +346,8 @@ export function Component() {
                   <Bar type="monotone" dataKey="applied" stackId="1" stroke="#ffcaca" fill="#ffcaca" />
                   <Bar type="monotone" dataKey="u16" stackId="1" stroke="#8884d8" fill="#8884d8" />
                   <Bar type="monotone" dataKey="o16" stackId="1" stroke="#82ca9d" fill="#82ca9d">
-                    <LabelList
-                      position="top"
-                      valueAccessor={entry => entry.o16 + entry.u16 + entry.applied} 
-                    />
-                    </Bar>
+                    <LabelList position="top" valueAccessor={(entry) => entry.o16 + entry.u16 + entry.applied} />
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </Grid>
@@ -339,9 +418,11 @@ export function Component() {
           <Typography sx={{ mt: 1 }} variant="body2">
             {b.camping?.accessibilityNeeds}
           </Typography>
-          {b.village && b.village !== "" ? <Typography sx={{ mt: 1 }} variant="body2">
-            "{b.village}"
-          </Typography>: null}
+          {b.village && b.village !== "" ? (
+            <Typography sx={{ mt: 1 }} variant="body2">
+              "{b.village}"
+            </Typography>
+          ) : null}
           <FormControl fullWidth sx={{ mt: 2 }}>
             <InputLabel id={`select-village-${i}`}>Village</InputLabel>
             <Select value="" label="Villages" onChange={assignVillage(b.userId)} labelId={`select-village-${i}`} disabled={bookingOperation.isPending}>
@@ -358,7 +439,9 @@ export function Component() {
       return (
         <Paper sx={{ p: 2, mb: 2 }} key={i}>
           <Stack alignItems="center" gap={1} direction="row">
-            <Typography variant="h6">{a.name} - {a.district}</Typography>
+            <Typography variant="h6">
+              {a.name} - {a.district}
+            </Typography>
             {applicationTypeIcon(a.bookingType)}
           </Stack>
           <Typography sx={{ mt: 1 }} variant="body2">
