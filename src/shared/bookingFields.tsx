@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { capitalizeWord, parseDate } from "./util.js";
 import { formatDistanceToNow, formatISO9075 } from "date-fns";
 import { fees } from "./fee/fee.js";
+import { JsonBookingWithExtraType } from "./computedDataTypes.js";
 
 abstract class Field {
     event: JsonEventType | OnetableEventType;
@@ -126,6 +127,19 @@ class NumberOfParticipants extends Field {
     fieldName = "Participants"
     value(booking: JsonBookingType) {
         return booking.participants.length
+    }
+    sortComparator(a: BookingType | JsonBookingType, b: BookingType | JsonBookingType) {
+        return a.participants.length - b.participants.length
+    }
+}
+
+class NumberOfParticipantsPerOption extends Field {
+    fieldName = "First 3 / Last 7"
+    enabledCSV = false
+    value(booking: JsonBookingWithExtraType) {
+        const firstThree = booking.participants.filter((p) => (p.attendance.option === 0 || p.attendance.option === 1)).length;
+        const lastSeven = booking.participants.filter((p) => (p.attendance.option === 0 || p.attendance.option === 2)).length;
+        return `${firstThree} / ${lastSeven}`
     }
     sortComparator(a: BookingType | JsonBookingType, b: BookingType | JsonBookingType) {
         return a.participants.length - b.participants.length
@@ -303,6 +317,7 @@ export class BookingFields {
             new BookingContactEmail(event),
             new BookingContactPhone(event),
             new NumberOfParticipants(event),
+            new NumberOfParticipantsPerOption(event),
             new EmergencyContactName(event),
             new EmergencyContactPhone(event),
             new BookingHowDidYouHear(event),
