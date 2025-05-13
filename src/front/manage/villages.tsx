@@ -83,14 +83,14 @@ const TownGraph: React.FC<{ event: JsonEventType; participants: JsonParticipantW
         <XAxis dataKey="name" tick={{ dy: 7 }} />
         <YAxis tickCount={2} />
         <Tooltip />
-        <Bar type="monotone" dataKey="applications" stackId="1" stroke="#999999" fill="rgb(99, 99, 99)" />
+        <Bar type="monotone" dataKey="applications" stackId="1" stroke="#999999" fill="rgb(190, 190, 190)" />
         <Bar type="monotone" dataKey="Woodchips" stackId="1" stroke="#999999" fill="rgb(255, 243, 192)" />
         <Bar type="monotone" dataKey="Elfins" stackId="1" stroke="#999999" fill="rgb(250, 156, 156)" />
         <Bar type="monotone" dataKey="Pioneers" stackId="1" stroke="#999999" fill="rgb(182, 255, 175)"/>
         <Bar type="monotone" dataKey="Venturers" stackId="1" stroke="#999999" fill="rgb(167, 215, 255)" />
         <Bar type="monotone" dataKey="DFs" stackId="1" stroke="#999999" fill="rgb(138, 146, 255)" />
         <Bar type="monotone" dataKey="Adults" stackId="1" stroke="#999999" fill="rgb(218, 169, 255)">
-          <LabelList position="center" valueAccessor={(entry) => entry.Woodchips + entry.Elfins + entry.Pioneers + entry.Venturers + entry.DFs + entry.Adults} />
+          <LabelList position="center" valueAccessor={(entry) => applications + entry.Woodchips + entry.Elfins + entry.Pioneers + entry.Venturers + entry.DFs + entry.Adults} />
         </Bar>
       </BarChart>
     </ResponsiveContainer>
@@ -357,7 +357,7 @@ export function Component() {
                   <Bar type="monotone" dataKey="applied" stackId="1" stroke="#ffcaca" fill="#ffcaca" />
                   <Bar type="monotone" dataKey="u16" stackId="1" stroke="#8884d8" fill="#8884d8" />
                   <Bar type="monotone" dataKey="o16" stackId="1" stroke="#82ca9d" fill="#82ca9d">
-                    <LabelList position="top" valueAccessor={(entry) => entry.o16 + entry.u16 + entry.applied} />
+                    <LabelList position="center" valueAccessor={(entry) => entry.o16 + entry.u16 + entry.applied} />
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
