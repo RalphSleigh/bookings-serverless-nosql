@@ -48,7 +48,7 @@ export function Component() {
     }, [bookings])
 
     return <Grid xs={12} p={2} item>
-        <BookingsModal event={event} selectedBooking={selectedBooking} booking={typeof selectedBooking == "number" ? bookings[selectedBooking] : undefined} handleClose={() => setSelectedBooking(undefined)} />
+        <BookingsModal event={event} selectedBooking={selectedBooking} booking={typeof selectedBooking == "number" ? bookings.filter(b => !b.deleted || displayDeleted)[selectedBooking] : undefined} handleClose={() => setSelectedBooking(undefined)} />
         <DataGrid rowSelection={false}
             pageSizeOptions={[100]}
             rows={rows}
