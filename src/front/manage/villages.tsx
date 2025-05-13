@@ -70,7 +70,7 @@ const TownGraph: React.FC<{ event: JsonEventType; participants: JsonParticipantW
           strokeDasharray="3 3"
           vertical={false}
           horizontalCoordinatesGenerator={({ yAxis, width, height, offset }) => {
-            const heightPerTen = (offset.height! / yAxis.niceTicks[1]) * 50;
+            const heightPerTen = (offset.height! / yAxis.niceTicks[1]) * 100;
             const lines: number[] = [];
             let i = offset.height!;
             while (i > 0) {
@@ -80,8 +80,8 @@ const TownGraph: React.FC<{ event: JsonEventType; participants: JsonParticipantW
             return lines;
           }}
         />
-        <XAxis dataKey="name" tick={{ dy: 7 }} />
-        <YAxis tickCount={2} />
+        <XAxis dataKey="name" tick={{ dy: 7 }}/>
+        <YAxis tickCount={2} domain={[0, 800]}/>
         <Tooltip />
         <Bar type="monotone" dataKey="applications" stackId="1" stroke="#999999" fill="rgb(190, 190, 190)" />
         <Bar type="monotone" dataKey="Woodchips" stackId="1" stroke="#999999" fill="rgb(255, 243, 192)" />
@@ -131,7 +131,7 @@ const TownsSummary: React.FC<{ event: JsonEventType; bookings: JsonBookingWithEx
     }, []);
 
     return (
-      <Grid item key={i} xs={12} sm={3}>
+      <Grid item key={i} xs={12} sm={3} md={2}>
         <Typography variant="h5">{town}</Typography>
         <TownGraph event={event} participants={participants} applications={applicationsInTown.reduce((a,c) => a += c.predictedParticipants, 0)}/>
       </Grid>
