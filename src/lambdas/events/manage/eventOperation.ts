@@ -50,7 +50,7 @@ export const lambdaHandler = lambda_wrapper_json(
                             {
                                 set: { villages: renamedVillages }
                             })
-                        const bookings = await BookingModel.find({ sk: { begins: `event:${event.id}` }, village: operation.oldName, version: 'latest' }) as [OnetableBookingType]
+                        const bookings = await BookingModel.find({ sk: { begins: `event:${event.id}` }, village: operation.oldName, version: 'latest', deleted: false }) as [OnetableBookingType]
                         for(const b of bookings) {
                             await addVersionToBooking(event as EventType, b as BookingType, { village: operation.newName })
                         }
