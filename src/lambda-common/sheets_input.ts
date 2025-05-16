@@ -329,9 +329,12 @@ export async function createSheetForBooking(config: ConfigType, event: OnetableE
 const promiseCache = {}
 
 const cachedPromise = (key, fn) => {
+    console.log("Cached promise", key)
     if (!promiseCache[key]) {
+        console.log("Creating new promise", key)
         promiseCache[key] = fn()
     }
+    console.log("Returning cached promise", key)
     return promiseCache[key]
 }
 
@@ -361,11 +364,13 @@ export async function getParticipantsFromSheet(config, event: OnetableEventType,
 
     const sheets_instance = await cachedPromise(`sheetsclient`, () => getSheetsClient(config))
 
+    console.log("Getting sheet data", sheet.id)
     const response = await sheets_instance.spreadsheets.values.get({
         spreadsheetId: sheet.id!,
         range: 'Sheet1',
         valueRenderOption: 'UNFORMATTED_VALUE',
     })
+    console.log("Got sheet data", sheet.id)
 
     if (!response.data.values) throw new Error("No data found")
 
