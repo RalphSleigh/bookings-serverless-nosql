@@ -22,6 +22,8 @@ export function toLocalDate(date: Date | string | undefined): Date | null {
   return new Date(localDate.getTime() + localDate.getTimezoneOffset() * 60000);
 }
 
+const campDate = new Date("2025-08-01T00:00:00Z");
+
 //We need the dates to work both in the browser in whatever timezone thats in, and also serverside.
 //This date picker will convert the picked date to the start of that day in UTC, and expects a UTC datetime in its value.
 //This way we always send the server the same date that the user picked, and not possibly a UTC datetime thats outside that day
@@ -31,7 +33,7 @@ export function UtcDatePicker(props) {
   const convertOnChange = (d, c) => {
     onChange(toUtcDate(d), c);
   };
-  return <DatePicker value={toLocalDate(value)} onChange={convertOnChange} {...rest} isRequired />;
+  return <DatePicker maxDate={campDate} value={toLocalDate(value)} onChange={convertOnChange} {...rest} isRequired />;
 }
 
 export function useDebounceState<T>(defaultValue: T, delay: number): [T, T, (T) => void] {
