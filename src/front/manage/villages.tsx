@@ -183,13 +183,13 @@ const AddVillageWidget: React.FC<{ event: JsonEventType }> = ({ event }) => {
 
   return (
     <Grid container spacing={2} p={2}>
-      <Grid item xs={5}>
+      <Grid item sm={5} xs={12}>
         <TextField label="Name" value={newVillage.name} onChange={updateField("name")} fullWidth />
       </Grid>
-      <Grid item xs={5}>
+      <Grid item sm={5} xs={12}>
         <TextField label="Town" value={newVillage.town} onChange={updateField("town")} fullWidth />
       </Grid>
-      <Grid item xs={2}>
+      <Grid item sm={2} xs={12}>
         <Button disabled={!newEnabled} onClick={submit}>
           Add Village
         </Button>
@@ -324,7 +324,7 @@ export function Component() {
                 </IconButton>
               </Stack>
             </Grid>
-            <Grid item xs={4}>
+            <Grid item sm={4} xs={12}>
               <ResponsiveContainer width="100%" aspect={1}>
                 <BarChart
                   width={100}
@@ -362,7 +362,7 @@ export function Component() {
                 </BarChart>
               </ResponsiveContainer>
             </Grid>
-            <Grid item xs={8}>
+            <Grid item sm={8} xs={12}>
               <TableContainer component={Paper}>
                 <Table size="small">
                   <TableHead>
@@ -474,11 +474,11 @@ export function Component() {
       <Grid item xs={12}>
         <TownsSummary event={event} bookings={rawBookings} waitingApplications={waitingApplications} />
       </Grid>
-      <Grid item xs={4}>
+      <Grid item sm={4} xs={12}>
         {bookingVillages}
         {applicationVillages}
       </Grid>
-      <Grid item xs={8}>
+      <Grid item sm={8} xs={12}>
         {rows}
       </Grid>
     </Grid>
