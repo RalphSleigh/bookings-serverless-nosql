@@ -32,24 +32,29 @@ import { ApplicationType, JsonApplicationType, JsonBookingType, JsonEventType, J
 import { Bar, BarChart, CartesianGrid, LabelList, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { useSuspenseQueries } from "@tanstack/react-query";
 import { EnableInsightRulesCommand } from "@aws-sdk/client-cloudwatch";
+import { BookingsModal } from "./bookingsModal.js";
 
-const TownGraph: React.FC<{ event: JsonEventType; participants: JsonParticipantWithExtraType[], applications: number}> = ({ event, participants, applications }) => {
-  
-  
-    const data = [
+const TownGraph: React.FC<{ event: JsonEventType; participants: JsonParticipantWithExtraType[]; applications: number }> = ({ event, participants, applications }) => {
+  const data = [
     {
       name: "First 3",
-      ...ageGroups().reduce((a, g) => {
-        const inAge = participants.filter((p) => g.filter(p.age) && (p.attendance.option === 0 || p.attendance.option === 1));
-        return { ...a, [g.name]: inAge.length };
-      }, {applications}),
+      ...ageGroups().reduce(
+        (a, g) => {
+          const inAge = participants.filter((p) => g.filter(p.age) && (p.attendance.option === 0 || p.attendance.option === 1));
+          return { ...a, [g.name]: inAge.length };
+        },
+        { applications }
+      ),
     },
     {
       name: "Last 7",
-      ...ageGroups().reduce((a, g) => {
-        const inAge = participants.filter((p) => g.filter(p.age) && (p.attendance.option === 0 || p.attendance.option === 2));
-        return { ...a, [g.name]: inAge.length };
-      }, {applications}),
+      ...ageGroups().reduce(
+        (a, g) => {
+          const inAge = participants.filter((p) => g.filter(p.age) && (p.attendance.option === 0 || p.attendance.option === 2));
+          return { ...a, [g.name]: inAge.length };
+        },
+        { applications }
+      ),
     },
   ];
 
@@ -80,13 +85,13 @@ const TownGraph: React.FC<{ event: JsonEventType; participants: JsonParticipantW
             return lines;
           }}
         />
-        <XAxis dataKey="name" tick={{ dy: 7 }}/>
-        <YAxis tickCount={2} domain={[0, 800]}/>
+        <XAxis dataKey="name" tick={{ dy: 7 }} />
+        <YAxis tickCount={2} domain={[0, 800]} />
         <Tooltip />
         <Bar type="monotone" dataKey="applications" stackId="1" stroke="#999999" fill="rgb(190, 190, 190)" />
         <Bar type="monotone" dataKey="Woodchips" stackId="1" stroke="#999999" fill="rgb(255, 243, 192)" />
         <Bar type="monotone" dataKey="Elfins" stackId="1" stroke="#999999" fill="rgb(250, 156, 156)" />
-        <Bar type="monotone" dataKey="Pioneers" stackId="1" stroke="#999999" fill="rgb(182, 255, 175)"/>
+        <Bar type="monotone" dataKey="Pioneers" stackId="1" stroke="#999999" fill="rgb(182, 255, 175)" />
         <Bar type="monotone" dataKey="Venturers" stackId="1" stroke="#999999" fill="rgb(167, 215, 255)" />
         <Bar type="monotone" dataKey="DFs" stackId="1" stroke="#999999" fill="rgb(138, 146, 255)" />
         <Bar type="monotone" dataKey="Adults" stackId="1" stroke="#999999" fill="rgb(218, 169, 255)">
@@ -97,13 +102,13 @@ const TownGraph: React.FC<{ event: JsonEventType; participants: JsonParticipantW
   );
 };
 
-const TownsSummary: React.FC<{ event: JsonEventType; bookings: JsonBookingWithExtraType[], waitingApplications: JsonApplicationType[] }> = ({ event, bookings, waitingApplications }) => {
+const TownsSummary: React.FC<{ event: JsonEventType; bookings: JsonBookingWithExtraType[]; waitingApplications: JsonApplicationType[] }> = ({ event, bookings, waitingApplications }) => {
   const towns = new Set<string>();
   event.villages?.forEach((v) => {
     towns.add(v.town);
   });
   const rows = Array.from(towns).map((town, i) => {
-    const applicationsInTown = waitingApplications.filter((a) => event.villages?.find(v => v.name === a.village && v.town === town));
+    const applicationsInTown = waitingApplications.filter((a) => event.villages?.find((v) => v.name === a.village && v.town === town));
     const villagesInTown = event.villages?.filter((v) => v.town === town).map((v) => v.name);
     const bookingsInTown = bookings.filter((b) => villagesInTown?.includes(b.village || "") && !b.deleted);
     const participants = bookingsInTown.reduce<JsonParticipantWithExtraType[]>((a, c) => {
@@ -115,14 +120,13 @@ const TownsSummary: React.FC<{ event: JsonEventType; bookings: JsonBookingWithEx
         <TableCell>{town}</TableCell>
         <TableCell>{villagesInTown?.length}</TableCell>
         <TableCell>{participants.length}</TableCell>
-        <TableCell>{applicationsInTown.reduce((a,c) => a += c.predictedParticipants, 0)}</TableCell>
+        <TableCell>{applicationsInTown.reduce((a, c) => (a += c.predictedParticipants), 0)}</TableCell>
       </TableRow>
     );
   });
 
   const graphs = Array.from(towns).map((town, i) => {
-
-    const applicationsInTown = waitingApplications.filter((a) => event.villages?.find(v => v.name === a.village && v.town === town));
+    const applicationsInTown = waitingApplications.filter((a) => event.villages?.find((v) => v.name === a.village && v.town === town));
 
     const villagesInTown = event.villages?.filter((v) => v.town === town).map((v) => v.name);
     const bookingsInTown = bookings.filter((b) => villagesInTown?.includes(b.village || "") && !b.deleted);
@@ -133,7 +137,7 @@ const TownsSummary: React.FC<{ event: JsonEventType; bookings: JsonBookingWithEx
     return (
       <Grid item key={i} xs={12} sm={3} md={2}>
         <Typography variant="h5">{town}</Typography>
-        <TownGraph event={event} participants={participants} applications={applicationsInTown.reduce((a,c) => a += c.predictedParticipants, 0)}/>
+        <TownGraph event={event} participants={participants} applications={applicationsInTown.reduce((a, c) => (a += c.predictedParticipants), 0)} />
       </Grid>
     );
   });
@@ -212,6 +216,8 @@ export function Component() {
   const eventOperation = useEventOperation(event.id);
   const bookingOperation = useBookingOperation();
 
+  const [selectedBooking, setSelectedBooking] = React.useState<number | undefined>(undefined);
+
   const removeVillage = (name) => (e) => {
     eventOperation.mutate({ operation: { type: "removeVillage", name: name } });
     e.preventDefault();
@@ -276,7 +282,7 @@ export function Component() {
 
       const tableRows = bookingsInVillage.map((b, i) => {
         return (
-          <TableRow key={i}>
+          <TableRow key={i} onClick={() => setSelectedBooking(rawBookings.findIndex((i) => i.userId === b.userId))} sx={{ cursor: "pointer" }}>
             <TableCell>{b.basic.bookingType === "group" ? b.basic.district : b.basic.contactName}</TableCell>
             <TableCell>{b.participants.length}</TableCell>
             <TableCell>
@@ -364,7 +370,14 @@ export function Component() {
             </Grid>
             <Grid item sm={8} xs={12}>
               <TableContainer component={Paper}>
-                <Table size="small">
+                <Table
+                  size="small"
+                  sx={{
+                    "& .MuiTableRow-root:hover": {
+                      backgroundColor: "primary.light",
+                    },
+                  }}
+                >
                   <TableHead>
                     <TableRow>
                       <TableCell>Group</TableCell>
@@ -470,6 +483,12 @@ export function Component() {
 
   return (
     <Grid container spacing={2} p={2}>
+      <BookingsModal
+        event={event}
+        selectedBooking={selectedBooking}
+        booking={typeof selectedBooking == "number" ? rawBookings[selectedBooking] : undefined}
+        handleClose={() => setSelectedBooking(undefined)}
+      />
       <AddVillageWidget event={event} />
       <Grid item xs={12}>
         <TownsSummary event={event} bookings={rawBookings} waitingApplications={waitingApplications} />
