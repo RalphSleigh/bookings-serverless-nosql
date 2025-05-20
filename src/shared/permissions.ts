@@ -79,6 +79,13 @@ export const CanManageEvent = new LoggedInPermission<"event">(data => {
     return false
 }, "User can't manage event")
 
+export const CanManageWholeEvent = new LoggedInPermission<"event">(data => {
+    if (IsGlobalAdmin.if(data)) return true
+    if (hasRoleOnEvent(data.user, data.event, ["Owner", "Manage", "View", "Money", "KP", "Comms", "Accessibility"])) return true
+    return false
+}, "User can't manage whole event")
+
+
 export const CanCreateAnyRole = new LoggedInPermission<"event">(data => {
     if (IsGlobalAdmin.if(data)) return true
     return hasRoleOnEvent(data.user, data.event, ["Owner", "Manage"])
@@ -157,7 +164,7 @@ export const CanManageApplications = new LoggedInPermission<"event">(data => {
 export const CanManageVillages = new LoggedInPermission<"event">(data => {
     if (IsGlobalAdmin.if(data)) return true
     return data.event.bigCampMode && hasRoleOnEvent(data.user, data.event, ["Owner", "Manage"])
-}, "User can't manage applications")
+}, "User can't manage Villages")
 
 const hasRoleOnEvent = (user: NonNullable<UserResponseType | JsonUserResponseType>, event: OnetableEventType | JsonEventType, roles: Array<RoleType["role"]>): Boolean => {
     return !!roles.find(role => ((user.roles as Array<RoleType>).find(r => r.eventId === event.id && r.role === role)))
