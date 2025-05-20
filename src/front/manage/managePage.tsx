@@ -165,7 +165,7 @@ function LatestDataLoader({ event, timeline, displayDeleted, participantSearch, 
     const mode = location.pathname.endsWith("money") || location.pathname.endsWith("bookings") ? "find" : "filter"
     const { bookings } = useEventBookings(event.id).data
     const enhancedBookings = addComputedFieldsToBookingsQueryResult(bookings, event)
-    if(shouldIgnoreSearch(location)) return <Outlet context={{ event, bookings, timeline, displayDeleted }} />
+    if(shouldIgnoreSearch(location)) return <Outlet context={{ event, bookings: enhancedBookings, timeline, displayDeleted }} />
     const bookingSearchedBookings = bookingsBookingSearch(event, enhancedBookings, bookingSearch, villageSearch, townSearch)
     const searchedBookings = bookingsParticipantSearch(bookingSearchedBookings, participantSearch, mode)
     return <Outlet context={{ event, bookings: searchedBookings, timeline, displayDeleted }} />
@@ -177,7 +177,7 @@ function TimeLineDataLoader({ event, timeline, displayDeleted, participantSearch
     const mode = location.pathname.endsWith("money") || location.pathname.endsWith("bookings") ? "find" : "filter"
     const { bookings } = useHistoricalEventBookings(event.id, Date.parse(timeline.position.time).toString()).data
     const enhancedBookings = addComputedFieldsToBookingsQueryResult(bookings, event)
-    if(shouldIgnoreSearch(location)) return <Outlet context={{ event, bookings, timeline, displayDeleted }} />
+    if(shouldIgnoreSearch(location)) return <Outlet context={{ event, bookings: enhancedBookings, timeline, displayDeleted }} />
     const bookingSearchedBookings = bookingsBookingSearch(event, enhancedBookings, bookingSearch, villageSearch, townSearch)
     const searchedBookings = bookingsParticipantSearch(bookingSearchedBookings, participantSearch, mode)
     return <Outlet context={{ event, bookings: searchedBookings, timeline, displayDeleted }} />
