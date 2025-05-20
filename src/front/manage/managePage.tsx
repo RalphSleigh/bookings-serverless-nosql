@@ -152,6 +152,10 @@ function shouldShowSearch(location) {
     || location.pathname.endsWith("money")
 }
 
+function shouldIgnoreSearch(location) {
+    return location.pathname.endsWith("villages") 
+}
+
 export type managePageContext = manageLoaderContext & {
     bookings: Array<JsonBookingWithExtraType>
     displayDeleted: boolean
@@ -160,6 +164,7 @@ export type managePageContext = manageLoaderContext & {
 function LatestDataLoader({ event, timeline, displayDeleted, participantSearch, bookingSearch, villageSearch, townSearch, location }) {
     const mode = location.pathname.endsWith("money") || location.pathname.endsWith("bookings") ? "find" : "filter"
     const { bookings } = useEventBookings(event.id).data
+    if(shouldIgnoreSearch(location)) return <Outlet context={{ event, bookings, timeline, displayDeleted }} />
     const enhancedBookings = addComputedFieldsToBookingsQueryResult(bookings, event)
     const bookingSearchedBookings = bookingsBookingSearch(event, enhancedBookings, bookingSearch, villageSearch, townSearch)
     const searchedBookings = bookingsParticipantSearch(bookingSearchedBookings, participantSearch, mode)
@@ -171,6 +176,7 @@ const MemoLatestDataLoader = React.memo(LatestDataLoader)
 function TimeLineDataLoader({ event, timeline, displayDeleted, participantSearch, bookingSearch, villageSearch, townSearch, location }) {
     const mode = location.pathname.endsWith("money") || location.pathname.endsWith("bookings") ? "find" : "filter"
     const { bookings } = useHistoricalEventBookings(event.id, Date.parse(timeline.position.time).toString()).data
+    if(shouldIgnoreSearch(location)) return <Outlet context={{ event, bookings, timeline, displayDeleted }} />
     const enhancedBookings = addComputedFieldsToBookingsQueryResult(bookings, event)
     const bookingSearchedBookings = bookingsBookingSearch(event, enhancedBookings, bookingSearch, villageSearch, townSearch)
     const searchedBookings = bookingsParticipantSearch(bookingSearchedBookings, participantSearch, mode)
