@@ -153,7 +153,7 @@ function shouldShowSearch(location) {
 }
 
 function shouldIgnoreSearch(location) {
-    return location.pathname.endsWith("villages") 
+    return location.pathname.endsWith("villages") || location.pathname.endsWith("applications")
 }
 
 export type managePageContext = manageLoaderContext & {
