@@ -186,7 +186,7 @@ export class Large extends FeeStructure {
         results.push({
           description: "Cancellation Fees",
           values: [(totalBeforeDeadline - totalNow) / 2],
-          tooltip: `50% of the difference between the total fees at the booking deadline(${currency(totalBeforeDeadline)}) and now (${currency(totalNow)})`,
+          tooltip: `50% of the difference between the total fees at the booking deadline (${currency(totalBeforeDeadline)}) and now (${currency(totalNow)})`,
         });
 
       return results;
