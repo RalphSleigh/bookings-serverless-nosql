@@ -175,7 +175,7 @@ export class Large extends FeeStructure {
       for (const [band, item] of Object.entries(totals)) {
         for (const [index, option] of Object.entries(item)) {
           results.push({
-            description: `${option.count} ${option.count == 1 ? "Person" : "People"} for the ${event.attendanceData!.options![index]}`,
+            description: `${option.count} ${option.count == 1 ? "Person" : "People"} for the ${event.attendanceData!.options![index]} ${option.band.description || ""}`,
             tooltip: `${format(option.band.beforeDate!, "PPPp")}`,
             values: [option.count * option.band.fees[index]],
           });
