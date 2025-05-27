@@ -28,9 +28,9 @@ export function Component() {
     return acc + " " + diets.trim();
   },"");
 
-  const filteredWords = ["","Sunday","me","was","i","if","N/A","eg","None","has",".","/","are","He's","She's","he","she","He","She","am","is", "the", "and", "a", "to", "of", "in", "for", "with", "on", "that", "it", "this", "as", "by", "at", "from", "I"];
+  const filteredWords = ["","•","Sunday","me","was","i","if","N/A","eg","None","has",".","/","are","He's","She's","he","she","He","She","am","is", "the", "and", "a", "to", "of", "in", "for", "with", "on", "that", "it", "this", "as", "by", "at", "from", "I"];
 
-  const wordData = wordFreq(dietString).filter(w => !filteredWords.includes(w.text))
+  const wordData = wordFreq(dietString).filter(w => !filteredWords.includes(w.text) && w.value > 1)
 
   const tableRows = Object.entries(graphDataQuery.countPerUser)
     .sort((a, b) => b[1] - a[1])
