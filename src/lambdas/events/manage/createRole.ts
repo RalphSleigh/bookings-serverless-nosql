@@ -49,7 +49,7 @@ export const lambdaHandler = lambda_wrapper_json(
 
             const role = await RoleModel.create(lambda_event.body.role)
 
-            if(role.role !== "Book") {
+            if(role.role !== "Book" && role.role !== "Amend") {
                 await queueEmail({
                     template: "managerDataAccess",
                     recipient: targetUser,
