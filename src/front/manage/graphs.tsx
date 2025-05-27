@@ -28,7 +28,7 @@ export function Component() {
     return acc + " " + diets.trim();
   },"");
 
-  const filteredWords = ["","is", "the", "and", "a", "to", "of", "in", "for", "with", "on", "that", "it", "this", "as", "by", "at", "from", "I"];
+  const filteredWords = ["","Sunday","me","was","i","if","N/A","eg","None","has",".","/","are","He's","She's","he","she","He","She","am","is", "the", "and", "a", "to", "of", "in", "for", "with", "on", "that", "it", "this", "as", "by", "at", "from", "I"];
 
   const wordData = wordFreq(dietString).filter(w => !filteredWords.includes(w.text))
 
@@ -97,8 +97,8 @@ function getRotationDegree() {
         <Wordcloud 
         fontSize={fontSizeSetter}
         spiral='archimedean'
-        width={1000}
-        height={600}
+        width={1500}
+        height={1000}
         font={'Impact'}
         padding={2}
         rotate={getRotationDegree}
