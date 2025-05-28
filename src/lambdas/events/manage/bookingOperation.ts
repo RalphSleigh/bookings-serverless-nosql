@@ -1,6 +1,6 @@
 import { Model } from 'dynamodb-onetable';
 import { lambda_wrapper_json } from '../../../lambda-common/lambda_wrappers.js';
-import { BookingType, EventType, OnetableBookingType, RoleType, UserType, table } from '../../../lambda-common/onetable.js';
+import { BookingType, EventType, OnetableBookingType, OnetableEventType, RoleType, UserType, table } from '../../../lambda-common/onetable.js';
 import { CanCreateRole, CanManageVillages, CanWriteMoney } from '../../../shared/permissions.js';
 import { admin, auth } from '@googleapis/admin';
 import { BookingOperationType } from '../../../shared/computedDataTypes.js';
@@ -8,7 +8,7 @@ import { Jsonify } from 'type-fest'
 import { postToDiscord } from '../../../lambda-common/discord.js';
 import { addVersionToBooking } from '../../../lambda-common/util.js';
 
-const EventModel = table.getModel<EventType>('Event')
+const EventModel = table.getModel<OnetableEventType>('Event')
 const RoleModel = table.getModel<RoleType>('Role')
 const UserModel: Model<UserType> = table.getModel<UserType>('User')
 const BookingModel: Model<OnetableBookingType> = table.getModel<OnetableBookingType>('Booking')
@@ -20,6 +20,7 @@ export const lambdaHandler = lambda_wrapper_json(
             const booking = await BookingModel.get({ eventId: lambda_event.pathParameters?.id, userId: lambda_event.pathParameters?.userId, version: "latest" })
             if (booking) {
                 const operation: BookingOperationType = lambda_event.body.operation
+                console.log("Operation", JSON.stringify(operation))
                 switch (operation.type) {
                     case "addPayment":
                         CanWriteMoney.throw({ user: current_user, event: event })
@@ -58,12 +59,11 @@ export const lambdaHandler = lambda_wrapper_json(
                         return { message: "Fee removed" }
                     case "assignVillage":
                         CanManageVillages.throw({ user: current_user, event: event })
-                        await addVersionToBooking(booking as BookingType, { village: operation.village })
+                        await addVersionToBooking(event as EventType, booking as BookingType, { village: operation.village })
                         return { message: "Village assigned" }
                     case "unassignVillage":
                         CanManageVillages.throw({ user: current_user, event: event })
-                        //@ts-ignore
-                        await addVersionToBooking(booking as BookingType, { village: null })
+                        await addVersionToBooking(event as EventType, booking as BookingType, { village: "" })
                         return { message: "Village unassigned" }
                     default:
                         throw new Error("Invalid operation")

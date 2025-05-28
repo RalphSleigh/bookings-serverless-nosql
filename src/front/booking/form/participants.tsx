@@ -170,8 +170,8 @@ function ParticipantForm({ index,
                 <Grid xs={12} item>
                     <Box display="flex" justifyContent="flex-end">
                         <IconButton onClick={() => setCollapse(true)}><ExpandLess /></IconButton>
-                        <IconButton color="warning" onClick={e => setDeleteLock(d => !d)}>{deleteLock ? <Lock /> : <LockOpen />}</IconButton>
-                        <IconButton color="error" disabled={deleteLock} onClick={deleteParticipant(index, participant.basic?.name)}><Close /></IconButton>
+                        <IconButton color="warning" disabled={readOnly} onClick={e => setDeleteLock(d => !d)}>{deleteLock ? <Lock /> : <LockOpen />}</IconButton>
+                        <IconButton color="error" disabled={deleteLock || readOnly} onClick={deleteParticipant(index, participant.basic?.name)}><Close /></IconButton>
                     </Box>
                 </Grid>
             </Grid>

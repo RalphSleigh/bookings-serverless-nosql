@@ -35,7 +35,7 @@ import { JsonBookingWithExtraType } from "../computedDataTypes.js";
 import { organisations } from "../ifm.js";
 import { EnvContext } from "../../front/app/envContext.js";
 import { Description } from "@mui/icons-material";
-import { create } from "@mui/material/styles/createTransitions.js";
+import addDays from "date-fns/addDays";
 
 const paymentInstructions = `Please make bank transfers to:  
 
@@ -109,6 +109,12 @@ export class Large extends FeeStructure {
         return newP;
       };
 
+      const validatePreviousParticipant: (any) => ParticipantType = (p) => {
+        const newP = { ...p, created: p.created ? parseDate(p.created) : addDays(parseDate(event.bookingDeadline!), -1) };
+        newP.basic.dob = parseDate(newP.basic!.dob);
+        return newP;
+      };
+
       const computedBands = feeData.largeCampBands.map((band) => {
         return { ...band, beforeDate: parseDate(band.before), beforeString: parseDate(band.before)!.toISOString() };
       });
@@ -135,7 +141,7 @@ export class Large extends FeeStructure {
 
       let totalsBeforeDeadline: Record<string, Record<number, { count: number; band: (typeof computedBands)[0] }>> = {};
 
-      const validPrevParticipants = (booking.extraFeeData?.participantsAtDeadline || []).filter(filterParticipants).map(validateParticipant);
+      const validPrevParticipants = (booking.extraFeeData?.participantsAtDeadline || []).filter(filterParticipants).map(validatePreviousParticipant);
 
       for (const participant of validPrevParticipants) {
         if (differenceInYears(startDate!, participant.basic.dob) < 5) {
@@ -175,7 +181,7 @@ export class Large extends FeeStructure {
       for (const [band, item] of Object.entries(totals)) {
         for (const [index, option] of Object.entries(item)) {
           results.push({
-            description: `${option.count} ${option.count == 1 ? "Person" : "People"} for the ${event.attendanceData!.options![index]}`,
+            description: `${option.count} ${option.count == 1 ? "Person" : "People"} for the ${event.attendanceData!.options![index]} ${option.band.description || ""}`,
             tooltip: `${format(option.band.beforeDate!, "PPPp")}`,
             values: [option.count * option.band.fees[index]],
           });
@@ -186,7 +192,7 @@ export class Large extends FeeStructure {
         results.push({
           description: "Cancellation Fees",
           values: [(totalBeforeDeadline - totalNow) / 2],
-          tooltip: `50% of the difference between the total fees at the booking deadline(${currency(totalBeforeDeadline)}) and now (${currency(totalNow)})`,
+          tooltip: `50% of the difference between the total fees at the booking deadline (${currency(totalBeforeDeadline)}) and now (${currency(totalNow)})`,
         });
 
       return results;
