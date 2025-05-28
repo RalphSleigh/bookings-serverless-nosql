@@ -35,7 +35,7 @@ import { JsonBookingWithExtraType } from "../computedDataTypes.js";
 import { organisations } from "../ifm.js";
 import { EnvContext } from "../../front/app/envContext.js";
 import { Description } from "@mui/icons-material";
-import { create } from "@mui/material/styles/createTransitions.js";
+import addDays from "date-fns/addDays";
 
 const paymentInstructions = `Please make bank transfers to:  
 
@@ -110,7 +110,7 @@ export class Large extends FeeStructure {
       };
 
       const validatePreviousParticipant: (any) => ParticipantType = (p) => {
-        const newP = { ...p, created: p.created ? parseDate(p.created) : subtractDays(parseDate(event.bookingDeadline), 1) };
+        const newP = { ...p, created: p.created ? parseDate(p.created) : addDays(parseDate(event.bookingDeadline!), -1) };
         newP.basic.dob = parseDate(newP.basic!.dob);
         return newP;
       };
@@ -572,7 +572,3 @@ const FeeBandConfig = ({
     </Paper>
   );
 };
-function subtractDays(arg0: Date | null, arg1: number) {
-  throw new Error("Function not implemented.");
-}
-
