@@ -109,6 +109,12 @@ export class Large extends FeeStructure {
         return newP;
       };
 
+      const validatePreviousParticipant: (any) => ParticipantType = (p) => {
+        const newP = { ...p, created: p.created ? parseDate(p.created) : subtractDays(parseDate(event.bookingDeadline), 1) };
+        newP.basic.dob = parseDate(newP.basic!.dob);
+        return newP;
+      };
+
       const computedBands = feeData.largeCampBands.map((band) => {
         return { ...band, beforeDate: parseDate(band.before), beforeString: parseDate(band.before)!.toISOString() };
       });
@@ -135,7 +141,7 @@ export class Large extends FeeStructure {
 
       let totalsBeforeDeadline: Record<string, Record<number, { count: number; band: (typeof computedBands)[0] }>> = {};
 
-      const validPrevParticipants = (booking.extraFeeData?.participantsAtDeadline || []).filter(filterParticipants).map(validateParticipant);
+      const validPrevParticipants = (booking.extraFeeData?.participantsAtDeadline || []).filter(filterParticipants).map(validatePreviousParticipant);
 
       for (const participant of validPrevParticipants) {
         if (differenceInYears(startDate!, participant.basic.dob) < 5) {
@@ -566,3 +572,7 @@ const FeeBandConfig = ({
     </Paper>
   );
 };
+function subtractDays(arg0: Date | null, arg1: number) {
+  throw new Error("Function not implemented.");
+}
+
