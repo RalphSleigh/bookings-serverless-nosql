@@ -55,9 +55,9 @@ export const lambdaHandler = lambda_wrapper_json(
                     recipient: targetUser,
                     event: event as EventType,
                 }, config)
-
-                await postToDiscord(config, `${current_user.userName} granted ${targetUser.userName} role ${role.role} for ${event.name}`)
             }
+
+            await postToDiscord(config, `${current_user.userName} granted ${targetUser.userName} role ${role.role} for ${event.name}`)
 
             return {}
         } else {
