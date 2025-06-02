@@ -135,6 +135,9 @@ const ParticipantModal = ({ event, selectedParticipant, participant, handleClose
                         <a href={`mailto:${participant.booking.basic.contactEmail}`}>{participant.booking.basic.contactEmail}</a><br />
                         <a href={`tel:${participant.booking.basic.contactPhone}`}>{participant.booking.basic.contactPhone}</a>
                     </Typography>
+                    {event.allParticipantEmails ? <Typography variant="body1" sx={noWrap}>
+                        <b>Email: </b><a href={`mailto:${participant.basic.email}`}>{participant.basic.email}</a><br />
+                    </Typography> : null }
                     { participant.booking.emergency?.name || participant.booking.emergency?.phone ? <Typography variant="body1" sx={noWrap}>
                         <b>Emergency Contact:</b><br /> {participant.booking.emergency?.name}<br />
                         <a href={`tel:${participant.booking.emergency?.phone}`}>{participant.booking.emergency?.phone}</a>
