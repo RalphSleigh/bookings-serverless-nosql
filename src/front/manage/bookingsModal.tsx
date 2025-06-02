@@ -7,7 +7,7 @@ import { fees } from "../../shared/fee/fee.js"
 import { CanCreateAnyRole } from "../../shared/permissions.js"
 import { IfHasPermission } from "../permissions.js"
 import { applicationTypeIcon } from "./utils.js"
-import { useCreateRole, useEventRoles } from "../queries.js"
+import { useCreateRole, useDeleteRole, useEventRoles } from "../queries.js"
 
 export const BookingsModal = ({ event, selectedBooking, booking, handleClose }: { event: JsonEventType, selectedBooking: number | undefined, booking: JsonBookingWithExtraType | undefined, handleClose: () => void }) => {
     if (!booking) return null
@@ -88,6 +88,7 @@ export const BookingsModal = ({ event, selectedBooking, booking, handleClose }: 
 
 const UnlockWidget = ({ event, booking }: { event: JsonEventType, booking: JsonBookingWithExtraType }) => {
     const createRole = useCreateRole(event.id)
+    const deleteRole = useDeleteRole(event.id)
     const roleData = useEventRoles(event.id)
 
     const haveRole = roleData.data?.roles.find(r => r.userId === booking.userId && r.role === "Amend")
@@ -96,7 +97,11 @@ const UnlockWidget = ({ event, booking }: { event: JsonEventType, booking: JsonB
         createRole.mutate({ eventId: event.id, userId: booking.userId, role: "Amend" })
     }
 
+    const lockOnClick = () => {
+        deleteRole.mutate(haveRole?.id || "" )
+    }
+
     return <Grid item xs={12}>
-        {haveRole ? <Button variant="contained" disabled={true} >Unlocked</Button> : <Button variant="contained" disabled={createRole.isPending} onClick={unlockOnClick}>Unlock</Button>}
+        {haveRole ? <Button variant="contained" disabled={deleteRole.isPending} onClick={lockOnClick} color="warning">Lock</Button> : <Button variant="contained" disabled={createRole.isPending} onClick={unlockOnClick} color="success">Unlock</Button>}
     </Grid>
 }
