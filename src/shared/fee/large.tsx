@@ -122,26 +122,43 @@ export class Large extends FeeStructure {
       let free = 0;
       let totals: Record<string, Record<number, { count: number; band: (typeof computedBands)[0] }>> = {};
 
-      const validParticipants = (booking.participants as JsonParticipantType[]).filter(filterParticipants).map(validateParticipant);
+      const validParticipants = (booking.participants as JsonParticipantType[])
+        .filter(filterParticipants)
+        .map(validateParticipant)
+        .sort((a, b) => a.created.getTime() - b.created.getTime());
+
+      const validPrevParticipants = (booking.extraFeeData?.participantsAtDeadline || []).filter(filterParticipants).map(validatePreviousParticipant);
+
+      let participantCount = 0;
 
       for (const participant of validParticipants) {
-        if (differenceInYears(startDate!, participant.basic.dob) < 5) {
-          free++;
+        if (participantCount < validPrevParticipants.length) {
+          participantCount++;
+          if (differenceInYears(startDate!, participant.basic.dob) < 5) {
+            free++;
+          } else {
+            const band = computedBands[0];
+            if (!totals[band.beforeString]) totals[band.beforeString] = {};
+            if (!totals[band.beforeString][participant.attendance!.option!]) totals[band.beforeString][participant.attendance!.option!] = { count: 0, band: band };
+            totals[band.beforeString][participant.attendance!.option!].count++;
+          }
         } else {
-          for (const band of computedBands) {
-            if (band.beforeDate! > participant.created) {
-              if (!totals[band.beforeString]) totals[band.beforeString] = {};
-              if (!totals[band.beforeString][participant.attendance!.option!]) totals[band.beforeString][participant.attendance!.option!] = { count: 0, band: band };
-              totals[band.beforeString][participant.attendance!.option!].count++;
-              break;
+          if (differenceInYears(startDate!, participant.basic.dob) < 5) {
+            free++;
+          } else {
+            for (const band of computedBands) {
+              if (band.beforeDate! > participant.created) {
+                if (!totals[band.beforeString]) totals[band.beforeString] = {};
+                if (!totals[band.beforeString][participant.attendance!.option!]) totals[band.beforeString][participant.attendance!.option!] = { count: 0, band: band };
+                totals[band.beforeString][participant.attendance!.option!].count++;
+                break;
+              }
             }
           }
         }
       }
 
       let totalsBeforeDeadline: Record<string, Record<number, { count: number; band: (typeof computedBands)[0] }>> = {};
-
-      const validPrevParticipants = (booking.extraFeeData?.participantsAtDeadline || []).filter(filterParticipants).map(validatePreviousParticipant);
 
       for (const participant of validPrevParticipants) {
         if (differenceInYears(startDate!, participant.basic.dob) < 5) {
@@ -393,7 +410,7 @@ export class Large extends FeeStructure {
         );
       });
 
-      const paymentLines = booking.fees
+    const paymentLines = booking.fees
       ?.filter((f) => f.type === "payment")
       .map((f, i) => {
         totalPaid += f.value;
@@ -426,34 +443,35 @@ export class Large extends FeeStructure {
             {feeLines}
             {adjustmentLines}
             <tr>
-                <td>
-                    <b>Total:{" "}</b>
-                </td>
-                <td>
-                    <b>{currency(totalOwed)}</b>
-                </td>
+              <td>
+                <b>Total: </b>
+              </td>
+              <td>
+                <b>{currency(totalOwed)}</b>
+              </td>
             </tr>
-            {paymentLines.length > 0 ? <> 
-            <tr>
-                <td colSpan={2} align="center"><b>Payments Received:</b></td>
-            </tr>
-            {paymentLines}
-            <tr>
-                <td>
-                    <b>Total:{" "}</b>
-                </td>
-                <td>
+            {paymentLines.length > 0 ? (
+              <>
+                <tr>
+                  <td colSpan={2} align="center">
+                    <b>Payments Received:</b>
+                  </td>
+                </tr>
+                {paymentLines}
+                <tr>
+                  <td>
+                    <b>Total: </b>
+                  </td>
+                  <td>
                     <b>{currency(totalPaid)}</b>
-                </td>
-            </tr>
-            </> : null }
+                  </td>
+                </tr>
+              </>
+            ) : null}
           </tbody>
         </table>
         <p>
-          <b>
-            Balance:{" "}
-            {currency(totalOwed - totalPaid)}
-          </b>
+          <b>Balance: {currency(totalOwed - totalPaid)}</b>
         </p>
       </>
     );
