@@ -148,6 +148,7 @@ export function Component() {
             <MenuItem value="Comms">Comms</MenuItem>
             <MenuItem value="Accessibility">Accessibility</MenuItem>
             <MenuItem value="Book">Book</MenuItem>
+            <MenuItem value="Amend">Amend</MenuItem>
             <MenuItem value="View - Village">View - Village</MenuItem>
           </Select>
         </FormControl>
