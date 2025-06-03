@@ -55,7 +55,7 @@ export const lambdaHandler = lambda_wrapper_json(
                                 set: { fees: newFees }
                             })
 
-                        await postToDiscord(config, `${current_user.userName} deleted a payment/adjustment from booking ${booking.basic.district || booking.basic.contactName}: (${deletedFee?.type}) of ${currency(deletedFee?.value || 0)} (${deletedFee?.description})`)
+                        await postToDiscord(config, `${current_user.userName} deleted a ${deletedFee?.type} from booking ${booking.basic.district || booking.basic.contactName} of ${currency(deletedFee?.value || 0)} (${deletedFee?.description})`)
 
                         return { message: "Fee removed" }
                     case "assignVillage":
