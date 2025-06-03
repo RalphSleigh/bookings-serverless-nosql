@@ -129,9 +129,10 @@ export class Large extends FeeStructure {
       const validPrevParticipants = (booking.extraFeeData?.participantsAtDeadline || []).filter(filterParticipants).map(validatePreviousParticipant);
 
       let participantCount = 0;
+      const bookingCreatedBeforeDeadline = parseDate(event.bookingDeadline!)!.getTime() > parseDate(booking.created!)!.getTime();
 
       for (const participant of validParticipants) {
-        if (participantCount < validPrevParticipants.length) {
+        if (participantCount < validPrevParticipants.length && bookingCreatedBeforeDeadline) {
           participantCount++;
           if (differenceInYears(startDate!, participant.basic.dob) < 5) {
             free++;
