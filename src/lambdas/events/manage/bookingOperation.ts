@@ -48,13 +48,14 @@ export const lambdaHandler = lambda_wrapper_json(
                         return { message: "Adjustment added" }
                     case "removeFeeItem":
                         CanWriteMoney.throw({ user: current_user, event: event })
+                        const deletedFee = booking.fees.find(fee => fee.date.toISOString() === operation.date)
                         const newFees = booking.fees.filter(fee => fee.date.toISOString() !== operation.date).map(f => { return { ...f, date: f.date.toISOString() } })
                         await BookingModel.update({ eventId: booking.eventId, userId: booking.userId, version: "latest" },
                             {
                                 set: { fees: newFees }
                             })
 
-                        await postToDiscord(config, `${current_user.userName} deleted a payment/adjustment from booking ${booking.basic.district} (TODO: Figure out what)`)
+                        await postToDiscord(config, `${current_user.userName} deleted a payment/adjustment from booking ${booking.basic.district || booking.basic.contactName}: (${deletedFee?.type}) of ${currency(deletedFee?.value || 0)} (${deletedFee?.description})`)
 
                         return { message: "Fee removed" }
                     case "assignVillage":
