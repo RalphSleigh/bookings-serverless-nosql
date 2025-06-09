@@ -4,7 +4,7 @@ import { managePageContext } from "./managePage.js";
 import { Avatar, AvatarGroup, Box, Button, FormControl, Grid, InputLabel, MenuItem, Modal, Paper, Select, Stack, Typography } from "@mui/material";
 import { UserContext } from "../user/userContext.js";
 import { useCreateRole, useEventRoles, useHistoricalEventBookingSingle } from "../queries.js";
-import ReactJsonViewCompare from "react-json-view-compare";
+import ReactDiffViewer from 'react-diff-viewer-continued';
 
 export function Component() {
   const { event, bookings, displayDeleted } = useOutletContext<managePageContext>();
@@ -112,7 +112,7 @@ export function Component() {
         </Button>
       </Grid>
       <Grid xs={12} p={2} item>
-        <ReactJsonViewCompare oldData={startData} newData={endData} displayDataTypes={false} displayObjectSize={false} />
+        <ReactDiffViewer.default showDiffOnly={false} oldValue={startData} newValue={endData} splitView={false} compareMethod={ReactDiffViewer.DiffMethod.JSON}/>
       </Grid>
     </>
   );

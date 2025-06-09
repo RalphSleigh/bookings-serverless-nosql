@@ -83,6 +83,7 @@
     "react": "^18.2.0",
     "react-beautiful-dnd": "^3.0.0",
     "react-copy-to-clipboard": "^5.0.1",
+    "react-diff-viewer-continued": "^3.4.0",
     "react-dom": "^18.2.0",
     "react-dom-factories": "^1.0.2",
     "react-json-view-compare": "^2.0.2",
