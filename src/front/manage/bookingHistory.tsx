@@ -28,36 +28,63 @@ export function Component() {
   const startData = historyData.bookings[start];
   const endData = historyData.bookings[end];
 
-  if(!startData || !endData) {
-    return <>
-      <Grid xs={12} p={2} item>
-        <FormControl>
-          <InputLabel id={`Start`}>Start</InputLabel>
-          <Select value={start} label="Start" onChange={(e) => setStart(parseInt(e.target.value))} labelId={`Start`}>
-            {startItems}
-          </Select>
-        </FormControl>
-        <FormControl>
-          <InputLabel id={`End`}>End</InputLabel>
-          <Select value={end} label="End" onChange={(e) => setEnd(parseInt(e.target.value))} labelId={`End`}>
-            {startItems}
-          </Select>
-        </FormControl>
-        <Button
-          variant="contained"
-          onClick={() => {
-            setStart(start - 1);
-            setEnd(end - 1);
-          }}
-        >
-          Back
-        </Button>
-      </Grid>
-    </>
+  if (!startData || !endData) {
+    return (
+      <>
+        <Grid xs={12} p={2} item>
+          <FormControl>
+            <InputLabel id={`Start`}>Start</InputLabel>
+            <Select value={start} label="Start" onChange={(e) => setStart(parseInt(e.target.value))} labelId={`Start`}>
+              {startItems}
+            </Select>
+          </FormControl>
+          <FormControl>
+            <InputLabel id={`End`}>End</InputLabel>
+            <Select value={end} label="End" onChange={(e) => setEnd(parseInt(e.target.value))} labelId={`End`}>
+              {startItems}
+            </Select>
+          </FormControl>
+          <Button
+            variant="contained"
+            onClick={() => {
+              setStart(start - 1);
+              setEnd(end - 1);
+            }}
+          >
+            Back
+          </Button>
+        </Grid>
+      </>
+    );
   }
 
-  startData.participants = startData.participants.sort((a, b) => a.created.localeCompare(b.created));
-  endData.participants = endData.participants.sort((a, b) => a.created.localeCompare(b.created));
+  startData.participants = startData.participants
+    .sort((a, b) => a.basic.name.localeCompare(b.basic.name))
+    .map((p) => {
+      //@ts-expect-error
+      delete p.created;
+      //@ts-expect-error
+      delete p.updated;
+      return p;
+    });
+  endData.participants = endData.participants
+    .sort((a, b) => a.basic.name.localeCompare(b.basic.name))
+    .map((p) => {
+      //@ts-expect-error
+      delete p.created;
+      //@ts-expect-error
+      delete p.updated;
+      return p;
+    });
+
+  //@ts-expect-error
+  delete startData.created;
+  //@ts-expect-error
+  delete startData.updated;
+  //@ts-expect-error
+  delete endData.created;
+  //@ts-expect-error
+  delete endData.updated;
 
   return (
     <>
