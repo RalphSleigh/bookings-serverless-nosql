@@ -1,5 +1,5 @@
 import React from "react"
-import { Typography, Paper, Grid, Modal, Stack, Button } from "@mui/material"
+import { Typography, Paper, Grid, Modal, Stack, Button, Link } from "@mui/material"
 import { parseDate } from "../../shared/util.js"
 import { JsonEventType } from "../../lambda-common/onetable.js"
 import { JsonBookingWithExtraType } from "../../shared/computedDataTypes.js"
@@ -71,6 +71,7 @@ export const BookingsModal = ({ event, selectedBooking, booking, handleClose }: 
                         </Typography>
                     </> : null}
                     {customAnswers}
+                    <Link href={`/event/${event.id}/manage/bookings/history/${booking.userId}`}>History</Link>
                 </Grid>
                 <Grid item xs={12} sm sx={{overflowY: "scroll"}}>
                 <Typography variant="body1" sx={noWrap}><b>Attendees: ({booking.participants.length})</b></Typography>

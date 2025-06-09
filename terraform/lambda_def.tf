@@ -93,6 +93,12 @@ variable "lambda_definitions" {
       path   = "event/{id}/manage/bookings/{timestamp}"
       method = "get"
     },
+    event_bookings_historical_single = {
+      name   = "events_bookings_historical_single"
+      code   = "events/manage/getHistoricalSingleBooking"
+      path   = "event/{id}/manage/booking/history/{userId}"
+      method = "get"
+    },
     event_bookings_paricipant_numbers_chart_data = {
       name   = "event_bookings_paricipant_numbers_chart_data"
       code   = "events/manage/getParticipantNumbersChartData"

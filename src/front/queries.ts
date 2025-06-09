@@ -242,6 +242,14 @@ export function useHistoricalEventBookings(eventId, timestamp) {
     }) as QueryObserverSuccessResult<{ "bookings": [JsonBookingType] }>;
 }
 
+export function useHistoricalEventBookingSingle(eventId, userId) {
+    return useSuspenseQuery({
+        queryKey: ['manage', eventId, 'bookingsHistory', userId],
+        queryFn: async () => (await axios.get(`/api/event/${eventId}/manage/booking/history/${userId}`)).data
+    }) as QueryObserverSuccessResult<{ "bookings": [JsonBookingType] }>;
+}
+
+
 export function useParticipantNumbersChartData(eventId) {
     return useSuspenseQuery({
         queryKey: ['manage', eventId, 'bookings', 'chart'],
