@@ -3,6 +3,7 @@ import { Client, Events, GatewayIntentBits } from 'discord.js'
 import { serializeError } from 'serialize-error'
 
 export async function postToDiscord(config, message) {
+    console.log("posting to discord", message)
     try {
         if(!config.DISCORD_ENABLED) return
         console.log("putting message in queue - discord")

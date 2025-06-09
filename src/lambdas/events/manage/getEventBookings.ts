@@ -18,11 +18,15 @@ const BookingModel = table.getModel<BookingType>('Booking')
 
 export const lambdaHandler = lambda_wrapper_json(
     async (lambda_event, config, current_user) => {
+        console.log("Getting event")
         const event = await EventModel.get({ id: lambda_event.pathParameters?.id })
         if (event) {
             CanManageEvent.throw({ user: current_user, event: event })
+            console.log("Getting bookings")
             const bookings = await BookingModel.find({ sk: { begins: `event:${event.id}:version:latest` } }) as BookingType[]
+            console.log("Bookings found")
             const filtered = filterDataByRoles(event, bookings, current_user!)
+            console.log("Filtered bookings")
             return { bookings: filtered };
         } else {
             throw new Error("Can't find event")

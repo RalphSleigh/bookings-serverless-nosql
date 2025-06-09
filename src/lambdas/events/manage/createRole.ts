@@ -49,15 +49,15 @@ export const lambdaHandler = lambda_wrapper_json(
 
             const role = await RoleModel.create(lambda_event.body.role)
 
-            if(role.role !== "Book") {
+            if(role.role !== "Book" && role.role !== "Amend") {
                 await queueEmail({
                     template: "managerDataAccess",
                     recipient: targetUser,
                     event: event as EventType,
                 }, config)
-
-                await postToDiscord(config, `${current_user.userName} granted ${targetUser.userName} role ${role.role} for ${event.name}`)
             }
+
+            await postToDiscord(config, `${current_user.userName} **granted** ${targetUser.userName} role ${role.role} for ${event.name}`)
 
             return {}
         } else {
