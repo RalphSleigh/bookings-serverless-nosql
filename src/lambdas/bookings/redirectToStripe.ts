@@ -73,7 +73,8 @@ export const lambdaHandler = lambda_wrapper_json(
                     eventId: event.id,
                     userId: current_user.id,
                     donate: donate.toString()
-                }
+                },
+                receipt_email: current_user.email,
             }
         });
 
