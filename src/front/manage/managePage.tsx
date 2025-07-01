@@ -90,7 +90,7 @@ export function Component() {
                     <PermissionTab user={user} event={event} permission={CanSeeMoneyPage} label="Money" value={moneyPath.pathname} href={moneyPath.pathname} component={Link} />
                     <PermissionTab user={user} event={event} permission={CanManageWholeEvent} label="Villages" value={villagesPath.pathname} href={villagesPath.pathname} component={Link} />
                     <Tab label="🎂" value={birthdaysPath.pathname} href={birthdaysPath.pathname} component={Link} />
-                    <Tab label="📈" value={graphsPath.pathname} href={graphsPath.pathname} component={Link} />
+                    <PermissionTab user={user} event={event} permission={CanManageWholeEvent} label="📈" value={graphsPath.pathname} href={graphsPath.pathname} component={Link} />
                 </Tabs>
             </Grid>
         </Grid>
@@ -196,7 +196,7 @@ const SyncWidget: React.FC<{ user: JsonUserResponseType }> = props => {
     const disableDriveSync = useDisableDriveSync()
 
     const { user } = props
-    if (!user || user.source !== "google") return null
+    if (!user || user.source !== "google" || !!user.roles.find(r => r.role === "View - Village")) return null
 
     const change = e => {
         if (user.tokens) {
