@@ -120,7 +120,7 @@ export class Large extends FeeStructure {
       });
 
       let free = 0;
-      let totals: Record<string, Record<number, { count: number; band: (typeof computedBands)[0] }>> = {};
+      let totals: Record<string, Record<number, { count: number; band: (typeof computedBands)[0]; tooltip: string }>> = {};
 
       const validParticipants = (booking.participants as JsonParticipantType[])
         .filter(filterParticipants)
@@ -139,8 +139,9 @@ export class Large extends FeeStructure {
           } else {
             const band = computedBands[0];
             if (!totals[band.beforeString]) totals[band.beforeString] = {};
-            if (!totals[band.beforeString][participant.attendance!.option!]) totals[band.beforeString][participant.attendance!.option!] = { count: 0, band: band };
+            if (!totals[band.beforeString][participant.attendance!.option!]) totals[band.beforeString][participant.attendance!.option!] = { count: 0, band: band, tooltip: "" };
             totals[band.beforeString][participant.attendance!.option!].count++;
+            totals[band.beforeString][participant.attendance!.option!].tooltip += `${participant.basic.name}, \n`
           }
         } else {
           if (differenceInYears(startDate!, participant.basic.dob) < 5) {
@@ -149,8 +150,9 @@ export class Large extends FeeStructure {
             for (const band of computedBands) {
               if (band.beforeDate! > participant.created) {
                 if (!totals[band.beforeString]) totals[band.beforeString] = {};
-                if (!totals[band.beforeString][participant.attendance!.option!]) totals[band.beforeString][participant.attendance!.option!] = { count: 0, band: band };
+                if (!totals[band.beforeString][participant.attendance!.option!]) totals[band.beforeString][participant.attendance!.option!] = { count: 0, band: band, tooltip: "" };
                 totals[band.beforeString][participant.attendance!.option!].count++;
+                totals[band.beforeString][participant.attendance!.option!].tooltip += `${participant.basic.name}, \n`
                 break;
               }
             }
@@ -199,7 +201,7 @@ export class Large extends FeeStructure {
         for (const [index, option] of Object.entries(item)) {
           results.push({
             description: `${option.count} ${option.count == 1 ? "Person" : "People"} for the ${event.attendanceData!.options![index]} ${option.band.description || ""}`,
-            tooltip: `${format(option.band.beforeDate!, "PPPp")}`,
+            tooltip: option.tooltip,
             values: [option.count * option.band.fees[index]],
           });
         }
