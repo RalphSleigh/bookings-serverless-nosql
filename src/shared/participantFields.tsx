@@ -193,7 +193,7 @@ class AttendanceOption extends Field {
 
 class Diet extends Field {
     fieldName = "Diet"
-    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP", "View - Village"]
     value (participant: JsonParticipantWithExtraType | ParticipantType) {
         return participant.kp?.diet
     }
@@ -205,7 +205,7 @@ class Diet extends Field {
 
 class AddtionalDiet extends Field {
     fieldName = "Additional Diet"
-    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP", "View - Village"]
     visbileMobile = false
     defaultValue = ""
     value (participant: JsonParticipantWithExtraType | ParticipantType) {
@@ -215,7 +215,7 @@ class AddtionalDiet extends Field {
 
 class DietPreferences extends Field {
     fieldName = "Diet Preferences"
-    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP", "View - Village"]
     visbileMobile = false
     defaultValue = ""
     enabled(): boolean {
@@ -228,7 +228,7 @@ class DietPreferences extends Field {
 
 class DietNutAllergy extends Field {
     fieldName = "Nut Allergy"
-    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP", "View - Village"]
     visbileMobile = false
     enabled(): boolean {
         return this.event.kpMode == "large"
@@ -251,7 +251,7 @@ class DietNutAllergy extends Field {
 
 class DietGlutenAllergy extends Field {
     fieldName = "Gluten Allergy"
-    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP", "View - Village"]
     visbileMobile = false
     enabled(): boolean {
         return this.event.kpMode == "large"
@@ -273,7 +273,7 @@ class DietGlutenAllergy extends Field {
 
 class DietSoyaAllergy extends Field {
     fieldName = "Soya Allergy"
-    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP", "View - Village"]
     visbileMobile = false
     enabled(): boolean {
         return this.event.kpMode == "large"
@@ -295,7 +295,7 @@ class DietSoyaAllergy extends Field {
 
 class DietDairyAllergy extends Field {
     fieldName = "Dairy Allergy"
-    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP", "View - Village"]
     visbileMobile = false
     enabled(): boolean {
         return this.event.kpMode == "large"
@@ -317,7 +317,7 @@ class DietDairyAllergy extends Field {
 
 class DietEggAllergy extends Field {
     fieldName = "Egg Allergy"
-    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP", "View - Village"]
     visbileMobile = false
     enabled(): boolean {
         return this.event.kpMode == "large"
@@ -339,7 +339,7 @@ class DietEggAllergy extends Field {
 
 class DietPorkAllergy extends Field {
     fieldName = "No Pork"
-    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP", "View - Village"]
     visbileMobile = false
     enabled(): boolean {
         return this.event.kpMode == "large"
@@ -361,7 +361,7 @@ class DietPorkAllergy extends Field {
 
 class DietChickpeaAllergy extends Field {
     fieldName = "Chickpea Allergy"
-    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP", "View - Village"]
     visbileMobile = false
     enabled(): boolean {
         return this.event.kpMode == "large"
@@ -383,7 +383,7 @@ class DietChickpeaAllergy extends Field {
 
 class DietDiabetic extends Field {
     fieldName = "Diabetic"
-    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP", "View - Village"]
     visbileMobile = false
     enabled(): boolean {
         return this.event.kpMode == "large"
@@ -405,7 +405,7 @@ class DietDiabetic extends Field {
 
 class DietContactMe extends Field {
     fieldName = "Contact Me"
-    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP"]
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "KP", "View - Village"]
     visbileMobile = false
     enabled(): boolean {
         return this.event.kpMode == "large"
@@ -428,7 +428,7 @@ class DietContactMe extends Field {
 class PhotoConsent extends Field {
     fieldName = "Photo Consent"
     visbileMobile = false
-    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View"]
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "View - Village"]
     enabled(): boolean {
         return this.event.consentMode == "camp100"
     }
@@ -450,7 +450,7 @@ class PhotoConsent extends Field {
 class RSEConsent extends Field {
     fieldName = "RSE Consent"
     visbileMobile = false
-    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View"]
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View", "View - Village"]
     enabled(): boolean {
         return this.event.consentMode == "camp100"
     }
@@ -472,7 +472,7 @@ class RSEConsent extends Field {
 class Medical extends Field {
     fieldName = "Medical"
     visbileMobile = false
-    roles: Array<RoleType["role"]> = ["Owner", "Manage", "Accessibility"]
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "Accessibility", "View - Village"]
     defaultValue = ""
     value (participant: JsonParticipantWithExtraType) {
         return participant.medical?.details
@@ -482,7 +482,7 @@ class Medical extends Field {
 class Accessbility extends Field {
     fieldName = "Accessbility"
     visbileMobile = false
-    roles: Array<RoleType["role"]> = ["Owner", "Manage", "Accessibility"]
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "Accessibility", "View - Village"]
     defaultValue = ""
     enabled(): boolean {
         return this.event.bigCampMode
@@ -495,7 +495,7 @@ class Accessbility extends Field {
 class AccessbilityContactMe extends Field {
     fieldName = "Accessbility Contact Me"
     visbileMobile = false
-    roles: Array<RoleType["role"]> = ["Owner", "Manage", "Accessibility"]
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "Accessibility", "View - Village"]
     defaultValue = ""
     enabled(): boolean {
         return this.event.bigCampMode
@@ -518,7 +518,7 @@ class AccessbilityContactMe extends Field {
 class FirstAid extends Field {
     fieldName = "First Aid"
     visbileMobile = false
-    roles: Array<RoleType["role"]> = ["Owner", "Manage"]
+    roles: Array<RoleType["role"]> = ["Owner", "Manage", "View - Village"]
     defaultValue = ""
     enabled(): boolean {
         return this.event.bigCampMode
