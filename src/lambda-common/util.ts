@@ -117,7 +117,7 @@ export async function addVersionToBooking(event: EventType, existing: BookingTyp
     }
   );
 
-  return newVersion;
+  return newLatest;
 }
 
 /* export function updateAssociation(db, instance, key, Association, values) {
