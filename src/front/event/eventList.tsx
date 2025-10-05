@@ -20,7 +20,7 @@ export function EventList(props) {
     const bookings = bookingsQuery.data.bookings
     const user = useContext(UserContext)
 
-    const futureEvents = events.filter(e => e.bigCampMode || parseISO(e.endDate) > new Date())
+    const futureEvents = events.filter(e => !CanManageEvent.if({ event: e, user: user }) || parseISO(e.endDate) > new Date())
     const pastEventsCanManage = events.filter(e => parseISO(e.endDate) < new Date() && CanManageEvent.if({ event: e, user: user }))
 
     const cards = futureEvents.sort((a, b) => (a.startDate < b.startDate) ? -1 : ((a.startDate > b.startDate) ? 1 : 0)).map(e => <EventCard event={e} key={e.id} booking={bookings.find(b => b.eventId === e.id)} />)
