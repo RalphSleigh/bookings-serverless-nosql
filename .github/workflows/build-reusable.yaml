@@ -65,4 +65,4 @@ jobs:
       - name: terraform apply
         working-directory: terraform
         run: |
-          terraform apply -auto-approve -var-file="env/${{ inputs.environment }}.tfvars"
+          terraform apply -auto-approve -var-file="env/${{ inputs.environment }}.tfvars" -var "backup_cross_account_arn=${{ secrets.BACKUP_CROSS_ACCOUNT_ARN }}"
