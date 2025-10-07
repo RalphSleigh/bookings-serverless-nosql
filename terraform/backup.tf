@@ -67,10 +67,6 @@ resource "aws_backup_plan" "cross_account_backup" {
     completion_window = 10080
     copy_action {
       destination_vault_arn = var.backup_cross_account_arn
-
-      lifecycle {
-        delete_after = -1
-      }
     }
   }
 }
