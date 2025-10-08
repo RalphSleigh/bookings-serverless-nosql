@@ -40,22 +40,8 @@ jobs:
           role-session-name: terraform-session
           aws-region: eu-west-2
 
-      - name: install base
-        run: |
-          npm ci --include=dev --legacy-peer-deps
-
-      - name: install layer
-        working-directory: common-layer/nodejs
-        run: |
-          npm ci --include=dev --legacy-peer-deps
-
-      - name: build lambdas
-        run: |
-          node esbuild-lambda.js 
-
-      - name: build front
-        run: |
-          npx webpack          
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
 
       - name: terraform init
         working-directory: terraform
