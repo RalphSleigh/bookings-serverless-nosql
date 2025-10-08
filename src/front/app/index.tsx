@@ -115,7 +115,12 @@ const router = createBrowserRouter([{
                     }, {
                         path: "bookings",
                         lazy: () => import('../manage/bookings.js')
-                    }, {
+                    },
+                    {
+                        path: "bookings/history/:userId",
+                        lazy: () => import('../manage/bookingHistory.js')
+                    },
+                    {
                         path: "applications",
                         lazy: () => import('../manage/applications.js')
                     }, {

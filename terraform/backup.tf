@@ -1,12 +1,12 @@
 
 resource "aws_backup_vault" "bookings_backup_vault" {
-  name        = "bookings-backup-vault"
+  name = "bookings-backup-vault"
 }
 
 resource "aws_backup_vault_lock_configuration" "test" {
-  backup_vault_name   = aws_backup_vault.bookings_backup_vault.name
-  max_retention_days  = 1200
-  min_retention_days  = 29
+  backup_vault_name  = aws_backup_vault.bookings_backup_vault.name
+  max_retention_days = 1200
+  min_retention_days = 29
 }
 
 data "aws_iam_policy_document" "backup_trust_policy" {
@@ -54,4 +54,19 @@ resource "aws_backup_selection" "bookings_backup_selection" {
   resources = [
     aws_dynamodb_table.bookings_table.arn
   ]
+}
+
+resource "aws_backup_plan" "cross_account_backup" {
+  name = "backup_plan"
+
+  rule {
+    rule_name         = "backup_rule"
+    target_vault_name = aws_backup_vault.bookings_backup_vault.name
+    schedule          = "cron(0 5 ? * * *)"
+    start_window      = 480
+    completion_window = 10080
+    copy_action {
+      destination_vault_arn = var.backup_cross_account_arn
+    }
+  }
 }

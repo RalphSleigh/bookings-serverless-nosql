@@ -33,3 +33,9 @@ variable "dynamodb_write_max_capacity" {
   default     = 20
   type = number
 }
+
+variable "backup_cross_account_arn" {
+  description = "The ARN of the account to send backups to"
+  type        = string
+  default     = ""
+}

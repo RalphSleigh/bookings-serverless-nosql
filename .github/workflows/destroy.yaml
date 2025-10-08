@@ -5,8 +5,13 @@ on:
     inputs:
       branch:
         required: true
+        type: string
       confirm:
-        required: true  
+        required: true
+        type: string
+      environment:
+        required: true
+        type: string
 
 concurrency: 
   group: ${{ github.ref_name }}
@@ -16,6 +21,7 @@ jobs:
   destroy:
     name: Destroy
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
     env:
       NODE_ENV: production
       AWS_ACCOUNT_SECRET_KEY: ${{ github.ref_name }}_aws_account
@@ -26,7 +32,7 @@ jobs:
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: arn:aws:iam::${{ secrets[env.AWS_ACCOUNT_SECRET_KEY] }}:role/github-role
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-role
           role-session-name: terraform-session
           aws-region: eu-west-2
 

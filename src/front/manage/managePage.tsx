@@ -6,7 +6,7 @@ import { useDisableDriveSync, useEventBookings, useHistoricalEventBookings, useT
 import { JsonBookingType, JsonEventType, JsonUserResponseType } from "../../lambda-common/onetable.js";
 import { SuspenseWrapper } from "../suspense.js";
 import { UserContext } from "../user/userContext.js";
-import { CanCreateAnyRole, CanManageApplications, CanManageVillages, CanSeeKPPage, CanSeeMoneyPage } from "../../shared/permissions.js";
+import { CanCreateAnyRole, CanManageApplications, CanManageVillages, CanManageWholeEvent, CanSeeKPPage, CanSeeMoneyPage } from "../../shared/permissions.js";
 import { bookingsBookingSearch, bookingsParticipantSearch, useDebounceState, useStickyState } from "../util.js";
 import { JsonBookingWithExtraType } from "../../shared/computedDataTypes.js";
 import { ReactErrorBoundary } from "../app/errors.js";
@@ -88,9 +88,9 @@ export function Component() {
                     <Tab label="Emails" value={emailsPath.pathname} href={emailsPath.pathname} component={Link} />
                     <PermissionTab user={user} event={event} permission={CanCreateAnyRole} label="Roles" value={rolesPath.pathname} href={rolesPath.pathname} component={Link} />
                     <PermissionTab user={user} event={event} permission={CanSeeMoneyPage} label="Money" value={moneyPath.pathname} href={moneyPath.pathname} component={Link} />
-                    <PermissionTab user={user} event={event} permission={CanManageVillages} label="Villages" value={villagesPath.pathname} href={villagesPath.pathname} component={Link} />
+                    <PermissionTab user={user} event={event} permission={CanManageWholeEvent} label="Villages" value={villagesPath.pathname} href={villagesPath.pathname} component={Link} />
                     <Tab label="🎂" value={birthdaysPath.pathname} href={birthdaysPath.pathname} component={Link} />
-                    <Tab label="📈" value={graphsPath.pathname} href={graphsPath.pathname} component={Link} />
+                    <PermissionTab user={user} event={event} permission={CanManageWholeEvent} label="📈" value={graphsPath.pathname} href={graphsPath.pathname} component={Link} />
                 </Tabs>
             </Grid>
         </Grid>
@@ -152,6 +152,10 @@ function shouldShowSearch(location) {
     || location.pathname.endsWith("money")
 }
 
+function shouldIgnoreSearch(location) {
+    return location.pathname.endsWith("villages") || location.pathname.endsWith("applications")
+}
+
 export type managePageContext = manageLoaderContext & {
     bookings: Array<JsonBookingWithExtraType>
     displayDeleted: boolean
@@ -161,6 +165,7 @@ function LatestDataLoader({ event, timeline, displayDeleted, participantSearch, 
     const mode = location.pathname.endsWith("money") || location.pathname.endsWith("bookings") ? "find" : "filter"
     const { bookings } = useEventBookings(event.id).data
     const enhancedBookings = addComputedFieldsToBookingsQueryResult(bookings, event)
+    if(shouldIgnoreSearch(location)) return <Outlet context={{ event, bookings: enhancedBookings, timeline, displayDeleted }} />
     const bookingSearchedBookings = bookingsBookingSearch(event, enhancedBookings, bookingSearch, villageSearch, townSearch)
     const searchedBookings = bookingsParticipantSearch(bookingSearchedBookings, participantSearch, mode)
     return <Outlet context={{ event, bookings: searchedBookings, timeline, displayDeleted }} />
@@ -172,6 +177,7 @@ function TimeLineDataLoader({ event, timeline, displayDeleted, participantSearch
     const mode = location.pathname.endsWith("money") || location.pathname.endsWith("bookings") ? "find" : "filter"
     const { bookings } = useHistoricalEventBookings(event.id, Date.parse(timeline.position.time).toString()).data
     const enhancedBookings = addComputedFieldsToBookingsQueryResult(bookings, event)
+    if(shouldIgnoreSearch(location)) return <Outlet context={{ event, bookings: enhancedBookings, timeline, displayDeleted }} />
     const bookingSearchedBookings = bookingsBookingSearch(event, enhancedBookings, bookingSearch, villageSearch, townSearch)
     const searchedBookings = bookingsParticipantSearch(bookingSearchedBookings, participantSearch, mode)
     return <Outlet context={{ event, bookings: searchedBookings, timeline, displayDeleted }} />
@@ -190,7 +196,7 @@ const SyncWidget: React.FC<{ user: JsonUserResponseType }> = props => {
     const disableDriveSync = useDisableDriveSync()
 
     const { user } = props
-    if (!user || user.source !== "google") return null
+    if (!user || user.source !== "google" || !!user.roles.find(r => r.role === "View - Village")) return null
 
     const change = e => {
         if (user.tokens) {
