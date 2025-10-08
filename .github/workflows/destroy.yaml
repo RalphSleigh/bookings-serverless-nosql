@@ -17,6 +17,10 @@ concurrency:
   group: ${{ github.ref_name }}
   cancel-in-progress: true
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   destroy:
     name: Destroy
