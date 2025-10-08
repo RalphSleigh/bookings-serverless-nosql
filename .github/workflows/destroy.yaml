@@ -46,7 +46,7 @@ jobs:
       - name: terraform init
         working-directory: terraform
         run: |
-          terraform init -backend-config "bucket=bookings-terraform-state-${{ github.ref_name }}"
+          terraform init -backend-config "bucket=bookings-nosql-terraform-state-${{ github.ref_name }}"
 
       - name: terraform destroy
         if: github.ref_name == inputs.branch && inputs.confirm == 'DESTROY'
