@@ -5,17 +5,27 @@ on:
     inputs:
       branch:
         required: true
+        type: string
       confirm:
-        required: true  
+        required: true
+        type: string
+      environment:
+        required: true
+        type: string
 
 concurrency: 
   group: ${{ github.ref_name }}
   cancel-in-progress: true
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   destroy:
     name: Destroy
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
     env:
       NODE_ENV: production
       AWS_ACCOUNT_SECRET_KEY: ${{ github.ref_name }}_aws_account
@@ -23,10 +33,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: arn:aws:iam::${{ secrets[env.AWS_ACCOUNT_SECRET_KEY] }}:role/github-role
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-role
           role-session-name: terraform-session
           aws-region: eu-west-2
 
@@ -41,16 +54,16 @@ jobs:
 
       - name: build lambdas
         run: |
-          node esbuild-lambda.js 
+          node esbuild-lambda.cjs 
 
       - name: build front
         run: |
-          npx webpack          
+          node esbuild-front.mjs 
 
       - name: terraform init
         working-directory: terraform
         run: |
-          terraform init -backend-config "bucket=bookings-terraform-state-${{ github.ref_name }}"
+          terraform init -backend-config "bucket=bookings-nosql-terraform-state-${{ github.ref_name }}"
 
       - name: terraform destroy
         if: github.ref_name == inputs.branch && inputs.confirm == 'DESTROY'
